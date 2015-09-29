@@ -7,7 +7,7 @@ This is a ORM driven CRUD application for storing, viewing, relaying and submitt
 
 Installation
 ------------
-Import the SQL file in the /data directory to create the Database Schema.
+Import the SQL file in the /data directory to create the Database Schema. Copy/rename the .dist files in the config/autoload directory and enter database configuration parameters.
 
 Details
 ------------
