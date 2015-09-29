@@ -17,6 +17,7 @@ use Application\Hydrator\Strategy\DateTimeStrategy;
 use Zend\Stdlib\ResponseInterface as Response;
 use Lead\Entity\Lead;
 use Account\Entity\Account;
+use Zend\View\Model\JsonModel;
 
 class LeadController extends AbstractCrudController
 {
@@ -162,10 +163,12 @@ class LeadController extends AbstractCrudController
 				]))) {
 			$res = true;
 			$count = 0;
+			$total = 0;
 			foreach (array_filter($prg['sel']) as $lead_id => $one) {
 				if ($one) {
 					$res = $this->editLead($lead_id, $account_id, $action) ? $res : false;
 					$count = $res ? $count + 1 : $count;
+					$total ++;
 				}
 			}
 			$message = $this->successEditMessage;
@@ -173,20 +176,20 @@ class LeadController extends AbstractCrudController
 				
 				switch ($action) {
 					case 'delete':
-						$message = str_replace("The", $count, 
+						$message = str_replace("The", "{$count} out of {$total}", 
 								$this->successDeleteMessage);
 						break;
 					case 'unassign':
 					case 'assign':
-						$message = str_replace("The", $count, 
+						$message = str_replace("The", "{$count} out of {$total}", 
 								$this->successAssignMessage);
 						break;
 					case 'submit':
-						$message = str_replace("The", $count, 
+						$message = str_replace("The", "{$count} out of {$total}", 
 								$this->successSubmitMessage);
 						break;
 					case 'assignSubmit':
-						$message = str_replace("The", $count, 
+						$message = str_replace("The", "{$count} out of {$total}", 
 								$this->successSubmitMessage);
 						break;
 				}
@@ -196,20 +199,21 @@ class LeadController extends AbstractCrudController
 							->translate($message));
 			} else {
 				$message = $this->errorSubmitMessage;
+				$message_part = " " . ($total - $count) . " of {$total} Lead(s) were not successfully ";
 				
 				switch ($action) {
 					case 'delete':
-						$message = $this->errorDeleteMessage;
+						$message = $this->errorDeleteMessage . $message_part . "{$action}ed.";
 						break;
 					case 'unassign':
 					case 'assign':
-						$message = $this->errorAssignMessage;
+						$message = $this->errorAssignMessage . $message_part . "{$action}ed.";
 						break;
 					case 'submit':
-						$message = $this->errorSubmitMessage;
+						$message = $this->errorSubmitMessage . $message_part . "{$action}ted.";
 						break;
 					case 'assignSubmit':
-						$message = $this->errorSubmitMessage;
+						$message = $this->errorSubmitMessage . $message_part . "submitted.";
 						break;
 				}
 				$this->flashMessenger()->addErrorMessage(
@@ -224,7 +228,6 @@ class LeadController extends AbstractCrudController
 						->get('translator')
 						->translate($message));
 		}
-		
 		return $this->redirect()->toRoute($this->getActionRoute('list'), [], 
 				true);
 	}
@@ -794,6 +797,10 @@ class LeadController extends AbstractCrudController
 											'action' => 'process',
 											'id' => $lead_id
 									));
+							$response = $response instanceof JsonModel ? $response->getVariables() : $response;
+							if (isset($response['error']) || empty($response['data'])) {
+								$result = false;
+							}
 							$shouldLog = false;
 						} catch (\Exception $e) {
 							$this->logError($e);
