@@ -215,7 +215,6 @@ class ImportController extends AbstractCrudController
 									$em = $this->getEntityManager();
 									$em->persist($lead);
 									$em->flush();
-									$em->clear();
 									$lead_id = $lead->getId();
 									if ($account instanceof Account &&
 											 $account->getId() &&
