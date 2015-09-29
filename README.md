@@ -1,4 +1,4 @@
-Lead Capture Application
+Lead KPI Dashboard Application
 =======================
 
 Introduction
