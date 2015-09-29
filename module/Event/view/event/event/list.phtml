@@ -1,0 +1,115 @@
+<?php
+use Application\Form\View\Helper\Form as FormHelper;
+
+$title = 'Event Log';
+$this->headTitle($title);
+?>
+<h1>
+<?php echo $this->escapeHtml($title); ?>
+	<span class="pull-right"> <a
+		href="<?php echo $this->url('home', array('action' => 'index')); ?>"
+		class="btn btn-info" title="Back">Back</a>
+	</span>
+</h1>
+<hr class="small">
+<br />
+<div class="row">
+	<div class="col-xs-12">
+		<div class="view-header row">
+			<div class="col-xs-12">
+				<div class="formtable-header pull-right">
+					<?php
+					if (isset($this->filters)) {
+						$filters = $this->filters;
+						
+						$filters->setAttribute('class', 'pull-right leadform');
+						
+						$filters->setAttribute('id', 'eventFilterForm');
+						
+						echo $this->form(null, 
+								\Application\Form\View\Helper\Form::LAYOUT_INLINE)->openTag(
+								$filters);
+						
+						foreach ($filters as $filter) {
+							echo $this->formRow($filter);
+						}
+						
+						echo $this->form()->closeTag($filter);
+					}
+					?>
+				</div>
+				<div class="pager-header pull-left">
+					<?php echo $this->form($this->pager, FormHelper::LAYOUT_HORIZONTAL); ?>
+				</div>
+			</div>
+		</div>
+		<div class="batchevents clearfix">
+			<hr class="small">
+			<table class="table table-hover table-striped sel" id="leadstable">
+				<thead>
+					<tr>
+						<?php
+						$sl = $this->getHelperPluginManager()->getServiceLocator();
+						$em = $sl->get('doctrine.entitymanager.orm_default');
+						$r = $em->getRepository("Event\\Entity\\AccountEvent");
+						foreach ($this->ui['table'] as $field => $ui) :
+							$selected = $this->sort == $field;
+							$rorder = $this->order == 'asc' ? 'desc' : 'asc';
+							?>
+						<th class="col-xs-<?php echo $ui['col']; ?> <?php echo $field; ?>">
+							<?php if ($ui['sort']) : ?>
+								<a
+							class="sort <?php if ($selected) : echo "selected"; endif; ?>"
+							title="Sort by <?php echo $ui['label']; ?>"
+							href="<?php echo $this->url('event', array('action' => 'list'), array('query' => array_merge($this->query, array('page' => $this->page, 'sort' => $field, 'order' => ($selected ? $rorder : $this->order)))), true); ?>">
+								<span>
+										<?php echo $ui['label']; ?> <span
+									class="glyphicon <?php echo $this->order; ?>"
+									aria-hidden="true"></span>
+							</span>
+						</a>
+							<?php else: echo $ui['label']; endif; ?>
+						</th>
+						<?php endforeach; ?>
+					</tr>
+				</thead>
+				<tbody>
+	    		<?php foreach ($this->paginator as $entity): ?>
+	        		<tr class="eventitem">
+						<td class="col-xs-2 occurred"><?php echo date_format($entity->getOccurred(), 'd M, Y h:i A') ?></td>
+						<td class="col-xs-2 event"><a
+							href="<?php echo $this->losUrl()->from('event/view',['id'=>$entity->getId()], false)?>"><?php echo $entity->getEvent(); ?></a></td>
+						<td class="col-xs-3 account">
+							<?php
+								$ae = $r->getAccount($entity->getId(), 'entity');
+								$links = [];
+								if ($ae) :
+									foreach ($ae as $ev) :
+										$account = $ev->getAccount();
+										$links[] = '<a href="' . $this->losUrl()->from(
+												'account/view', 
+												[
+														'id' => $account->getId()
+												], false) . '">' .
+												 $account->getName() . '</a>';
+									endforeach
+									;
+									echo implode(', ', $links);
+								 else :
+									echo 'N/A';
+								endif;
+								?></td>
+						<td class="col-xs-5 message"><?php echo $entity->getMessage(); ?></td>
+					</tr>
+				<?php endforeach;?>
+				</tbody>
+			</table>
+			<hr>
+		</div>
+	</div>
+</div>
+<?php if ($this->paginator->count() > 1):?>
+<div class="row">
+	<div class="col-xs-12 text-center"><?php echo $this->losPaginationControl($this->paginator,'Sliding',null,['query'=>$this->query]); ?></div>
+</div>
+<?php endif?>

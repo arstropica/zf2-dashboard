@@ -1,0 +1,100 @@
+<?php
+// module/Lead/view/lead/lead/view.phtml:
+$title = 'Submit Lead';
+$this->headTitle($title);
+?>
+<h1>
+<?php echo $this->escapeHtml($title); ?>
+<span class="pull-right"> <a class="btn btn-info"
+		href="<?php echo $this->url('services/email', array('action'=>'list'));?>">Back</a>
+	</span>
+</h1>
+<?php
+/**
+ *
+ * @var /Lead/Entity/Lead
+ */
+$entity = $this->entity;
+$detail = $entity->getAttributes();
+$account = $entity->getAccount();
+$events = $entity->getEvents();
+?>
+<div class="row content-row">
+	<div class="col-md-12">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<?php echo $this->translate('Lead Summary')?>
+				</h3>
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover table-condensed nomargin">
+					<tr>
+						<th>Created</th>
+						<td><?php echo date_format($entity->getTimecreated(), 'd M, Y h:i A'); ?></td>
+					</tr>
+					<tr>
+						<th>Referrer</th>
+						<td><a target="_blank" title="Referrer"
+							href="<?php echo $entity->getReferrer(); ?>"><?php echo $entity->getReferrer(); ?></a></td>
+					</tr>
+					<tr>
+						<th>I.P. Address</th>
+						<td><?php echo $entity->getIpaddress(); ?></td>
+					</tr>
+					<tr>
+						<th>Account</th>
+						<td><?php echo $account ? $account->getName() : 'None'; ?></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-12">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<?php echo $this->translate('Lead Details')?>
+				</h3>
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover table-condensed nomargin">
+					<?php foreach ($detail as $attribute) : ?>
+						<tr>
+						<th><?php echo $attribute->getAttribute()->getAttributeDesc(); ?></th>
+						<td><?php echo $attribute->getValue(); ?></td>
+					</tr>
+					<?php endforeach; ?>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-12">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<?php echo $this->translate('Lead History')?>
+				</h3>
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover table-condensed nomargin">
+					<thead>
+						<tr>
+							<th>Event</th>
+							<th>Message</th>
+							<th>Date</th>
+						</tr>
+					</thead>
+					<?php foreach ($events as $ev) : $event = $ev->getEvent(); ?>
+						<tr>
+						<th><?php echo $event->getEvent(); ?></th>
+						<td><?php echo $event->getMessage(); ?></td>
+						<td><?php echo date_format($event->getOccurred(), 'd M, Y h:i A'); ?></td>
+					</tr>
+					<?php endforeach; ?>
+				</table>
+			</div>
+		</div>
+	</div>
+
+</div>

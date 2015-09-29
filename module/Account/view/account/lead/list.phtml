@@ -1,0 +1,95 @@
+<?php
+$title = 'Display Leads';
+$this->headTitle($title);
+?>
+<div class="row">
+	<div class="col-xs-12">
+		<div class="pull-left">
+			<?php $this->entityNav(); ?>
+		</div>
+	</div>
+</div>
+<h1>
+<?php echo $this->escapeHtml($title); ?>
+	<span class="pull-right" style="margin-left: 15px;"> <a target="_blank"
+		href="<?php echo $this->url('lead/export', array('action' => 'export')); ?>"
+		class="btn btn-info" id="exportLeads" title="Export Leads">Export
+			Leads</a>
+	</span> <span class="pull-right"> <a
+		href="<?php echo $this->url('lead', array('action' => 'add')); ?>"
+		class="btn btn-success" title="Add New Lead">Add New Lead</a>
+	</span>
+</h1>
+<hr class="small">
+<br />
+<div class="row">
+	<div class="col-xs-12">
+		<div class="formtable-header pull-right">
+<?php
+if (isset($this->filters)) {
+	$filters = $this->filters;
+	
+	$filters->setAttribute('class', 'pull-right leadform');
+	
+	$filters->setAttribute('id', 'leadFilterForm');
+	
+	echo $this->form(null, \Application\Form\View\Helper\Form::LAYOUT_INLINE)->openTag(
+			$filters);
+	
+	foreach ($filters as $filter) {
+		echo $this->formRow($filter);
+	}
+	
+	echo $this->form()->closeTag($filter);
+}
+?>
+</div>
+		<table class="table table-hover table-striped sel" id="leadstable">
+			<thead>
+				<tr>
+			<?php
+			foreach ($this->ui['table'] as $field => $ui) :
+				$selected = $this->sort == $field;
+				$rorder = $this->order == 'asc' ? 'desc' : 'asc';
+				?>
+			<th class="col-xs-<?php echo $ui['col']; ?> <?php echo $field; ?>">
+			<?php if ($ui['sort']) : ?>
+			<a class="sort <?php if ($selected) : echo "selected"; endif; ?>"
+						title="Sort by <?php echo $ui['label']; ?>"
+						href="<?php echo $this->url('account/application/lead', array('action' => 'list', 'id' => $this->id), array('query' => array_merge($this->query, array('page' => $this->page, 'sort' => $field, 'order' => ($selected ? $rorder : $this->order)))), true); ?>">
+							<span>
+			<?php echo $ui['label']; ?> <span
+								class="glyphicon <?php echo $this->order; ?>" aria-hidden="true"></span>
+						</span>
+					</a>
+			<?php else: echo $ui['label']; endif; ?>
+			</th>
+			<?php endforeach; ?>
+			<th class="action col-xs-1 text-right">Action</th>
+				</tr>
+			</thead>
+			<tbody>
+    <?php foreach ($this->paginator as $entity):?>
+        <tr class="leaditem">
+					<td class="col-xs-6 source"><a
+						href="<?php echo $entity->getReferrer(); ?>"><?php echo $entity->getReferrer(); ?></a></td>
+					<td class="col-xs-4 date"><?php echo date_format($entity->getTimecreated(), 'd M, Y h:i A') ?></td>
+					<td class="action col-xs-2 text-right"><a
+						href="<?php echo $this->losUrl()->from('lead/view',['id'=>$entity->getId()], true)?>"
+						title="View Lead" class="btn btn-xs btn-info"><?php echo $this->losIcon('glyphicon-eye-open') ?></a>
+						<a
+						href="<?php echo $this->losUrl()->from('lead/edit',['id'=>$entity->getId()], true)?>"
+						title="Assign Lead" class="btn btn-xs btn-warning"><?php echo $this->losIcon('glyphicon-transfer') ?></a>
+					</td>
+				</tr>
+		<?php endforeach;?>
+</tbody>
+		</table>
+		<hr>
+	</div>
+</div>
+<?php if ($this->paginator->count() > 1):?>
+<div class="row">
+	<div class="col-xs-12 text-center"><?php echo $this->losPaginationControl($this->paginator,'Sliding',null,['query'=>$this->query]); ?></div>
+</div>
+<?php endif?>

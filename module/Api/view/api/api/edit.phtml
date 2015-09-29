@@ -1,0 +1,85 @@
+<?php
+use Zend\Form\Fieldset;
+use Application\Form\Element\Collection;
+// module/Api/view/api/api/edit.phtml:
+/**
+ *
+ * @var /Api/Entity/Api
+ */
+$entity = $this->entity;
+$title = $entity->getName() . ' Settings';
+$this->headTitle($title);
+$this->entityForm->prepare();
+?>
+<h1>
+<?php echo $this->escapeHtml($title); ?>
+<span class="pull-right"> <a class="btn btn-info"
+		href="<?php echo $this->url('home', array('action'=>'index'));?>">Back</a>
+	</span>
+</h1>
+<hr class="small">
+<div class="row">
+	<div class="col-xs-12">
+		<p>
+			<small><?php echo $entity->getDescription(); ?></small>
+		</p>
+	</div>
+</div>
+<div class="row">
+	<div class="col-xs-12">
+		<?php echo $this->form(null, \Application\Form\View\Helper\Form::LAYOUT_HORIZONTAL)->openTag($this->entityForm); ?>
+		<?php foreach ($this->entityForm as $elementOrFieldset) : ?>
+			<?php if ($elementOrFieldset instanceof Collection) : ?>
+				<fieldset
+			id="<?php echo $elementOrFieldset->getAttribute('id'); ?>-wrapper">
+					<?php echo $this->fieldCollection($elementOrFieldset); ?>
+				</fieldset>
+			<?php elseif ($elementOrFieldset instanceof Fieldset) : ?>
+				<fieldset
+			id="<?php echo $elementOrFieldset->getAttribute('id'); ?>-wrapper">
+					<?php if ($elementOrFieldset->getLabel()) : ?>
+						<legend><?php echo $this->formLabel($elementOrFieldset); ?></legend>
+					<?php endif; ?>
+					<?php foreach ($elementOrFieldset as $element) : ?>
+						<?php if ($element instanceof Collection) : ?>
+							<fieldset
+				id="<?php echo $element->getAttribute('id'); ?>-wrapper">
+								<?php echo $this->fieldCollection($element); ?>
+							</fieldset>
+						<?php elseif ($element instanceof Fieldset) : ?>
+							<fieldset
+				<?php if (($elementId = $element->getAttribute('id')) === true) :?>
+				id="<?php echo $elementId; ?>-wrapper" <?php endif; ?>>
+								<?php foreach ($element as $oElement) : ?>
+									<?php echo $this->formRow($oElement); ?>
+								<?php endforeach; ?>
+							</fieldset>
+						<?php elseif (in_array($element->getAttribute('type'), ['hidden', 'csrf'])) : ?>
+							<?php echo $this->formElement($element); ?>
+						<?php else: ?>
+							<?php echo $this->formRow($element); ?>
+						<?php endif; ?>
+					<?php endforeach; ?>
+				</fieldset>
+			<?php elseif (in_array($elementOrFieldset->getAttribute('type'), ['hidden', 'csrf'])) : ?>
+				<?php echo $this->formElement($elementOrFieldset); ?>
+			<?php elseif (in_array($elementOrFieldset->getAttribute('type'), ['button', 'submit'])) : ?>
+				<?php # echo $this->formElement($elementOrFieldset); ?>
+			<?php else: ?>
+				<?php echo $this->formRow($elementOrFieldset); ?>
+			<?php endif; ?>
+		<?php endforeach; ?>
+		<div class="row">
+			<div class="form-group col-sm-12">
+				<div class="pull-left" style="margin-right: 15px;">
+					<?php echo $this->formElement($this->entityForm->get('submit')); ?>
+				</div>
+				<div class="pull-left" style="margin-right: 15px;">
+					<?php echo $this->formElement($this->entityForm->get('cancel')); ?>
+				</div>
+			</div>
+		</div>
+		<?php echo $this->form()->closeTag($this->entityForm); ?>
+	</div>
+</div>
+

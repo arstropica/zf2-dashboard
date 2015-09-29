@@ -1,0 +1,42 @@
+ <?php
+	
+if ($this->pageCount) :
+		
+		$sm = $this->getHelperPluginManager()->getServiceLocator();
+		$request = $sm->get('Request');
+		?>
+<!-- <div> -->
+	<ul class="pagination">
+		<!-- Previous page link -->
+             <?php if (isset($this->previous)): ?>
+                 <li><a
+			href="<?php echo $this->url($this->route, array('page' => $this->previous), array('query' => $request->getQuery()->toArray()), true); ?>">
+				&laquo; </a></li>
+             <?php else: ?>
+                 <li class="disabled"><a href="#"> &laquo; </a></li>
+             <?php endif; ?>
+
+             <!-- Numbered page links -->
+             <?php foreach ($this->pagesInRange as $page): ?>
+                 <?php if (($page != $this->current) && (abs($page - $this->current) < 3)): ?>
+                     <li><a
+			href="<?php echo $this->url($this->route, array('page' => $page), array('query' => $request->getQuery()->toArray()), true);?>">
+                             <?php echo $page; ?>
+                         </a></li>
+                 <?php elseif ($page == $this->current) : ?>
+                     <li class="active"><a href="#"><?php echo $page; ?></a>
+		</li>
+                 <?php endif; ?>
+             <?php endforeach; ?>
+
+             <!-- Next page link -->
+             <?php if (isset($this->next)): ?>
+                 <li><a
+			href="<?php echo $this->url($this->route, array('page' => $this->next), array('query' => $request->getQuery()->toArray()), true); ?>">
+				&raquo; </a></li>
+             <?php else: ?>
+                 <li class="disabled"><a href="#"> &raquo; </a></li>
+             <?php endif; ?>
+         </ul>
+<!-- </div> -->
+<?php endif; ?>

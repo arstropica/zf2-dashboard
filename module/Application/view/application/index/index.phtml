@@ -1,0 +1,94 @@
+<div class="jumbotron">
+	<h1><?php echo sprintf($this->translate('Welcome to %sTarget Media Partners%s'), '<span class="zf-green">', '</span>') ?></h1>
+	<p><?php echo sprintf($this->translate('Welcome to your Admin Dashboard! From here you can %smanage your leads%s, send them to an API or export to csv.'), '<a href="' . $this->url('lead/list', array('action' => 'list')) . '">', '</a>'); ?></p>
+	<p>
+		<a class="btn btn-success btn-lg"
+			href="<?php echo $this->url('lead/list', array('action' => 'list')); ?>"><?php echo $this->translate('Get Started') ?> &raquo;</a>
+	</p>
+</div>
+
+<div class="row">
+
+	<div class="col-md-12">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title"><?php echo $this->translate('Recent Events') ?></h3>
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover table-condensed nomargin">
+					<thead>
+						<tr>
+							<th>Date</th>
+							<th>Event</th>
+							<th>Message</th>
+						</tr>
+					</thead>
+				<?php foreach ($this->events as $event) : ?>
+		            <tr>
+						<td><?php echo date_format($event->getOccurred(), 'd M, Y h:i A'); ?></td>
+						<td><?php echo $event->getEvent(); ?></td>
+						<td><?php echo $event->getMessage(); ?></td>
+					</tr>
+	            <?php endforeach; ?>
+	            </table>
+			</div>
+			<div class="panel-footer">
+				<p>
+					<a
+						href="<?php echo $this->url('event', array('action' => 'list')); ?>"
+						title="View More">View More &hellip;</a>
+				</p>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-6">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title"><?php echo $this->translate('Recent Leads') ?></h3>
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover">
+	            <?php foreach ($this->leads as $lead) : ?>
+		            <tr>
+						<td><a
+							href="<?php echo $this->url('lead/view', array('action' => 'view', 'id' => $lead->getId())); ?>"><?php echo $lead->getDescription(); ?></a></td>
+					</tr>
+	            <?php endforeach; ?>
+	            </table>
+			</div>
+			<div class="panel-footer">
+				<p>
+					<a
+						href="<?php echo $this->url('lead', array('action' => 'list')); ?>"
+						title="View More">View More &hellip;</a>
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-6">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title"><?php echo $this->translate('Recent Accounts') ?></h3>
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover">
+	            <?php foreach ($this->accounts as $account) : ?>
+		            <tr>
+						<td><a
+							href="<?php echo $this->url('account/view', array('action' => 'view', 'id' => $account->getId())); ?>"><?php echo $account->getName(); ?></a></td>
+					</tr>
+	            <?php endforeach; ?>
+	            </table>
+			</div>
+			<div class="panel-footer">
+				<p>
+					<a
+						href="<?php echo $this->url('account', array('action' => 'list')); ?>"
+						title="View More">View More &hellip;</a>
+				</p>
+			</div>
+		</div>
+	</div>
+
+</div>

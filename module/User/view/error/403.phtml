@@ -1,0 +1,19 @@
+<h1><?php echo $this->translate('Access Denied') ?></h1>
+<h2><?php echo $this->message ?></h2>
+
+<?php if (isset($this->reason) && $this->reason): ?>
+
+<?php
+	$reasonMessage = 'You are not authorized to view this section of the site.';
+	?>
+
+<p><?php echo $reasonMessage ?></p>
+
+<?php endif ?>
+
+<section class="desc">
+	<h4>
+		It looks like an error occurred. Would you like to go to <a
+			href="<?php echo $this->url('home'); ?>">homepage</a> instead?
+	</h4>
+</section>

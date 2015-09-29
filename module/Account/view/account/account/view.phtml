@@ -1,0 +1,159 @@
+<?php
+// module/Account/view/account/account/view.phtml:
+/**
+ *
+ * @var /Account/Entity/Account
+ */
+$entity = $this->entity;
+$title = $entity->getName();
+$this->headTitle($title);
+?>
+<div class="row">
+	<div class="col-xs-12">
+		<div class="pull-left">
+			<?php $this->entityNav(); ?>
+		</div>
+	</div>
+</div>
+<h1>
+<?php echo $this->escapeHtml($title); ?>
+<span class="pull-right"> <a class="btn btn-info"
+		href="<?php echo $this->url('account', array('action'=>'list'));?>">Back</a>
+	</span>
+</h1>
+<hr class="small">
+<?php
+$apis = $entity->getApis();
+$leads = $entity->getLeads();
+$leads = array_slice($leads, 0, 10);
+$events = $entity->getEvents();
+$events = array_slice($events, 0, 10);
+?>
+<div class="row content-row">
+	<div class="col-xs-12">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<span class="pull-right"> <a
+					href="<?php echo $this->url('account/edit', ['action' => 'edit', 'id' => $entity->getId()]); ?>"
+					class="beige underline" title="Edit Account">Edit</a>
+				</span>
+				<h3 class="panel-title">
+					<?php echo $this->translate('Account Summary')?>
+				</h3>
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover table-condensed nomargin">
+					<tr>
+						<th class="col-xs-2 col-sm-1">Account ID</th>
+						<td class="col-xs-10 col-sm-11"><?php echo $entity->getId(); ?></td>
+					</tr>
+					<tr>
+						<th class="col-xs-2 col-sm-1">Name</th>
+						<td class="col-xs-10 col-sm-11"><?php echo $entity->getName(); ?></td>
+					</tr>
+					<tr>
+						<th class="col-xs-2 col-sm-1">Description</th>
+						<td class="col-xs-10 col-sm-11"><?php echo $entity->getDescription(); ?></td>
+					</tr>
+					<tr>
+						<th class="col-xs-2 col-sm-1">Active</th>
+						<td class="col-xs-10 col-sm-11"><?php echo $entity->getActive() ? 'Active' : 'Inactive'; ?></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-6 col-xs-12">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<a
+						href="<?php echo $this->url('account/application/api/edit', ['action' => 'edit', 'id' => $entity->getId()]); ?>"
+						title="Account APIs"><?php echo $this->translate('Account APIs') ?></a>
+				</h3>
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover table-condensed nomargin">
+					<?php foreach ($apis as $api) : ?>
+						<tr>
+						<th><?php echo ucwords($api->getName()); ?></th>
+						<td><?php echo $api->getDescription(); ?></td>
+						<td><a
+							href="<?php echo $this->url('api/edit', ['id' => $api->getId()]); ?>"
+							title="API Options">Edit</a></td>
+					</tr>
+					<?php endforeach; ?>
+				</table>
+			</div>
+			<div class="panel-footer">
+				<a
+					href="<?php echo $this->url('account/application/api/edit', ['action' => 'edit', 'id' => $entity->getId()]); ?>"
+					title="Account APIs"><?php echo $this->translate('Edit Settings') ?></a>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-6 col-xs-12">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title"><?php echo $this->translate('Recent Leads') ?></h3>
+			</div>
+			<div class="panel-body">
+				<table
+					class="table table-hover inline-table table-condensed nomargin">
+					<thead>
+						<tr>
+							<th class="col-xs-8 lead.referrer">Referrer</th>
+							<th class="col-xs-4 lead.date">Date</th>
+						</tr>
+					</thead>
+					<tbody>
+					<?php foreach ($leads as $lead) : ?>
+						<tr>
+							<td class="col-xs-8 lead.referrer"><a target="_blank"
+								href="<?php echo $lead->getReferrer(); ?>"><?php echo $lead->getReferrer(); ?></a></td>
+							<td class="col-xs-4 lead.date"><?php echo date_format($lead->getTimecreated(), 'd M, Y h:i A'); ?></td>
+						</tr>
+					<?php endforeach; ?>
+					</tbody>
+				</table>
+			</div>
+			<div class="panel-footer">
+				<a
+					href="<?php echo $this->url('lead/list', ['action'=>'list'], ['query' => ['account' => $entity->getId()]]);?>"
+					title="View more leads for this account">More &hellip;</a>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-12">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<?php echo $this->translate('Account History')?>
+				</h3>
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover table-condensed nomargin">
+					<thead>
+						<tr>
+							<th>Event</th>
+							<th>Message</th>
+							<th>Date</th>
+						</tr>
+					</thead>
+					<?php foreach ($events as $ev) : $event = $ev->getEvent(); ?>
+						<tr>
+						<th><?php echo $event->getEvent(); ?></th>
+						<td><?php echo $event->getMessage(); ?></td>
+						<td><?php echo date_format($event->getOccurred(), 'd M, Y h:i A'); ?></td>
+					</tr>
+					<?php endforeach; ?>
+				</table>
+			</div>
+			<div class="panel-footer">
+				<p><a href="<?php echo $this->url('event', array('action' => 'list'), array('query' => array('account' => $entity->getId()))); ?>" title="View More">View More &hellip;</a></p>
+			</div>
+		</div>
+	</div>
+	
+</div>

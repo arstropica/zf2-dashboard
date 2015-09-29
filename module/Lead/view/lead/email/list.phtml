@@ -1,0 +1,128 @@
+<?php
+use Application\Form\View\Helper\Form as FormHelper;
+$title = 'Email Leads';
+$this->headTitle($title);
+?>
+<h1>
+<?php echo $this->escapeHtml($title); ?>
+<span class="pull-right" style="margin-left: 15px;"> <a target="_blank"
+		href="<?php echo $this->url('lead/export', array('action' => 'export')); ?>"
+		class="btn btn-info" id="exportLeads" title="Export Leads">Export
+			Leads</a>
+	</span> <span class="pull-right"> <a
+		href="<?php echo $this->url('lead/add', array('action' => 'add')); ?>"
+		class="btn btn-success" title="Add New Lead">Add New Lead</a>
+	</span>
+</h1>
+<hr class="small">
+<br />
+<div class="row">
+	<div class="col-xs-12">
+		<div class="view-header row">
+			<div class="col-xs-12">
+				<div class="formtable-header pull-right">
+					<?php
+					if (isset($this->filters)) {
+						$filters = $this->filters;
+						
+						$filters->setAttribute('class', 'pull-right leadform');
+						
+						$filters->setAttribute('id', 'leadFilterForm');
+						
+						echo $this->form(null, 
+								\Application\Form\View\Helper\Form::LAYOUT_INLINE)->openTag(
+								$filters);
+						
+						foreach ($filters as $filter) {
+							echo $this->formRow($filter);
+						}
+						
+						echo $this->form()->closeTag($filter);
+					}
+					?>
+				</div>
+				<div class="pager-header pull-left">
+					<?php echo $this->form($this->pager, FormHelper::LAYOUT_HORIZONTAL); ?>
+				</div>
+			</div>
+		</div>
+		<div class="batchleadsForm clearfix">
+			<?php
+			$form = $this->form;
+			$form->setAttribute('class', 'tenstreetform');
+			$form->setAttribute('id', 'tenstreetForm');
+			$form->prepare();
+			echo $this->form(null, 
+					\Application\Form\View\Helper\Form::LAYOUT_INLINE)->openTag(
+					$form);
+			?>
+			<hr class="small">
+			<div class="batch-assign-header clearfix">
+				<?php echo $this->formRow($form->get('submit')); ?>
+			</div>
+			<table class="table table-hover table-striped sel" id="leadstable">
+				<thead>
+					<tr>
+						<th class="lead.id col-xs-1"><input type="checkbox" class="selall"></th>
+				<?php
+				foreach ($this->ui['table'] as $field => $ui) :
+					$selected = $this->sort == $field;
+					$rorder = $this->order == 'asc' ? 'desc' : 'asc';
+					?>
+				<th class="col-xs-<?php echo $ui['col']; ?> <?php echo $field; ?>">
+				<?php if ($ui['sort']) : ?>
+				<a class="sort <?php if ($selected) : echo "selected"; endif; ?>"
+							title="Sort by <?php echo $ui['label']; ?>"
+							href="<?php echo $this->url('lead', array('action' => 'list'), array('query' => array_merge($this->query, array('page' => $this->page, 'sort' => $field, 'order' => ($selected ? $rorder : $this->order)))), true); ?>">
+								<span>
+				<?php echo $ui['label']; ?> <span
+									class="glyphicon <?php echo $this->order; ?>"
+									aria-hidden="true"></span>
+							</span>
+						</a>
+				<?php else: echo $ui['label']; endif; ?>
+				</th>
+				<?php endforeach; ?>
+				<th class="action col-xs-1 text-right">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+	    		<?php foreach ($this->paginator as $entity):?>
+	    			<?php
+								$repo = $this->getRepo('Event\Entity\LeadEvent');
+								$event = $repo->getEvent($entity->getId(), 
+										[
+												'e.event' => 'Email Sent'
+										], 
+										[
+												'e.occurred' => 'DESC'
+										], 'entity');
+								?>
+	        		<tr class="leaditem">
+						<td class="lead.id col-xs-1"><div class="checkbox"><?php echo $this->formElement($form->get("sel[" . $entity->getId() . "]")); ?></div></td>
+						<td class="col-xs-3 description"><a
+							href="<?php echo $this->losUrl()->from('lead/view',['id'=>$entity->getId()], false)?>"><?php echo $entity->getFullName(); ?></a></td>
+						<td class="col-xs-3 event"><?php echo ($event ? $event->getEvent()->getMessage() : "None"); ?></td>
+						<td class="col-xs-2 account"><?php $account = $entity->getAccount(); echo $account ? $account->getName() : 'None'; ?></td>
+						<td class="col-xs-2 date"><?php echo date_format($entity->getTimecreated(), 'd M, Y h:i A') ?></td>
+						<td class="action col-xs-1 text-right"><a
+							href="<?php echo $this->losUrl()->from('services/email/view',['id'=>$entity->getId()], false)?>"
+							title="View Lead" class="btn btn-xs btn-info"><?php echo $this->losIcon('glyphicon-eye-open') ?></a>
+							<a
+							href="<?php echo $this->losUrl()->from('services/email/submit',['action' => 'submit', 'id' => $entity->getId()], false)?>"
+							title="Sent Lead to TenStreet" class="btn btn-xs btn-warning"><?php echo $this->losIcon('glyphicon-arrow-right') ?></a>
+						</td>
+					</tr>
+				<?php endforeach;?>
+				</tbody>
+			</table>
+			<hr>
+			<?php echo $this->form()->closeTag(); ?>
+		</div>
+	</div>
+</div>
+<?php if ($this->paginator->count() > 1):?>
+<div class="row">
+	<div class="col-xs-12 text-center"><?php echo $this->losPaginationControl($this->paginator,'Sliding',null,['query'=>$this->query]); ?></div>
+</div>
+<?php endif?>

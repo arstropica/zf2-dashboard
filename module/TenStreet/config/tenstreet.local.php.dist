@@ -1,0 +1,14 @@
+<?php
+return array(
+		'TenStreet' => array(
+				'Controller' => array(
+						'SoapClient' => array(
+								'rootNode' => 'TenStreetData',
+								'wsdl' => array(
+										'development' => 'DEV wsdl',
+										'production' => 'PROD wsdl'
+								)
+						)
+				),
+		)
+);

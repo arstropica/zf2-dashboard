@@ -1,0 +1,74 @@
+<?php
+$title = 'Confirm Account(s) Deletion';
+$this->headTitle($title);
+?>
+<div class="row">
+	<div class="col-xs-12">
+		<div class="pull-left">
+			<?php $this->entityNav(); ?>
+		</div>
+	</div>
+</div>
+<h1>
+<?php echo $this->escapeHtml($title); ?>
+<span class="pull-right"> <a
+		href="<?php echo $this->url('account/list', array('action' => 'list')); ?>"
+		class="btn btn-info" title="Back">Back</a>
+	</span>
+</h1>
+<hr class="small">
+<br />
+<div class="row">
+	<div class="col-xs-12">
+	<?php if ($this->isAllowed('resource', 'delete')) : ?>
+		<?php if (! isset($this->paginator, $this->form)) : ?>
+			<h2>You did not select anything!</h2>
+		<div>
+			<a
+				href="<?php echo $this->url('account/list', array('action' => 'list')); ?>"
+				class="btn btn-info" title="Back">Back</a>
+		</div>
+		<?php else : ?>
+			<?php
+			$form = $this->form;
+			$form->setAttribute('class', 'accountform');
+			$form->setAttribute('id', 'accountForm');
+			$form->prepare();
+			echo $this->form(null, \Application\Form\View\Helper\Form::LAYOUT_INLINE)->openTag($form);
+			?>
+				<table class="table table-hover table-striped sel"
+			id="accountstable">
+			<thead>
+				<tr>
+							<?php
+			foreach ($this->ui['table'] as $field => $ui) :
+				$selected = $this->sort == $field;
+				$rorder = $this->order == 'asc' ? 'desc' : 'asc';
+				?>
+							<th
+						class="col-xs-<?php echo $ui['col']; ?> <?php echo $field; ?>">
+								<?php echo $ui['label']; ?>
+							</th>
+							<?php endforeach; ?>
+							<th></th>
+				</tr>
+			</thead>
+			<tbody>
+		    			<?php foreach ($this->paginator as $entity):?>
+					<tr class="accountitem">
+					<td class="col-xs-2 name"><?php echo $entity->getName(); ?></td>
+					<td class="col-xs-4 description"><?php echo $entity->getDescription(); ?></td>
+					<td class="col-xs-2 apis"><?php echo implode(", ", array_map(function($api){return $api->getName();}, $entity->getApis())); ?></td>
+					<td class="col-xs-2 leads"><?php echo count($entity->getleads()); ?></td>
+					<td><?php echo $this->formElement($form->get('sel[' . $entity->getId() . ']')); ?></td>
+				</tr>
+						<?php endforeach;?>
+				</tbody>
+		</table>
+		<hr>
+			<?php echo $this->formRow($form->get('confirm')); ?>
+			<?php echo $this->form()->closeTag(); ?>
+		<?php endif; ?>
+	<?php endif; ?>
+	</div>
+</div>

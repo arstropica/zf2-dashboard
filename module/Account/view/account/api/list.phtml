@@ -1,0 +1,92 @@
+<?php
+$title = 'API Settings';
+$this->headTitle($title);
+?>
+<div class="row">
+	<div class="col-xs-12">
+		<div class="pull-left">
+			<?php $this->entityNav(); ?>
+		</div>
+	</div>
+</div>
+<h1>
+<?php echo $this->escapeHtml($title); ?>
+	<span class="pull-right"> <a
+		href="<?php echo $this->url('account/application/api', array('action' => 'add', 'id' => $this->id)); ?>"
+		class="btn btn-success" title="Add Api Setting">Add Setting</a>
+	</span>
+</h1>
+<hr class="small">
+<br />
+<div class="row">
+	<div class="col-xs-12">
+		<div class="formtable-header pull-right">
+			<?php
+			if (isset($this->filters)) {
+				$filters = $this->filters;
+				
+				$filters->setAttribute('class', 'pull-right apiform');
+				
+				$filters->setAttribute('id', 'apiFilterForm');
+				
+				echo $this->form(null, \Application\Form\View\Helper\Form::LAYOUT_INLINE)->openTag(
+						$filters);
+				
+				foreach ($filters as $filter) {
+					echo $this->formRow($filter);
+				}
+				
+				echo $this->form()->closeTag($filter);
+			}
+			?>
+		</div>
+		<table class="table table-hover table-striped sel" id="leadstable">
+			<thead>
+				<tr>
+			<?php
+			foreach ($this->ui['table'] as $field => $ui) :
+				$selected = $this->sort == $field;
+				$rorder = $this->order == 'asc' ? 'desc' : 'asc';
+				?>
+			<th class="col-xs-<?php echo $ui['col']; ?> <?php echo $field; ?>">
+			<?php if ($ui['sort']) : ?>
+			<a class="sort <?php if ($selected) : echo "selected"; endif; ?>"
+						title="Sort by <?php echo $ui['label']; ?>"
+						href="<?php echo $this->url('account/application/api', array('action' => 'list', 'id' => $this->id), array('query' => array_merge($this->query, array('page' => $this->page, 'sort' => $field, 'order' => ($selected ? $rorder : $this->order)))), true); ?>">
+							<span>
+			<?php echo $ui['label']; ?> <span
+								class="glyphicon <?php echo $this->order; ?>" aria-hidden="true"></span>
+						</span>
+					</a>
+			<?php else: echo $ui['label']; endif; ?>
+			</th>
+			<?php endforeach; ?>
+			<th class="action col-xs-1 text-right">Action</th>
+				</tr>
+			</thead>
+			<tbody>
+    <?php foreach ($this->paginator as $entity):?>
+        <tr class="apiSettingitem">
+					<td class="col-xs-2 api"><?php echo ucwords($entity->getApi()); ?></td>
+					<td class="col-xs-5 apiOption"><a
+						href="<?php echo $this->url('account/application/api', ['action' => 'edit', 'id' => $entity->getId()]); ?>"><?php echo $entity->getApiOption(); ?></a></td>
+					<td class="col-xs-3 apiValue"><?php echo $entity->getApiValue(); ?></td>
+					<td class="action col-xs-2 text-right"><a
+						href="<?php echo $this->losUrl()->from('account/application/api',['action' => 'view', 'id'=>$entity->getId()], true)?>"
+						title="View Setting" class="btn btn-xs btn-info"><?php echo $this->losIcon('glyphicon-eye-open') ?></a>
+						<a
+						href="<?php echo $this->losUrl()->from('account/application/api',['action' => 'view', 'id'=>$entity->getId()], true)?>"
+						title="Edit Setting" class="btn btn-xs btn-warning"><?php echo $this->losIcon('glyphicon-edit') ?></a>
+					</td>
+				</tr>
+		<?php endforeach;?>
+</tbody>
+		</table>
+		<hr>
+</div>
+</div>
+<?php if ($this->paginator->count() > 1):?>
+<div class="row">
+	<div class="col-xs-12 text-center"><?php echo $this->losPaginationControl($this->paginator,'Sliding',null,['query'=>$this->query]); ?></div>
+</div>
+<?php endif?>

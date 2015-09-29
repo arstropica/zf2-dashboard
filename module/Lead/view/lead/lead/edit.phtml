@@ -1,0 +1,21 @@
+<?php
+$title = 'Assign Lead';
+$this->headTitle($title);
+?>
+<h1>
+<?php echo $this->escapeHtml($title); ?>
+<span class="pull-right"> <a
+		href="<?php echo $this->url('lead', array('action' => 'list')); ?>"
+		class="btn btn-success" title="Display Leads">Back</a>
+	</span>
+</h1>
+<hr class="small">
+<div class="row">
+	<div class="col-xs-12">
+		<?php echo $this->losWell()->small('<code>' . $this->entity->getIpaddress() . '</code>@' . $this->entity->getTimecreated()->format('d M, Y h:i A')); ?>
+	</div>
+	<div
+		class="col-xs-12 col-sm-10 col-md-8 col-lg-6">
+		<?php echo $this->losForm($this->entityForm); ?>
+	</div>
+</div>

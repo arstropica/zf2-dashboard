@@ -1,0 +1,16 @@
+<?php
+return array(
+		'User' => array(
+				'db' => array(
+						'dsn' => 'mysql:dbname=dbname;hostname=localhost',
+						'username' => 'dbuser',
+						'password' => 'password'
+				),
+				'session' => array(
+						'use_cookies' => true,
+						'cookie_httponly' => true,
+						'gc_maxlifetime' => 2419200,
+						'cookie_lifetime' => 2419200
+				)
+		)
+);

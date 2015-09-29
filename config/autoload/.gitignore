@@ -1,0 +1,11 @@
+local.php
+*.local.php
+/doctrine.global.php
+/doctrine.development.php
+/doctrine.production.php
+/global.php
+/oauth2.development.php
+/oauth2.global.php
+/user.development.php
+/user.global.php
+/bjyprofiler.development.php
