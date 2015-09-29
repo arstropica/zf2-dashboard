@@ -3,7 +3,7 @@ Lead KPI Dashboard Application
 
 Introduction
 ------------
-This is a ORM drived CRUD application for storing, viewing, relaying and submitting commerical driver applications to different 3rd Party Web Services and/or email depending on client account.
+This is a ORM driven CRUD application for storing, viewing, relaying and submitting commerical driver applications to different 3rd Party Web Services and/or email depending on client account.
 
 Installation
 ------------
