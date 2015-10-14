@@ -10,8 +10,60 @@
  * control, so do not include passwords or other sensitive information in this
  * file.
  */
+$env = getenv('APPLICATION_ENV') ?  : 'development';
+switch ($env) {
+	case 'production':
+		 $dbParams = array(
+				'database' => 'dbname',
+				'username' => 'dbuser',
+				'password' => 'password',
+				'hostname' => 'localhost'
+		);
+		break;
+	case 'development':
+	default:
+		 $dbParams = array(
+				'database' => 'dbname',
+				'username' => 'dbuser',
+				'password' => 'password',
+				'hostname' => 'localhost'
+		);
+		break;
+}
+
 return array(
-		'site' => [
-				'title' => 'Site Title'
-		]
+		'site' => array(
+				'title' => 'Target Media Partners'
+		),
+		'service_manager' => array(
+				'factories' => array(
+						'Zend\Db\Adapter\Adapter' => function  ($sm) use( 
+						$dbParams)
+						{
+							$adapter = new \Zend\Db\Adapter\Adapter(
+									array(
+											'driver' => 'pdo',
+											'dsn' => 'mysql:dbname=' .
+													 $dbParams['database'] .
+													 ';host=' .
+													 $dbParams['hostname'],
+													'database' => $dbParams['database'],
+													'username' => $dbParams['username'],
+													'password' => $dbParams['password'],
+													'hostname' => $dbParams['hostname']
+									));
+							
+							if (php_sapi_name() == 'cli') {
+								$logger = new Zend\Log\Logger();
+								// write queries profiling info to stdout in CLI
+								// mode
+								$writer = new Zend\Log\Writer\Stream(
+										'php://output');
+								$logger->addWriter($writer, 
+										Zend\Log\Logger::DEBUG);
+							}
+							return $adapter;
+						}
+				)
+		)
 );

@@ -2,14 +2,14 @@
 // bootstrap.php
 // Include Composer Autoload (relative to project root).
 $dbParams = [];
-require_once _DIR_ . "/../vendor/autoload.php";
-require_once _DIR_ . "/development.db.php";
+require_once __DIR__ . "/../../vendor/autoload.php";
+require_once __DIR__ . "/local.db.php";
 
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 
-$loader = require __DIR__ . '/../vendor/autoload.php';
+$loader = require __DIR__ . '/../../vendor/autoload.php';
 
 AnnotationRegistry::registerLoader(array(
 		$loader,
