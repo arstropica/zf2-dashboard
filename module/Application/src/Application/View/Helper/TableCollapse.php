@@ -76,7 +76,19 @@ HTML;
 						{
 							$v = is_array($d) ? current($d) : $d;
 							$k = is_array($d) ? key($d) : $k;
-							return sprintf('<tr>' . $TD . $TD . '</tr>', $k, $v);
+							if (is_array($v)) {
+								$output = [];
+								foreach ($d as $kv) {
+									$k = key($kv);
+									$v = current($kv);
+									$output[] = sprintf(
+											'<tr>' . $TD . $TD . '</tr>', $k, $v);
+								}
+								return implode("\n", $output);
+							} else {
+								return sprintf('<tr>' . $TD . $TD . '</tr>', $k, 
+										$v);
+							}
 						}, $data, array_keys($data))) . '</table>';
 		return sprintf($TR, count($headings) + 1, $index, $TDs, $TABLE, $class);
 	}
