@@ -63,15 +63,7 @@ abstract class AggregateAbstractListener implements ListenerAggregateInterface
 	 *
 	 */
 	public function attach (EventManagerInterface $events)
-	{
-		$sm = $events->getSharedManager();
-		
-		$this->listeners[] = $sm->attach('*', 'RuntimeError', 
-				array(
-						$this,
-						'OnError'
-				), - 1000);
-	}
+	{}
 
 	public function _attachStateful (SharedEventManager $sm, $target, $method)
 	{
@@ -104,7 +96,7 @@ abstract class AggregateAbstractListener implements ListenerAggregateInterface
 		$entityName = is_object($entity) ? basename(
 				str_replace('\\', '/', get_class($entity))) : false;
 		
-		if ($base) {
+		if ($base && $event) {
 			$event->setEvent($base);
 			
 			switch ($entityName) {

@@ -20,6 +20,14 @@ class AggregateListener extends AggregateAbstractListener implements
 	 */
 	public function attach (EventManagerInterface $events)
 	{
+		$sm = $events->getSharedManager();
+		
+		$this->listeners['RuntimeError'] = $sm->attach('*', 'RuntimeError', 
+				array(
+						$this,
+						'OnError'
+				), - 1000);
+		
 		parent::attach($events);
 	}
 }
