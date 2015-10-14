@@ -2,12 +2,14 @@
 namespace Lead\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Zend\Form\Annotation;
 
 /**
  * LeadAttribute
  *
  * @ORM\Table(name="lead_attributes")
  * @ORM\Entity(repositoryClass="Lead\Entity\Repository\LeadAttributeRepository")
+ * @Annotation\Instance("\Lead\Entity\LeadAttribute")
  */
 class LeadAttribute
 {
@@ -17,6 +19,7 @@ class LeadAttribute
 	 * @var integer @ORM\Column(name="id", type="integer", nullable=false)
 	 *      @ORM\Id
 	 *      @ORM\GeneratedValue(strategy="IDENTITY")
+	 *      @Annotation\Exclude()
 	 */
 	private $id;
 
@@ -24,6 +27,14 @@ class LeadAttribute
 	 *
 	 * @var string @ORM\Column(name="attribute_name", type="string", length=255,
 	 *      nullable=false)
+	 *      @Annotation\Type("Zend\Form\Element\Hidden")
+	 *      @Annotation\Filter({"name":"StripTags"})
+	 *      @Annotation\Filter({"name":"StringTrim"})
+	 *      @Annotation\Required(true)
+	 *      @Annotation\Options({
+	 *      "required":"true",
+	 *      "label":"Name",
+	 *      })
 	 */
 	private $attributeName;
 
@@ -31,6 +42,13 @@ class LeadAttribute
 	 *
 	 * @var string @ORM\Column(name="attribute_desc", type="text", length=65535,
 	 *      nullable=false)
+	 *      @Annotation\Filter({"name":"StripTags"})
+	 *      @Annotation\Filter({"name":"StringTrim"})
+	 *      @Annotation\Required(true)
+	 *      @Annotation\Options({
+	 *      "required":"true",
+	 *      "label":"Description",
+	 *      })
 	 */
 	private $attributeDesc;
 
@@ -39,6 +57,7 @@ class LeadAttribute
 	 * @var \Doctrine\Common\Collections\Collection
 	 *      @ORM\OneToMany(targetEntity="Lead\Entity\LeadAttributeValue",
 	 *      mappedBy="attribute", cascade={"persist"}, fetch="EXTRA_LAZY")
+	 *      @Annotation\Exclude()
 	 */
 	protected $values;
 

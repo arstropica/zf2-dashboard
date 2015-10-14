@@ -6,7 +6,8 @@ return array(
 						'Lead\Controller\TenStreet' => 'Lead\Controller\TenStreetController',
 						'Lead\Controller\Email' => 'Lead\Controller\EmailController',
 						'Lead\Controller\Import' => 'Lead\Controller\ImportController',
-						'Lead\Controller\Services' => 'Lead\Controller\ServicesController'
+						'Lead\Controller\Services' => 'Lead\Controller\ServicesController',
+						'Lead\Controller\Attribute' => 'Lead\Controller\AttributeController'
 				),
 				'factories' => array(
 						'Lead\Controller\Rest' => 'Lead\Controller\Factory\RestControllerFactory'
@@ -290,6 +291,67 @@ return array(
 												'action' => 'index'
 										)
 								)
+						),
+						'attribute' => array(
+								'type' => 'Literal',
+								'options' => array(
+										'route' => '/attribute',
+										'defaults' => array(
+												'controller' => 'Lead\Controller\Attribute',
+												'action' => 'list'
+										)
+								),
+								'may_terminate' => true,
+								'child_routes' => array(
+										'list' => array(
+												'type' => 'Literal',
+												'options' => array(
+														'route' => '/list',
+														'defaults' => array(
+																'controller' => 'Lead\Controller\Attribute',
+																'action' => 'list'
+														)
+												)
+										),
+										'add' => array(
+												'type' => 'Literal',
+												'options' => array(
+														'route' => '/add',
+														'defaults' => array(
+																'controller' => 'Lead\Controller\Attribute',
+																'action' => 'add'
+														)
+												)
+										),
+										'edit' => array(
+												'type' => 'Segment',
+												'options' => array(
+														'route' => '/edit[/:id]',
+														'constraints' => array(
+																'id' => '[0-9]+'
+														),
+														'defaults' => array(
+																'controller' => 'Lead\Controller\Attribute',
+																'action' => 'edit',
+																'id' => 0
+														)
+												)
+										),
+										'delete' => array(
+												'type' => 'Segment',
+												'options' => array(
+														'route' => '/delete[/:id]',
+														'constraints' => array(
+																'id' => '[0-9]+'
+														),
+														'defaults' => array(
+																'controller' => 'Lead\Controller\Attribute',
+																'action' => 'delete',
+																'id' => 0
+														)
+												)
+										)
+								)
 						)
 				)
 		),
@@ -303,12 +365,14 @@ return array(
 		),
 		'service_manager' => array(
 				'factories' => array(
-						'Lead\Form\AddFormFactory' => 'Lead\Form\Factory\AddFormFactory'
+						'Lead\Form\AddFormFactory' => 'Lead\Form\Factory\AddFormFactory',
+						'Lead\Form\Attribute\AddFormFactory' => 'Lead\Form\Factory\Attribute\AddFormFactory'
 				)
 		),
 		'form_elements' => array(
 				'invokables' => array(
-						'Lead\Form\AddForm' => 'Lead\Form\AddForm'
+						'Lead\Form\AddForm' => 'Lead\Form\AddForm',
+						'Lead\Form\Attribute\AddForm' => 'Lead\Form\Attribute\AddForm'
 				),
 				'factories' => array(
 						'Lead\Form\FilterForm' => 'Lead\Form\Factory\FilterFormFactory',

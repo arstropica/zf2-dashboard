@@ -11,6 +11,7 @@ use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
 use Lead\Event\Listener\LeadListener;
+use Lead\Event\Listener\AttributeListener;
 
 class Module implements AutoloaderProviderInterface
 {
@@ -47,5 +48,6 @@ class Module implements AutoloaderProviderInterface
 		
 		$sm = $e->getApplication()->getServiceManager();
 		$eventManager->attach(new LeadListener($sm));
+		$eventManager->attach(new AttributeListener($sm));
 	}
 }
