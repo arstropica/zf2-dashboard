@@ -2,7 +2,7 @@
 $env = getenv('APPLICATION_ENV') ?  : 'development';
 return array(
 		'view_manager' => array(
-				'display_exceptions' => ($env == 'production') ? false : true,
+				'display_exceptions' => true, // ($env == 'production') ? false : true,
 				'template_map' => array(
 						'error/403' => __DIR__ . '/../view/error/403.phtml',
 						'oauth/receive-code' => __DIR__ .
@@ -220,6 +220,15 @@ return array(
 								
 								array(
 										'controller' => 'Lead\Controller\Services',
+										'roles' => array(
+												'user',
+												'moderator',
+												'administrator'
+										)
+								),
+								
+								array(
+										'controller' => 'Lead\Controller\Attribute',
 										'roles' => array(
 												'user',
 												'moderator',
