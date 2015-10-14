@@ -62,6 +62,9 @@ $this->headTitle($title);
 				<?php echo $this->formRow($form->get('account')); ?>
 				<?php echo $this->formRow($form->get('bulk_action')); ?>
 				<?php echo $this->formRow($form->get('submit')); ?>
+				<div class="total-item-count pull-right">
+					<?php echo $this->paginatorPosition($this->paginator); ?>
+				</div>
 			</div>
 			<table class="table table-hover table-striped sel" id="leadstable">
 				<thead>

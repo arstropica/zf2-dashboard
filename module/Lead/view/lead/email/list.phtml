@@ -59,6 +59,9 @@ $this->headTitle($title);
 			<hr class="small">
 			<div class="batch-assign-header clearfix">
 				<?php echo $this->formRow($form->get('submit')); ?>
+				<div class="total-item-count pull-right">
+					<?php echo $this->paginatorPosition($this->paginator); ?>
+				</div>
 			</div>
 			<table class="table table-hover table-striped sel" id="leadstable">
 				<thead>
