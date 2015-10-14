@@ -244,11 +244,15 @@ class ApiController extends AbstractCrudController
 		$this->getEventManager()->trigger($event, $this->getServiceEvent());
 	}
 
-	protected function logError (\Exception $e)
+	protected function logError (\Exception $e, $result = [])
 	{
 		$this->getServiceEvent()->setIsError(true);
 		$this->getServiceEvent()->setMessage($e->getMessage());
-		$this->getServiceEvent()->setResult($e->getTraceAsString());
+		if ($result) {
+			$this->getServiceEvent()->setResult(print_r($result, true));
+		} else {
+			$this->getServiceEvent()->setResult($e->getTraceAsString());
+		}
 		$this->logEvent('RuntimeError');
 	}
 }
