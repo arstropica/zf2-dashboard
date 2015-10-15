@@ -140,7 +140,8 @@ return array(
 						'fieldCollection' => 'Application\Form\View\Helper\FieldCollection',
 						'routeLabel' => 'Application\View\Helper\RouteLabel',
 						'tableCollapse' => 'Application\View\Helper\TableCollapse',
-						'getRepo' => 'Application\View\Helper\EntityRepo'
+						'getRepo' => 'Application\View\Helper\EntityRepo',
+						'paginatorPosition' => 'Application\View\Helper\PaginatorPosition'
 				),
 				'factories' => array(
 						'formElement' => 'Application\Form\View\Helper\Factory\FormElementFactory'
@@ -220,6 +221,11 @@ return array(
 										array(
 												'label' => 'Add Lead',
 												'route' => 'lead/add',
+												'action' => 'add'
+										),
+										array(
+												'label' => 'Add Attribute',
+												'route' => 'attribute/add',
 												'action' => 'add'
 										),
 										array(
@@ -334,7 +340,7 @@ return array(
 												'params' => array(
 														'id' => 2
 												)
-										),
+										)
 								)
 						),
 						array(
@@ -440,6 +446,32 @@ return array(
 												'route' => 'lead/delete',
 												'action' => 'delete',
 												'visible' => true
+										),
+										array(
+												'label' => 'Attributes',
+												'route' => 'attribute',
+												'pages' => array(
+														array(
+																'label' => 'Display Attributes',
+																'route' => 'attribute/list',
+																'action' => 'list'
+														),
+														array(
+																'label' => 'Edit Attribute',
+																'route' => 'attribute/edit',
+																'action' => 'edit'
+														),
+														array(
+																'label' => 'Add Attribute',
+																'route' => 'attribute/add',
+																'action' => 'add'
+														),
+														array(
+																'label' => 'Delete Attribute',
+																'route' => 'attribute/delete',
+																'action' => 'delete'
+														)
+												)
 										)
 								)
 						),
