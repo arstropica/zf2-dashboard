@@ -115,7 +115,8 @@ echo $this->form(null, \Application\Form\View\Helper\Form::LAYOUT_INLINE)->openT
 					<td class="col-xs-4 description"><?php echo $entity->getDescription(); ?></td>
 					<td class="col-xs-2 apis"><a
 						href="<?php echo $this->losUrl()->from('account/application/api/edit',['id'=>$entity->getId()], false)?>"><?php echo implode(", ", array_map(function($api){return $api->getName();}, $entity->getApis())); ?></a></td>
-					<td class="col-xs-2 leads"><?php echo count($entity->getleads()); ?></td>
+					<td class="col-xs-2 leads"><?php $count = count($entity->getleads()); if ($count) : ?><a
+						href="<?php echo $this->url('lead/list', ['action'=>'list'], ['query' => ['account' => $entity->getId()]]);?>"><?php echo $count; ?></a><?php else : echo $count; endif; ?></td>
 					<td class="action col-xs-1 text-right"><a
 						href="<?php echo $this->losUrl()->from('account/view',['id'=>$entity->getId()], false)?>"
 						title="View Account" class="btn btn-xs btn-info"><?php echo $this->losIcon('glyphicon-eye-open') ?></a>
