@@ -117,7 +117,6 @@ class ImportController extends AbstractCrudController
 					if ($csv['count']) {
 						$results['data'] = $this->mapImportedValues(
 								$csv['body'], $match, false);
-						
 						$required = $this->checkRequiredFields($results['data']);
 						
 						if (! $required) {
@@ -408,14 +407,27 @@ JTPL;
 				if (! $valid || (isset($valid[$i]) && $valid[$i] == 'valid')) {
 					foreach ($row as $field => $fieldSet) {
 						foreach ($fieldSet as $fieldName => $value) {
-							$form->add(
-									array(
-											'name' => "leads[{$i}][{$field}][{$fieldName}]",
-											'attributes' => array(
-													'value' => $value,
-													'type' => 'hidden'
-											)
-									));
+							if (is_array($value)) {
+								foreach ($value as $_fieldName => $_value) {
+									$form->add(
+											array(
+													'name' => "leads[{$i}][{$field}][{$fieldName}][{$_fieldName}]",
+													'attributes' => array(
+															'value' => $_value,
+															'type' => 'hidden'
+													)
+											));
+								}
+							} else {
+								$form->add(
+										array(
+												'name' => "leads[{$i}][{$field}][{$fieldName}]",
+												'attributes' => array(
+														'value' => $value,
+														'type' => 'hidden'
+												)
+										));
+							}
 						}
 					}
 				}
@@ -476,9 +488,18 @@ JTPL;
 		foreach ($match as $fieldName => $fieldSet) {
 			$attributeId = $fieldSet['importField'];
 			if ($attributeId && isset($row[$fieldName])) {
-				$result[$attributeId] = [
-						$fieldName => $row[$fieldName]
-				];
+				switch ($attributeId) {
+					case 'Question':
+						$result[$attributeId][$fieldName] = [
+								$fieldName => $row[$fieldName]
+						];
+						break;
+					default:
+						$result[$attributeId] = [
+								$fieldName => $row[$fieldName]
+						];
+						break;
+				}
 			}
 		}
 		return $result;
@@ -513,15 +534,42 @@ JTPL;
 						$lead->addAttribute($leadAttributeValue);
 					}
 				} elseif ($attributeId == "Question") {
-					$leadAttribute = new LeadAttribute();
-					$leadAttribute->setAttributeName($attributeId);
-					$leadAttribute->setAttributeDesc($csvHeading);
-					
-					$leadAttributeValue = new LeadAttributeValue();
-					$leadAttributeValue->setValue($csvValue);
-					$leadAttributeValue->setAttribute($leadAttribute);
-					
-					$lead->addAttribute($leadAttributeValue);
+					if (is_array($csvValue)) {
+						foreach ($csvRowItem as $csvHeading => $arrayValue) {
+							$csvValue = current($arrayValue);
+							
+							$leadAttribute = $leadAttributeRepository->findOneBy(
+									[
+											'attributeDesc' => $csvHeading
+									]);
+							if (! $leadAttribute) {
+								$leadAttribute = new LeadAttribute();
+								$leadAttribute->setAttributeName($attributeId);
+								$leadAttribute->setAttributeDesc($csvHeading);
+							}
+							$leadAttributeValue = new LeadAttributeValue();
+							$leadAttributeValue->setValue($csvValue);
+							$leadAttributeValue->setAttribute($leadAttribute);
+							
+							$lead->addAttribute($leadAttributeValue);
+						}
+					} else {
+						
+						$leadAttribute = $leadAttributeRepository->findOneBy(
+								[
+										'attributeDesc' => $csvHeading
+								]);
+						if (! $leadAttribute) {
+							$leadAttribute = new LeadAttribute();
+							$leadAttribute->setAttributeName($attributeId);
+							$leadAttribute->setAttributeDesc($csvHeading);
+						}
+						$leadAttributeValue = new LeadAttributeValue();
+						$leadAttributeValue->setValue($csvValue);
+						$leadAttributeValue->setAttribute($leadAttribute);
+						
+						$lead->addAttribute($leadAttributeValue);
+					}
 				} elseif (in_array($attributeId, 
 						[
 								'timecreated',
@@ -597,11 +645,15 @@ JTPL;
 		$this->getEventManager()->trigger($event, $this->getServiceEvent());
 	}
 
-	protected function logError (\Exception $e)
+	protected function logError (\Exception $e, $result = [])
 	{
 		$this->getServiceEvent()->setIsError(true);
 		$this->getServiceEvent()->setMessage($e->getMessage());
-		$this->getServiceEvent()->setResult($e->getTraceAsString());
+		if ($result) {
+			$this->getServiceEvent()->setResult(print_r($result, true));
+		} else {
+			$this->getServiceEvent()->setResult($e->getTraceAsString());
+		}
 		$this->logEvent('RuntimeError');
 	}
 }

@@ -43,7 +43,6 @@ class RestController extends AbstractRestfulController
 	public function __construct (OAuth2Server $server)
 	{
 		$this->server = $server;
-		$this->baseEvent = null;
 	}
 
 	protected function authorize ()
@@ -73,14 +72,12 @@ class RestController extends AbstractRestfulController
 					"Not Authorized.");
 		}
 		
-		$this->baseEvent = null;
-		
 		$request = $this->getRequest();
 		$result = array(
 				'data' => null
 		);
 		if ($request->isPost()) {
-			$data = $request->getPost();
+			$data = $request->getPost()->toArray();
 			$result = $this->create($data);
 		}
 		
@@ -99,8 +96,12 @@ class RestController extends AbstractRestfulController
 		$result = null;
 		if ($request->isPost()) {
 			$data = $request->getPost();
+			$logger = $this->getServiceLocator()->get('Logger');
+			$logger->info(print_r($data, true));
 			$lead = $this->create($data);
-			$id = $lead->getId();
+			if ($lead instanceof Lead) {
+				$id = $lead->getId();
+			}
 		}
 		if ($id) {
 			$lead = $this->getLead($id, false);
@@ -242,76 +243,99 @@ class RestController extends AbstractRestfulController
 		
 		$accountRepository = $em->getRepository("Account\\Entity\\Account");
 		
-		foreach ($data as $section => $values) {
-			switch ($section) {
-				case 'attributes':
-					{
-						foreach ($values as $attributeName => $attributeValue) {
-							$leadAttribute = $leadAttributeRepository->findOneBy(
-									[
-											'attributeName' => $attributeName
-									]);
-							if (! $leadAttribute) {
-								$leadAttribute = new LeadAttribute();
-								$leadAttribute->setAttributeName('Question');
-								$leadAttribute->setAttributeDesc($attributeName);
+		if (isset($data['attributes'], $data['lead'])) {
+			foreach ($data as $section => $values) {
+				switch ($section) {
+					case 'attributes':
+						{
+							foreach ($values as $attributeName => $attributeValue) {
+								switch ($attributeName) {
+									default:
+										$leadAttribute = $leadAttributeRepository->findOneBy(
+												[
+														'attributeName' => $attributeName
+												]);
+										break;
+									case 'Question':
+										$leadAttribute = $leadAttributeRepository->findOneBy(
+												[
+														'attributeDesc' => $attributeValue,
+														'attributeName' => 'Question'
+												]);
+										break;
+								}
+								if (! $leadAttribute) {
+									$leadAttribute = new LeadAttribute();
+									$leadAttribute->setAttributeName('Question');
+									$leadAttribute->setAttributeDesc(
+											$attributeName);
+								}
+								if ($leadAttribute) {
+									$leadAttributeValue = new LeadAttributeValue();
+									
+									$leadAttributeValue->setValue(
+											$attributeValue);
+									$leadAttributeValue->setAttribute(
+											$leadAttribute);
+									
+									$lead->addAttribute($leadAttributeValue);
+								}
 							}
-							if ($leadAttribute) {
-								$leadAttributeValue = new LeadAttributeValue();
-								
-								$leadAttributeValue->setValue($attributeValue);
-								$leadAttributeValue->setAttribute(
-										$leadAttribute);
-								
-								$lead->addAttribute($leadAttributeValue);
-							}
+							break;
 						}
-						break;
-					}
-				case 'lead':
-					{
-						foreach ($values as $property => $value) {
-							switch ($property) {
-								case 'timecreated':
-								case 'referrer':
-								case 'ipaddress':
-									if ($property == 'timecreated') {
-										$isvalid = $this->validateDate($value);
-										$value = $isvalid ? new \DateTime($value) : new \DateTime(
-												"now");
-									}
-									$lead->{'set' . ucfirst($property)}($value);
-									break;
-								case 'company':
-								case 'companyid':
-									if (! $lead->getAccount()) {
-										switch ($property) {
-											case 'company':
-												$criteria = [
-														'name' => $value
-												];
-												break;
-											case 'companyid':
-												$criteria = [
-														'id' => $value
-												];
-												break;
+					case 'lead':
+						{
+							foreach ($values as $property => $value) {
+								switch ($property) {
+									case 'timecreated':
+									case 'referrer':
+									case 'ipaddress':
+										if ($property == 'timecreated') {
+											$isvalid = $this->validateDate(
+													$value);
+											$value = $isvalid ? new \DateTime(
+													$value) : new \DateTime(
+													"now");
 										}
-										$account = $accountRepository->findOneBy(
-												$criteria);
-										if ($account) {
-											$lead->setAccount($account);
+										if (method_exists($lead, 
+												'set' . ucfirst($property))) {
+											$lead->{'set' . ucfirst($property)}(
+													$value);
 										}
-									}
-									break;
+										break;
+									case 'company':
+									case 'companyid':
+										if (! $lead->getAccount()) {
+											switch ($property) {
+												case 'company':
+													$criteria = [
+															'name' => $value
+													];
+													break;
+												case 'companyid':
+													$criteria = [
+															'id' => $value
+													];
+													break;
+											}
+											$account = $accountRepository->findOneBy(
+													$criteria);
+											if ($account) {
+												$lead->setAccount($account);
+											}
+										}
+										break;
+								}
 							}
+							break;
 						}
-						break;
-					}
+				}
 			}
+			
+			return $lead;
 		}
 		
-		return $lead;
+		return false;
 	}
 
 	public function getEntityClass ()
@@ -353,11 +377,15 @@ class RestController extends AbstractRestfulController
 		$this->getEventManager()->trigger($event, $this->getServiceEvent());
 	}
 
-	protected function logError (\Exception $e)
+	protected function logError (\Exception $e, $result = [])
 	{
 		$this->getServiceEvent()->setIsError(true);
 		$this->getServiceEvent()->setMessage($e->getMessage());
-		$this->getServiceEvent()->setResult($e->getTraceAsString());
+		if ($result) {
+			$this->getServiceEvent()->setResult(print_r($result, true));
+		} else {
+			$this->getServiceEvent()->setResult($e->getTraceAsString());
+		}
 		$this->logEvent('RuntimeError');
 	}
 
@@ -414,7 +442,8 @@ class RestController extends AbstractRestfulController
 						"Invalid Submission. " . $e->getMessage(), $data);
 			}
 		} else {
-			$this->logError($e);
+			$e = new \Exception('Failed to create lead.', 400);
+			$this->logError($e, $data);
 			return $this->getJsonErrorResponse('json')->errorHandler(400, 
 					"Invalid Submission.", $data);
 		}
