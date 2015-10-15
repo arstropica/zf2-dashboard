@@ -542,3 +542,19 @@ form#pagerform SELECT.form-control {
 	margin: 0;
 	padding: 6px 3px;
 }
+.total-item-count {
+	padding: 6px 10px;
+	background: #F7F7F7;
+	width: 200px;
+	border: 1px solid #DDD;
+}
+
+.total-item-count * {
+	margin: 0;
+	padding: 0;
+	vertical-align: middle;
+}
+.total-item-count LABEL {
+	font-weight: normal;
+	color: black;
+}
