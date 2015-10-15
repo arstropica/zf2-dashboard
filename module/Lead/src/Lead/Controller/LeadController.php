@@ -176,20 +176,24 @@ class LeadController extends AbstractCrudController
 				
 				switch ($action) {
 					case 'delete':
-						$message = str_replace("The", "{$count} out of {$total}", 
+						$message = str_replace("The", 
+								"{$count} out of {$total}", 
 								$this->successDeleteMessage);
 						break;
 					case 'unassign':
 					case 'assign':
-						$message = str_replace("The", "{$count} out of {$total}", 
+						$message = str_replace("The", 
+								"{$count} out of {$total}", 
 								$this->successAssignMessage);
 						break;
 					case 'submit':
-						$message = str_replace("The", "{$count} out of {$total}", 
+						$message = str_replace("The", 
+								"{$count} out of {$total}", 
 								$this->successSubmitMessage);
 						break;
 					case 'assignSubmit':
-						$message = str_replace("The", "{$count} out of {$total}", 
+						$message = str_replace("The", 
+								"{$count} out of {$total}", 
 								$this->successSubmitMessage);
 						break;
 				}
@@ -199,21 +203,26 @@ class LeadController extends AbstractCrudController
 							->translate($message));
 			} else {
 				$message = $this->errorSubmitMessage;
-				$message_part = " " . ($total - $count) . " of {$total} Lead(s) were not successfully ";
+				$message_part = " " . ($total - $count) .
+						 " of {$total} Lead(s) were not successfully ";
 				
 				switch ($action) {
 					case 'delete':
-						$message = $this->errorDeleteMessage . $message_part . "{$action}ed.";
+						$message = $this->errorDeleteMessage . $message_part .
+								 "{$action}ed.";
 						break;
 					case 'unassign':
 					case 'assign':
-						$message = $this->errorAssignMessage . $message_part . "{$action}ed.";
+						$message = $this->errorAssignMessage . $message_part .
+								 "{$action}ed.";
 						break;
 					case 'submit':
-						$message = $this->errorSubmitMessage . $message_part . "{$action}ted.";
+						$message = $this->errorSubmitMessage . $message_part .
+								 "{$action}ted.";
 						break;
 					case 'assignSubmit':
-						$message = $this->errorSubmitMessage . $message_part . "submitted.";
+						$message = $this->errorSubmitMessage . $message_part .
+								 "submitted.";
 						break;
 				}
 				$this->flashMessenger()->addErrorMessage(
@@ -798,7 +807,20 @@ class LeadController extends AbstractCrudController
 											'id' => $lead_id
 									));
 							$response = $response instanceof JsonModel ? $response->getVariables() : $response;
-							if (isset($response['error']) || empty($response['data'])) {
+							if (is_array($response['data'])) {
+								if (isset($response['data']['error'])) {
+									foreach ($response['data']['error'] as $api_error) {
+										if (isset($api_error[0]) &&
+												 is_string($api_error[0])) {
+											$error_msg = $api_error[0];
+											throw new \Exception($error_msg, 400);
+										}
+									}
+								}
+							}
+							if (isset($response['data']['error'], 
+									$response['error']) ||
+									 empty($response['data'])) {
 								$result = false;
 							}
 							$shouldLog = false;
@@ -888,11 +910,15 @@ class LeadController extends AbstractCrudController
 		$this->getEventManager()->trigger($event, $this->getServiceEvent());
 	}
 
-	protected function logError (\Exception $e)
+	protected function logError (\Exception $e, $result = [])
 	{
 		$this->getServiceEvent()->setIsError(true);
 		$this->getServiceEvent()->setMessage($e->getMessage());
-		$this->getServiceEvent()->setResult($e->getTraceAsString());
+		if ($result) {
+			$this->getServiceEvent()->setResult(print_r($result, true));
+		} else {
+			$this->getServiceEvent()->setResult($e->getTraceAsString());
+		}
 		$this->logEvent('RuntimeError');
 	}
 }

@@ -83,13 +83,13 @@ class Lead
 
 	/**
 	 *
-	 * @var \Doctrine\Common\Collections\Collection
-	 *      @ORM\OneToMany(
+	 * @var \Doctrine\Common\Collections\Collection @ORM\OneToMany(
 	 *      targetEntity="Lead\Entity\LeadAttributeValue",
-	 *      mappedBy="lead", 
-	 *      fetch="EXTRA_LAZY", 
+	 *      mappedBy="lead",
+	 *      fetch="EXTRA_LAZY",
 	 *      cascade={"persist", "remove"}
 	 *      )
+	 *      @ORM\OrderBy({"attribute" = "ASC"})
 	 *     
 	 *      @Annotation\Exclude()
 	 */
@@ -97,10 +97,9 @@ class Lead
 
 	/**
 	 *
-	 * @var \Doctrine\Common\Collections\Collection
-	 *      @ORM\OneToMany(
+	 * @var \Doctrine\Common\Collections\Collection @ORM\OneToMany(
 	 *      targetEntity="Event\Entity\LeadEvent",
-	 *      mappedBy="lead", 
+	 *      mappedBy="lead",
 	 *      fetch="EXTRA_LAZY",
 	 *      cascade={"persist", "remove"}
 	 *      )
@@ -232,7 +231,7 @@ class Lead
 		$description['ipaddress'] = $this->getIpaddress();
 		$description['date'] = date_format($this->getTimecreated(), 'm.d.Y');
 		foreach ($fields as $field) {
-			if ($description[$field]) {
+			if (isset($description[$field])) {
 				switch ($field) {
 					case 'LastName':
 						$result .= " {$description[$field]}";
@@ -279,7 +278,7 @@ class Lead
 		}
 		$description['ipaddress'] = $this->getIpaddress();
 		foreach ($fields as $field) {
-			if ($description[$field]) {
+			if (isset($description[$field])) {
 				switch ($field) {
 					case 'LastName':
 						$result .= " {$description[$field]}";
@@ -295,8 +294,8 @@ class Lead
 		}
 		return $result;
 	}
-	
-	public function getFullName()
+
+	public function getFullName ()
 	{
 		$result = "";
 		$keys = [
@@ -315,7 +314,7 @@ class Lead
 				$description[$key] = $leadAttribute->getValue();
 		}
 		foreach ($fields as $field) {
-			if ($description[$field]) {
+			if (isset($description[$field])) {
 				switch ($field) {
 					case 'LastName':
 						$result .= " {$description[$field]}";
