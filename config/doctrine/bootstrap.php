@@ -3,7 +3,7 @@
 // Include Composer Autoload (relative to project root).
 $dbParams = [];
 require_once __DIR__ . "/../../vendor/autoload.php";
-require_once __DIR__ . "/local.db.php";
+require_once __DIR__ . "/development.db.php";
 
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
@@ -23,7 +23,15 @@ $paths = [
 		realpath('module/Event/src/Event/Entity'),
 		realpath('module/Api/src/Api/Entity')
 ];
-$isDevMode = true;
+
+/**
+ * The dev home dir name
+ * 
+ * @var string
+ */
+$devdir = 'zf2';
+$cwd = getcwd();
+$isDevMode = strstr($cwd, "/{$devdir}/");
 
 $config = Setup::createAnnotationMetadataConfiguration($paths, $isDevMode, null, 
 		null, false);
