@@ -57,7 +57,7 @@ class Lead
 	 * @ORM\ManyToOne(
 	 * targetEntity="Account\Entity\Account",
 	 * inversedBy="leads",
-	 * cascade={"persist"},
+	 * cascade={"persist", "remove"},
 	 * fetch="EXTRA_LAZY",
 	 * )
 	 * @ORM\JoinColumn(
@@ -375,6 +375,9 @@ class Lead
 	 */
 	public function setAccount ($account)
 	{
+		if (null === $account && $this->account) {
+			$this->account->removeLeads($this);
+		}
 		$this->account = $account;
 		
 		return $this;
