@@ -76,6 +76,18 @@ class AbstractCrudController extends BaseController
 		
 		return $form;
 	}
+
+	protected function getRedirect ($route = false, $params = [], $options = [], 
+			$reuseMatchedParams = true)
+	{
+		$route = $route ?  : $this->getMatchedRoute();
+		
+		return $this->redirect()->toRoute($route, 
+				[
+						'controller' => $this->params('controller'),
+						'action' => $this->params('action')
+				], $options, $reuseMatchedParams);
+	}
 }
 
 ?>
