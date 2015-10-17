@@ -485,15 +485,37 @@ class LeadController extends AbstractCrudController
 		$entity = $objRepository->find($id);
 		
 		if ($this->validateDelete($post)) {
-			$this->createServiceEvent()
-				->setEntityId($id)
-				->setEntityClass($this->getEntityClass())
-				->setDescription("Lead Deleted")
-				->setMessage("Lead #{$id} was deleted.");
-			
-			$this->logEvent("EditAction.post");
-			
+			if (null !== $entity->getAccount()) {
+				$entity->setAccount(null);
+				$this->createServiceEvent()
+					->setEntityId($id)
+					->setEntityClass($this->getEntityClass())
+					->setDescription("Lead Edited")
+					->setMessage("Lead #{$id} was unassigned.");
+				try {
+					$em->persist($entity);
+					$em->flush();
+					$this->getServiceEvent()->setMessage(
+							"Lead #{$id} was unassigned");
+					$this->logEvent("EditAction.post");
+				} catch (\Exception $e) {
+					$this->logError($e);
+					$this->flashMessenger()->addErrorMessage(
+							$this->getServiceLocator()
+								->get('translator')
+								->translate($this->errorDeleteMessage));
+					return false;
+				}
+			}
 			if ($this->getEntityService()->delete($entity)) {
+				$this->createServiceEvent()
+					->setEntityId($id)
+					->setEntityClass($this->getEntityClass())
+					->setDescription("Lead Deleted")
+					->setMessage("Lead #{$id} was deleted.");
+				
+				$this->logEvent("DeleteAction.post");
+				
 				$this->flashMessenger()->addSuccessMessage(
 						$this->getServiceLocator()
 							->get('translator')
@@ -740,6 +762,7 @@ class LeadController extends AbstractCrudController
 				$actions[] = 'unassign';
 				break;
 			case 'delete':
+				$actions[] = 'unassign';
 				$actions[] = 'delete';
 				break;
 			case 'submit':
@@ -764,8 +787,9 @@ class LeadController extends AbstractCrudController
 						
 						if ($lead instanceof Lead && $account instanceof Account) {
 							$lead->setAccount($account);
-							
+							$account->addLead($lead);
 							try {
+								$em->persist($account);
 								$em->persist($lead);
 								$em->flush();
 								$this->getServiceEvent()->setMessage(
@@ -781,10 +805,14 @@ class LeadController extends AbstractCrudController
 					
 					case 'unassign':
 						
-						if ($lead instanceof Lead) {
+						if (($lead instanceof Lead) &&
+								 (null !== $lead->getAccount())) {
+							$account = $lead->getAccount();
+							$account->removeLeads([$lead]);
 							$lead->setAccount(null);
 							
 							try {
+								$em->persist($account);
 								$em->persist($lead);
 								$em->flush();
 								$this->getServiceEvent()->setMessage(
