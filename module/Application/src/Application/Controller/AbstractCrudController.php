@@ -29,7 +29,7 @@ class AbstractCrudController extends BaseController
 
 	public function getSession ($name)
 	{
-		if (null === $this->sessionContainers[$name]) {
+		if (null === $this->sessionContainers) {
 			$this->sessionContainers = [];
 		}
 		if (! isset($this->sessionContainers[$name])) {
