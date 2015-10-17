@@ -258,4 +258,14 @@ class ImportForm extends Form implements InputFilterAwareInterface,
 	{
 		return $this->objectManager;
 	}
+
+    public function __sleep()
+    {
+        return $this->getData();
+    }
+    
+    public function __wakeup()
+    {
+        // ...
+    }
 }
