@@ -13,6 +13,7 @@ use Application\Hydrator\Strategy\DateTimeStrategy;
 use Account\Entity\Account;
 use Event\Entity\Event;
 use Account\Utility\IdGenerator;
+use Zend\Form\Form;
 
 /**
  *
@@ -22,13 +23,23 @@ use Account\Utility\IdGenerator;
 class ImportController extends AbstractCrudController
 {
 
-	protected $errorResponse;
-
 	protected $successImportMessage = 'The Lead(s) were successfully imported.';
 
 	protected $errorImportMessage = 'There was a problem importing your Leads.';
 
 	protected $errorImportTypeMessage = 'There was a problem with the file you were attempting to import.';
+
+	/**
+	 *
+	 * @var array
+	 */
+	protected $results;
+
+	/**
+	 *
+	 * @var int
+	 */
+	protected $stage = 1;
 
 	public function __construct ()
 	{}
@@ -47,109 +58,157 @@ class ImportController extends AbstractCrudController
 					->__invoke('js/typeahead.bundle.js'));
 		
 		// Stage 1
+		$this->init();
 		// Get Form
+		$form = $this->getImportForm();
 		$request = $this->getRequest();
+		$post = $request->getPost()->toArray();
 		
-		$results = array(
+		if ($post) {
+			try {
+				// Stage 2
+				// Handle Uploads
+				if ($this->handleUpload($post, $form)) {
+					return $this->results;
+				}
+				
+				// Stage 3
+				// Handle Field Matching
+				if ($this->handleMatch($post, $form)) {
+					return $this->results;
+				}
+				
+				// Stage 4
+				// Handle Save
+				if ($this->handleImport($post, $form)) {
+					return $this->redirect()->toRoute(
+							$this->getActionRoute('list'), [], true);
+				}
+			} catch (\Exception $e) {
+				$this->flashMessenger()->addErrorMessage($e->getMessage());
+			}
+		} else {
+			$this->results['form'] = $form;
+			$this->setImportCache($this->stage, $this->results);
+			$form->addUploadField();
+			return $this->results;
+		}
+		
+		return $this->rollBack();
+	}
+
+	/**
+	 * Initialize Results (Stage 1)
+	 *
+	 * @return void
+	 */
+	protected function init ($stage = null)
+	{
+		$stage = $stage ?  : $this->stage;
+		$results = $this->results = array(
 				'fields' => false,
-				'stage' => 1,
+				'stage' => $stage,
 				'headings' => [],
-				'form' => false,
+				'form' => $this->getImportForm(),
 				'_tmp' => false,
 				'dataCount' => false,
 				'data' => false,
 				'valid' => false
 		);
-		$form = $this->getImportForm();
-		
-		$post = $request->getPost()->toArray();
+		return $results;
+	}
+
+	/**
+	 * Handle Uploads (Stage 2)
+	 *
+	 * @param array $post        	
+	 * @param Form $form        	
+	 * @param boolean $reload        	
+	 * @return boolean
+	 */
+	protected function handleUpload ($post, $form, $reload = false)
+	{
+		$outcome = false;
+		$request = $this->getRequest();
 		$files = $request->getFiles()->toArray();
+		$data = array_merge_recursive($post, $request->getFiles()->toArray());
 		
-		// Stage 2
-		// Handle Uploads
-		if ($post || $files) {
-			$results['stage'] = 2;
-			// set data post and file ...
-			$data = array_merge_recursive($post, 
-					$request->getFiles()->toArray());
-			
-			$results['fields'] = $form->getLeadAttributes();
-			$form->setData($data);
-			
-			if ($form->isValid()) {
-				// Handle Uploads
-				if ($files) {
-					$file = $this->params()->fromFiles('leadsUpload');
-					$tmp_file = $this->validateImportFile($file);
-					if ($tmp_file) {
-						$csv = $this->extractCSV(
-								$this->getUploadPath() . '/' . $tmp_file);
+		// set data post and file ...
+		$form->setData($data);
+		
+		if ($form->isValid() || $reload) {
+			// Handle Uploads
+			if ($files) {
+				$file = isset($post['leadsUpload']) ? $post['leadsUpload'] : $this->params()->fromFiles(
+						'leadsUpload');
+				$tmp_file = $this->validateImportFile($file);
+				if ($tmp_file) {
+					$csv = $this->extractCSV(
+							$this->getUploadPath() . '/' . $tmp_file);
+					
+					if ($csv['count']) {
+						// Setup Import Form
+						$fieldSet = $form->addImportFieldset(
+								array_combine($csv['headings'], 
+										$csv['headings']));
+						$this->setTypeAhead('Company', 
+								"Account\\Entity\\Account", "name");
+						$form->get('leadTmpFile')->setValue($tmp_file);
+						$form->get('submit')->setValue('Import');
 						
-						if ($csv['count']) {
-							// Setup Import Form
-							$fieldSet = $form->addImportFieldset(
-									array_combine($csv['headings'], 
-											$csv['headings']));
-							$this->setTypeAhead('Company', 
-									"Account\\Entity\\Account", "name");
-							$form->get('leadTmpFile')->setValue($tmp_file);
-							$form->get('submit')->setValue('Import');
-							
-							$results['_tmp'] = $tmp_file;
-							$results['count'] = $csv['count'];
-							$results['headings'] = $csv['headings'];
-						}
+						$outcome = true;
+						$this->stage = 2;
+						$this->results['stage'] = $this->stage;
+						$this->results['fields'] = $form->getLeadAttributes();
+						$this->results['_tmp'] = $tmp_file;
+						$this->results['count'] = $csv['count'];
+						$this->results['headings'] = $csv['headings'];
+						$this->results['form'] = $form;
+						$this->setImportCache($this->stage, $this->results);
 					}
 				}
+			}
+		} else {
+			$message = "There seems to be a problem with reading your CSV file or it is invalid.";
+			$this->flashMessenger()->addErrorMessage($message);
+		}
+		return $outcome;
+	}
+
+	/**
+	 * Handle Field Matching (Stage 3)
+	 *
+	 * @param array $post        	
+	 * @param Form $form        	
+	 * @param boolean $reload        	
+	 */
+	protected function handleMatch ($post, $form, $reload = false)
+	{
+		$outcome = false;
+		$valid = false;
+		$request = $this->getRequest();
+		
+		$form->setData($post);
+		
+		if ($form->isValid() || $reload) {
+			if ($post && isset($post['match'], $post['leadTmpFile'])) {
+				$match = $post['match'];
+				$company = $post['Company'];
+				$tmp_file = $this->getUploadPath() . '/' . $post['leadTmpFile'];
 				
-				// Stage 3
-				// Handle Field Matching
-				if ($post && isset($post['match'], $post['leadTmpFile'])) {
+				$importFieldset = $form->getImportFieldset();
+				$form->addConfirmField();
+				$csv = $this->extractCSV($tmp_file);
+				if ($csv['count']) {
+					$data = $this->mapImportedValues($csv['body'], $match, 
+							false);
 					
-					$importFieldset = $form->getImportFieldset();
-					$form->addConfirmField();
-					$results['stage'] = 3;
-					$match = $post['match'];
-					$company = $post['Company'];
-					$tmp_file = $this->getUploadPath() . '/' .
-							 $post['leadTmpFile'];
-					$csv = $this->extractCSV($tmp_file);
-					if ($csv['count']) {
-						$results['data'] = $this->mapImportedValues(
-								$csv['body'], $match, false);
-						$required = $this->checkRequiredFields($results['data']);
-						
-						if (! $required) {
-							$message = "One or more required fields were missing.";
-							$this->flashMessenger()->addErrorMessage($message);
-							return $this->redirect()->toRoute('import', 
-									[
-											'action' => 'import'
-									], [], true);
-						} else {
-							
-							if ($results['data']) {
-								$results['valid'] = array_map(
-										function  ($v)
-										{
-											return $v ? 'valid' : 'invalid';
-										}, 
-										array_map(
-												array(
-														$this,
-														'checkDuplicateImport'
-												), $results['data']));
-								if (($invalid = array_keys($results['valid'], 
-										'invalid')) == true) {
-									
-									$this->flashMessenger()->addErrorMessage(
-											count($invalid) .
-													 " duplicate leads were found in your imported data.");
-								}
-								$form = $this->addImportFields($form, 
-										$results['data'], $results['valid']);
-							}
-							$results['headings'] = array_intersect_key(
+					if (($valid = $this->validateImportData($data)) == true) {
+						if ($valid) {
+							$form = $this->addImportFields($form, $data, $valid);
+							$form->get('submit')->setValue('Confirm');
+							$form->addHiddenField('Company', $company);
+							$headings = array_intersect_key(
 									$form->getAttributeFields(), 
 									array_flip(
 											[
@@ -158,121 +217,225 @@ class ImportController extends AbstractCrudController
 													'Last Name',
 													'Email'
 											]));
-							$form->get('submit')->setValue('Confirm');
-							$form->addHiddenField('Company', $company);
+							$outcome = true;
+							$this->stage = 3;
+							$this->results['stage'] = $this->stage;
+							$this->results['fields'] = $form->getLeadAttributes();
+							$this->results['data'] = $data;
+							$this->results['valid'] = $valid;
+							$this->results['form'] = $form;
+							$this->results['headings'] = $headings;
+							$this->setImportCache($this->stage, $this->results);
 						}
-					} else {
-						$message = "No valid records could be imported.";
-						$this->flashMessenger()->addErrorMessage($message);
-						return $this->redirect()->toRoute('import', 
-								[
-										'action' => 'import'
-								], [], true);
 					}
 				}
-				// Stage 4
-				// Handle Save
-				if ($post && isset($post['confirm'], $post['leads'])) {
-					
-					// Handle Account
-					$accountName = empty($post['Company']) ? false : $post['Company'];
-					if ($accountName) {
-						$account = $accountName ? $this->findAccount(
-								$accountName) : false;
-						if (! $account) {
-							$account = new Account();
-							$guid = IdGenerator::generate();
-							$account->setName($accountName)->setDescription(
-									$accountName);
-							$account->setGuid($guid);
-							try {
-								$em = $this->getEntityManager();
-								$em->persist($account);
-								$em->flush();
-							} catch (\Exception $e) {
-								$account = false;
-							}
-						}
-					} else {
-						$account = false;
-					}
-					
-					$importOutcome = false;
-					$leads = $post['leads'];
-					$company = $post['Company'];
-					if ($leads && is_array($leads)) {
-						$importOutcome = true;
-						foreach ($leads as $extract) {
-							$lead = null;
-							$this->createServiceEvent()
-								->setEntityClass($this->getEntityClass())
-								->setDescription("Lead Import");
-							$entity = new Lead();
-							$lead = $this->hydrate($entity, $extract);
-							if ($lead) {
-								try {
-									$em = $this->getEntityManager();
-									$em->persist($lead);
-									$em->flush();
-									$lead_id = $lead->getId();
-									if ($account instanceof Account &&
-											 $account->getId() &&
-											 $lead instanceof Lead && $lead_id) {
-										$account->addLead($lead);
-									}
-									$message = 'Lead #' . $lead_id .
-											 ' was imported.';
-									$this->getServiceEvent()
-										->setEntityId($lead_id)
-										->setMessage($message);
-									$this->logEvent("ImportAction.post");
-								} catch (\Exception $e) {
-									$this->logError($e);
-									if ($importOutcome) {
-										$this->flashMessenger()->addErrorMessage(
-												$e->getMessage());
-									}
-									$importOutcome = false;
-								}
-							} elseif ($importOutcome) {
-								$importOutcome = false;
-							}
-						}
-						$em->flush();
-						$em->clear();
-					}
-					if (! $importOutcome) {
-						$message = "One or more records could not be imported.";
-						$this->flashMessenger()->addErrorMessage($message);
-					} else {
-						$message = count($leads) . " records were imported.";
-						$this->flashMessenger()->addSuccessMessage($message);
-					}
-					return $this->redirect()->toRoute(
-							$importOutcome ? 'lead' : 'import', 
-							array(
-									'action' => $importOutcome ? 'list' : 'import'
-							), 
-							array(
-									'query' => array(
-											'msg' => 1
-									)
-							));
+				if (! $valid) {
+					$outcome = false;
+					$message = "No valid records could be imported.";
+					$this->flashMessenger()->addErrorMessage($message);
 				}
-			} else {
-				$message = array(
-						"You have invalid Form Entries."
-				);
-				$this->flashMessenger()->addErrorMessage($message);
 			}
 		} else {
-			$form->addUploadField();
+			$message = "You have invalid Form Entries.";
+			$this->flashMessenger()->addErrorMessage($message);
 		}
-		
-		$results['form'] = $form;
-		return $results;
+		return $outcome;
 	}
 
+	/**
+	 * Handle Import & Save (Stage 4)
+	 *
+	 * @param array $post        	
+	 * @param Form $form        	
+	 */
+	protected function handleImport ($post, $form)
+	{
+		$outcome = true;
+		$request = $this->getRequest();
+		
+		$fields = $form->getLeadAttributes();
+		$this->results['fields'] = $fields;
+		
+		$form->setData($post);
+		
+		if ($form->isValid()) {
+			if (isset($post['leads'])) {
+				$accountName = empty($post['Company']) ? false : $post['Company'];
+				if ($accountName) {
+					$account = $accountName ? $this->findAccount($accountName) : false;
+					if (! $account) {
+						$account = new Account();
+						$guid = IdGenerator::generate();
+						$account->setName($accountName)->setDescription(
+								$accountName);
+						$account->setGuid($guid);
+						try {
+							$em = $this->getEntityManager();
+							$em->persist($account);
+							$em->flush();
+						} catch (\Exception $e) {
+							$account = false;
+							$outcome = false;
+							$this->flashMessenger()->addErrorMessage(
+									$e->getMessage());
+						}
+					}
+				} else {
+					$account = false;
+				}
+				
+				$leads = $post['leads'];
+				$company = $post['Company'];
+				if ($leads && is_array($leads)) {
+					foreach ($leads as $extract) {
+						$lead = null;
+						$this->createServiceEvent()
+							->setEntityClass($this->getEntityClass())
+							->setDescription("Lead Import");
+						$entity = new Lead();
+						$lead = $this->hydrate($entity, $extract);
+						if ($lead) {
+							try {
+								$em = $this->getEntityManager();
+								$em->persist($lead);
+								$em->flush();
+								$lead_id = $lead->getId();
+								if ($account instanceof Account &&
+										 $account->getId() &&
+										 $lead instanceof Lead && $lead_id) {
+									$account->addLead($lead);
+								}
+								$message = 'Lead #' . $lead_id . ' was imported.';
+								$this->getServiceEvent()
+									->setEntityId($lead_id)
+									->setMessage($message);
+								$this->logEvent("ImportAction.post");
+							} catch (\Exception $e) {
+								$this->logError($e);
+								if ($outcome) {
+									$this->flashMessenger()->addErrorMessage(
+											$e->getMessage());
+								}
+								$outcome = false;
+							}
+						} elseif ($outcome) {
+							$outcome = false;
+						}
+					}
+					$em->flush();
+					$em->clear();
+				}
+				if (! $outcome) {
+					$message = "One or more records could not be properly imported.";
+					$this->flashMessenger()->addErrorMessage($message);
+				} else {
+					$message = count($leads) . " records were imported.";
+					$this->flashMessenger()->addSuccessMessage($message);
+					$this->stage = 4;
+				}
+			} else {
+				$outcome = false;
+			}
+		}
+		
+		return $outcome;
+	}
+
+	/**
+	 * Rollback to earlier stage
+	 *
+	 * @param string $stage        	
+	 * @return Ambigous <\Zend\Http\Response, boolean>
+	 */
+	protected function rollBack ($stage = null)
+	{
+		$output = false;
+		$form = $this->getImportForm();
+		$results = $this->getImportCache($stage);
+		$this->stage = $this->getImportCache($stage, 'stage');
+		return $results ?  : $this->getRedirect();
+	}
+
+	/**
+	 * Cache form data for back navigation
+	 *
+	 * @param unknown $stage        	
+	 * @param string $data        	
+	 */
+	protected function setImportCache ($stage, $data = null)
+	{
+		$sessionImportCache = $this->getSession('import');
+		$sessionImportCache->stage = $stage;
+		if ($stage == 1 || ! isset($sessionImportCache->data)) {
+			$sessionImportCache->data = [];
+		}
+		$sessionImportCache->data[$stage] = $data;
+	}
+
+	/**
+	 * Get form stage/cache from previous stage
+	 *
+	 * @param string $stage        	
+	 * @param string $mode        	
+	 * @return NULL|array
+	 */
+	protected function getImportCache ($stage = null, $mode = 'data')
+	{
+		$output = null;
+		$sessionImportCache = $this->getSession('import');
+		if (isset($sessionImportCache, $sessionImportCache->data, 
+				$sessionImportCache->stage)) {
+			$stage = $stage ?  : $sessionImportCache->stage;
+			if (isset($sessionImportCache->data[$stage])) {
+				$output = $mode == 'data' ? $sessionImportCache->data[$stage] : $stage;
+			} elseif ($mode != 'data') {
+				$output = 1;
+			}
+		}
+		return $output;
+	}
+
+	/**
+	 * Validate Import Data
+	 *
+	 * @param array $data        	
+	 */
+	protected function validateImportData ($data)
+	{
+		$valid = false;
+		$required = $this->checkRequiredFields($data);
+		
+		if (! $required) {
+			$message = "One or more required fields were missing.";
+			$this->flashMessenger()->addErrorMessage($message);
+		} else {
+			
+			if ($data) {
+				$valid = array_map(
+						function  ($v)
+						{
+							return $v ? 'valid' : 'invalid';
+						}, 
+						array_map(
+								array(
+										$this,
+										'checkDuplicateImport'
+								), $data));
+				if (($invalid = array_keys($valid, 'invalid')) == true) {
+					$this->flashMessenger()->addErrorMessage(
+							count($invalid) .
+									 " duplicate leads were found in your imported data.");
+				}
+			}
+		}
+		return $valid;
+	}
+
+	/**
+	 *
+	 * @param array $data        	
+	 * @return \Lead\Form\ImportForm
+	 */
 	protected function getImportForm ($data = [])
 	{
 		$sl = $this->getServiceLocator();
