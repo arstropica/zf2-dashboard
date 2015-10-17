@@ -99,23 +99,21 @@ class Account
 	 *      mappedBy="account",
 	 *      fetch="EXTRA_LAZY",
 	 *      indexBy="id",
-	 *      cascade={"all","merge","persist","refresh","remove"}
+	 *      cascade={"remove"},
 	 *      )
 	 *      @ORM\JoinTable(
-	 *      name="account_lead",
+	 *      name="lead",
 	 *      joinColumns={
 	 *      @ORM\JoinColumn(
 	 *      name="account_id",
 	 *      referencedColumnName="id",
-	 *      nullable=false,
 	 *      )
 	 *      },
 	 *      inverseJoinColumns={
 	 *      @ORM\JoinColumn(
-	 *      name="lead_id",
+	 *      name="id",
 	 *      referencedColumnName="id",
-	 *      nullable=false,
-	 *      unique=true
+	 *      unique=true,
 	 *      ),
 	 *      @ORM\JoinColumn(
 	 *      name="assigned",
@@ -137,24 +135,6 @@ class Account
 	 *      fetch="EXTRA_LAZY",
 	 *      indexBy="id",
 	 *      cascade={"all","merge","persist","refresh","remove"}
-	 *      )
-	 *      @ORM\JoinTable(
-	 *      name="events_account",
-	 *      joinColumns={
-	 *      @ORM\JoinColumn(
-	 *      name="account_id",
-	 *      referencedColumnName="id",
-	 *      onDelete="CASCADE",
-	 *      )
-	 *      },
-	 *      inverseJoinColumns={
-	 *      @ORM\JoinColumn(
-	 *      name="event_id",
-	 *      referencedColumnName="id",
-	 *      unique=true,
-	 *      onDelete="CASCADE",
-	 *      ),
-	 *      }
 	 *      )
 	 *      @ORM\OrderBy({"id"="DESC"})
 	 *      @Annotation\Exclude()
