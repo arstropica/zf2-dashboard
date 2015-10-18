@@ -3,6 +3,7 @@ namespace Lead\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Zend\Form\Annotation;
+use Application\Provider\EntityDataTrait;
 
 /**
  * Lead
@@ -13,6 +14,7 @@ use Zend\Form\Annotation;
  */
 class Lead
 {
+	use EntityDataTrait;
 
 	/**
 	 *
