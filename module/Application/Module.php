@@ -14,6 +14,7 @@ use Application\Controller\Plugin\BodyClasses;
 use Application\View\Helper\FlashMessenger;
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use Application\Event\Listener\AggregateListener;
+use Application\Controller\Plugin\DataDump;
 
 class Module implements AutoloaderProviderInterface
 {
@@ -182,6 +183,42 @@ class Module implements AutoloaderProviderInterface
 								
 								$element->setObjectManager($entityManager);
 							}
+						}
+				)
+		);
+	}
+
+	public function getControllerPluginConfig ()
+	{
+		return array(
+				'factories' => array(
+						'getJsonErrorResponse' => 'Application\Controller\Factory\JsonErrorResponseFactory',
+						'getErrorResponse' => 'Application\Controller\Factory\ErrorResponseFactory',
+						'logConsole' => function  ($sm)
+						{
+							$serviceLocator = $sm->getServiceLocator();
+							$dataDump = new DataDump($serviceLocator, 
+									'logConsole');
+							return $dataDump;
+						},
+						'dumpConsole' => function  ($sm)
+						{
+							$serviceLocator = $sm->getServiceLocator();
+							$dataDump = new DataDump($serviceLocator, 
+									'dumpConsole');
+							return $dataDump;
+						},
+						'preDump' => function  ($sm)
+						{
+							$serviceLocator = $sm->getServiceLocator();
+							$dataDump = new DataDump($serviceLocator, 'preDump');
+							return $dataDump;
+						},
+						'varDump' => function  ($sm)
+						{
+							$serviceLocator = $sm->getServiceLocator();
+							$dataDump = new DataDump($serviceLocator, 'varDump');
+							return $dataDump;
 						}
 				)
 		);
