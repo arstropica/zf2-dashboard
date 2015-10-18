@@ -26,6 +26,10 @@
 			</p>
 			<section id="apikey" class="collapse">
 				<div class="well">
+					<p class="url">
+						URL:
+						<code><?php echo $this->url('oauth',[], ['force_canonical' => true]); ?></code>
+					</p>
 					<p class="user">
 						User:
 						<code><?php echo $this->zfcUserIdentity()->getUsername(); ?></code>
