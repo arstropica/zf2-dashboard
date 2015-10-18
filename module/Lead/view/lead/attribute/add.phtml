@@ -19,8 +19,8 @@ $this->entityForm->prepare();
 </h1>
 <hr class="small">
 <div class="row" id ="attributeAddForm">
+<?php echo $this->form(null, \Application\Form\View\Helper\Form::LAYOUT_HORIZONTAL)->openTag($this->entityForm); ?>
 	<div class="col-xs-12">
-		<?php echo $this->form(null, \Application\Form\View\Helper\Form::LAYOUT_HORIZONTAL)->openTag($this->entityForm); ?>
 
 		<div class="panel panel-primary">
 			<div class="panel-heading">
@@ -86,7 +86,7 @@ $this->entityForm->prepare();
 				</div>
 			</div>
 		</div>
-		<?php echo $this->form()->closeTag($this->entityForm); ?>
 	</div>
+<?php echo $this->form()->closeTag($this->entityForm); ?>
 </div>
 

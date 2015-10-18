@@ -18,38 +18,40 @@ $this->entityForm->prepare();
 	</span>
 </h1>
 <hr class="small">
-<div class="row" id ="leadAddForm">
+<div class="row" id="leadAddForm">
+	<?php echo $this->form(null, \Application\Form\View\Helper\Form::LAYOUT_HORIZONTAL)->openTag($this->entityForm); ?>
 	<div class="col-xs-12">
-		<?php echo $this->form(null, \Application\Form\View\Helper\Form::LAYOUT_HORIZONTAL)->openTag($this->entityForm); ?>
-
 		<div class="panel panel-primary">
 			<div class="panel-heading">
-				<h3 class="panel-title">
-						Lead Summary
-					</h3>
+				<h3 class="panel-title">Lead Summary</h3>
 			</div>
 			<div class="panel-body">
-				<fieldset style="margin: 0 15px; padding:0 15px;">
+				<fieldset style="margin: 0 15px; padding: 0 15px;">
 				<?php foreach ($this->entityForm as $fieldName => $elementOrFieldset) : ?>
 					<?php switch ($fieldName) : case 'attributes' : case 'cancel' : case 'submit' : ?>
 							<?php break; ?>
 						<?php default : ?>
 							<?php if ($elementOrFieldset instanceof Collection) : ?>
-								<fieldset id="<?php echo $elementOrFieldset->getAttribute('id'); ?>-wrapper">
+								<fieldset
+						id="<?php echo $elementOrFieldset->getAttribute('id'); ?>-wrapper">
 									<?php echo $this->fieldCollection($elementOrFieldset); ?>
 								</fieldset>
 							<?php elseif ($elementOrFieldset instanceof Fieldset) : ?>
-								<fieldset id="<?php echo $elementOrFieldset->getAttribute('id'); ?>-wrapper">
+								<fieldset
+						id="<?php echo $elementOrFieldset->getAttribute('id'); ?>-wrapper">
 									<?php if ($elementOrFieldset->getLabel()) : ?>
 										<legend><?php echo $this->formLabel($elementOrFieldset); ?></legend>
 									<?php endif; ?>
 									<?php foreach ($elementOrFieldset as $element) : ?>
 										<?php if ($element instanceof Collection) : ?>
-											<fieldset id="<?php echo $element->getAttribute('id'); ?>-wrapper">
+											<fieldset
+							id="<?php echo $element->getAttribute('id'); ?>-wrapper">
 												<?php echo $this->fieldCollection($element); ?>
 											</fieldset>
 										<?php elseif ($element instanceof Fieldset) : ?>
-											<fieldset <?php if (($elementId = $element->getAttribute('id')) === true) :?> id="<?php echo $elementId; ?>-wrapper" <?php endif; ?>>
+											<fieldset
+							<?php if (($elementId = $element->getAttribute('id')) === true) :?>
+							id="<?php echo $elementId; ?>-wrapper" <?php endif; ?>>
 												<?php foreach ($element as $oElement) : ?>
 													<?php echo $this->formRow($oElement); ?>
 												<?php endforeach; ?>
@@ -90,7 +92,12 @@ $this->entityForm->prepare();
 				</div>
 			</div>
 		</div>
-		<?php echo $this->form()->closeTag($this->entityForm); ?>
 	</div>
+	<?php echo $this->form()->closeTag($this->entityForm); ?>
 </div>
-
+<?php echo $this->losHeadLink()->setBasePath('/js')->appendChosen()?>
+<?php echo $this->losHeadScript()->setBasePath('/js')->appendChosen()?>
+<script type="text/javascript">
+	$('#account').prop('multiple', 'multiple').prop("selected", false).val([]);
+	<?= $this->losChosen('#account',['disable_search_threshold'=>2, 'max_selected_options'=>1, 'placeholder_text_multiple' => 'Select Account', 'allow_single_deselect'=>true])?>
+</script>

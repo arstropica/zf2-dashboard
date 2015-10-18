@@ -602,6 +602,13 @@ class LeadController extends AbstractCrudController
 				));
 	}
 
+	/**
+	 * (non-PHPdoc)
+	 *
+	 * @see \LosBase\Controller\ORM\AbstractCrudController::getForm()
+	 *
+	 * @return /Zend/Form/Form
+	 */
 	public function getForm ($entityClass = null)
 	{
 		$form = parent::getForm($entityClass);
@@ -663,6 +670,13 @@ class LeadController extends AbstractCrudController
 		return $form;
 	}
 
+	/**
+	 * (non-PHPdoc)
+	 *
+	 * @see \LosBase\Controller\ORM\AbstractCrudController::getAddForm()
+	 *
+	 * @return /Zend/Form/Form
+	 */
 	protected function getAddForm ($data = array())
 	{
 		$sl = $this->getServiceLocator();
@@ -808,7 +822,9 @@ class LeadController extends AbstractCrudController
 						if (($lead instanceof Lead) &&
 								 (null !== $lead->getAccount())) {
 							$account = $lead->getAccount();
-							$account->removeLeads([$lead]);
+							$account->removeLeads([
+									$lead
+							]);
 							$lead->setAccount(null);
 							
 							try {

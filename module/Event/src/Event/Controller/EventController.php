@@ -219,9 +219,8 @@ class EventController extends AbstractCrudController
 					$qb->setParameter($key, $value);
 				}
 			}
-			echo "<script>console.dir(" . json_encode($qb->getQuery()->getSQL()) .
-					 ");</script>";
 		}
+		
 		return $qb;
 	}
 }
