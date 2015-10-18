@@ -2,7 +2,9 @@
 namespace Account\Form;
 use Application\Form\AbstractForm;
 use DoctrineORMModule\Stdlib\Hydrator\DoctrineEntity as DoctrineHydrator;
+use Zend\InputFilter\InputFilterAwareInterface;
 use Doctrine\ORM\EntityManager;
+use Zend\InputFilter\InputFilter;
 use Account\Entity\Account;
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
@@ -12,7 +14,8 @@ use Zend\ServiceManager\ServiceLocatorInterface;
  * @author arstropica
  *        
  */
-class EditForm extends AbstractForm implements ObjectManagerAwareInterface
+class EditForm extends AbstractForm implements ObjectManagerAwareInterface, 
+		InputFilterAwareInterface
 {
 
 	/**
@@ -26,6 +29,12 @@ class EditForm extends AbstractForm implements ObjectManagerAwareInterface
 	 * @var ServiceLocatorInterface
 	 */
 	protected $serviceLocator;
+
+	/**
+	 *
+	 * @var InputFilter
+	 */
+	protected $inputFilter;
 
 	public function __construct ()
 	{
@@ -50,7 +59,7 @@ class EditForm extends AbstractForm implements ObjectManagerAwareInterface
 				array(
 						'name' => 'apis',
 						'type' => 'DoctrineModule\Form\Element\ObjectSelect',
-						'required' => false,
+						'required' => true,
 						'allow_empty' => false,
 						'continue_if_empty' => true,
 						'options' => array(
@@ -138,5 +147,27 @@ class EditForm extends AbstractForm implements ObjectManagerAwareInterface
 	{
 		$this->entityManager = $entityManager;
 		return $this;
+	}
+
+	public function getInputFilter ()
+	{
+		if (! $this->inputFilter) {
+			$inputFilter = new InputFilter();
+			
+			$inputFilter->add(
+					array(
+							'name' => 'apis',
+							'required' => false,
+					));
+			
+			$inputFilter->add(
+					array(
+							'name' => 'apiSettings',
+							'required' => false,
+					));
+			
+			$this->inputFilter = $inputFilter;
+		}
+		return $this->inputFilter;
 	}
 }

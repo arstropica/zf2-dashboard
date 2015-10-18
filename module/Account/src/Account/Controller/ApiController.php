@@ -219,7 +219,7 @@ class ApiController extends AbstractCrudController
 					->get('translator')
 					->translate($this->successEditMessage));
 		
-		return $this->redirect()->toRoute($this->getActionRoute('view'), 
+		return $this->redirect()->toRoute($this->getMatchedRoute(), 
 				[
 						'id' => $id
 				], true);

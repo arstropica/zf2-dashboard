@@ -90,7 +90,7 @@ class Account
 	 *      )
 	 *      @Annotation\Exclude()
 	 */
-	protected $apis;
+	private $apis;
 
 	/**
 	 *

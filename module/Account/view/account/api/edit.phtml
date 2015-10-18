@@ -25,9 +25,9 @@ $this->entityForm->prepare();
 	</span>
 </h1>
 <hr class="small">
+<?php echo $this->form(null, \Application\Form\View\Helper\Form::LAYOUT_HORIZONTAL)->openTag($this->entityForm); ?>
 <div class="row" id ="accountAPIEntityForm">
 	<div class="col-xs-12">
-		<?php echo $this->form(null, \Application\Form\View\Helper\Form::LAYOUT_HORIZONTAL)->openTag($this->entityForm); ?>
 		<?php foreach ($this->entityForm as $fieldName => $elementOrFieldset) : ?>
 		<?php switch ($fieldName) : case 'apis' : ?>
 				<div class="panel panel-primary">
@@ -89,7 +89,7 @@ $this->entityForm->prepare();
 				</div>
 			</div>
 		</div>
-		<?php echo $this->form()->closeTag($this->entityForm); ?>
 	</div>
 </div>
+<?php echo $this->form()->closeTag($this->entityForm); ?>
 
