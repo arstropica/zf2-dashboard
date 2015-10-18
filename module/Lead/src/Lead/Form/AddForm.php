@@ -103,7 +103,7 @@ class AddForm extends AbstractForm implements ObjectManagerAwareInterface, Input
 						'required' => true,
 						'options' => array(
 								'label' => 'Add Lead Details',
-								'count' => 5,
+								'count' => 8,
 								'should_create_template' => true,
 								'template_placeholder' => '__index__',
 								'allow_add' => true,
