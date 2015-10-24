@@ -103,8 +103,11 @@ $this->headTitle($title);
 							href="<?php echo $entity->getReferrer(); ?>"><?php echo $entity->getReferrer(); ?></a></td>
 						<td class="col-xs-2 date"><?php echo date_format($entity->getTimecreated(), 'd M, Y h:i A') ?></td>
 						<td class="action col-xs-1 text-right"><a
-							href="<?php echo $this->losUrl()->from('lead/view',['id'=>$entity->getId()], false)?>"
+							href="<?php echo $this->losUrl()->from('lead/view',['id'=>$entity->getId()], true)?>"
 							title="View Lead" class="btn btn-xs btn-info"><?php echo $this->losIcon('glyphicon-eye-open') ?></a>
+							<a
+							href="<?php echo $this->losUrl()->from('lead/edit',['id'=>$entity->getId()], true)?>"
+							title="Edit Lead" class="btn btn-xs btn-warning"><?php echo $this->losIcon('glyphicon-edit') ?></a>
 						</td>
 					</tr>
 				<?php endforeach;?>

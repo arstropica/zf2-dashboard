@@ -6,7 +6,7 @@ $this->headTitle($title);
 <h1>
 <?php echo $this->escapeHtml($title); ?>
 <span class="pull-right"> <a class="btn btn-info"
-		href="<?php echo $this->url('services/email', array('action'=>'list'));?>">Back</a>
+		href="<?php echo $this->losUrl()->from('services/email', ['action'=>'list'], true);?>">Back</a>
 </span>
 </h1>
 <?php

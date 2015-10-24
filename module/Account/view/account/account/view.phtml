@@ -17,8 +17,13 @@ $this->headTitle($title);
 </div>
 <h1>
 <?php echo $this->escapeHtml($title); ?>
-<span class="pull-right"> <a class="btn btn-info"
+<span class="pull-right" style="margin-left: 15px;"> <a
+		class="btn btn-info"
 		href="<?php echo $this->url('account', array('action'=>'list'));?>">Back</a>
+	</span> <span class="pull-right"> <a
+		href="<?php echo $this->url('account/application/api/edit', 
+				['action' => 'edit', 'id' => $entity->getId()]); ?>" 
+		class="btn btn-success" title="API Settings">API Settings</a>
 	</span>
 </h1>
 <hr class="small">
@@ -151,9 +156,13 @@ $events = array_slice($events, 0, 10);
 				</table>
 			</div>
 			<div class="panel-footer">
-				<p><a href="<?php echo $this->url('event', array('action' => 'list'), array('query' => array('account' => $entity->getId()))); ?>" title="View More">View More &hellip;</a></p>
+				<p>
+					<a
+						href="<?php echo $this->url('event', array('action' => 'list'), array('query' => array('account' => $entity->getId()))); ?>"
+						title="View More">View More &hellip;</a>
+				</p>
 			</div>
 		</div>
 	</div>
-	
+
 </div>

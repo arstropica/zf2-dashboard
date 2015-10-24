@@ -10,13 +10,15 @@ $this->headTitle($title);
 ?>
 <h1>
 <?php echo $this->escapeHtml($title); ?>
-<span class="pull-right"> <a class="btn btn-danger"
-		style="margin: 0 15px;"
+	<span class="pull-right"> <a class="btn btn-info"
+		style="margin-left: 15px;"
+		href="<?php echo $this->losUrl()->from('lead', ['action'=>'list'], true);?>">Back</a>
+	</span> <span class="pull-right"> <a class="btn btn-danger"
+		style="margin-left: 15px;"
 		href="<?php echo $this->url('lead/delete', array('action'=>'delete', 'id' => $entity->getId()));?>">Delete
 			Lead</a>
-	</span> <span class="pull-right"> <a class="btn btn-info"
-		style="margin: 0 15px;"
-		href="<?php echo $this->url('lead', array('action'=>'list'));?>">Back</a>
+	</span> <span class="pull-right"> <a class="btn btn-success"
+		href="<?php echo $this->url('lead/edit', array('action'=>'edit', 'id' => $entity->getId()));?>">Edit Lead</a>
 	</span>
 </h1>
 <?php
