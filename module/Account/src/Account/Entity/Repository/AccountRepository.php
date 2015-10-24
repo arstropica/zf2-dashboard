@@ -18,6 +18,7 @@ class AccountRepository extends EntityRepository
 			a 
 		FROM 
 			\Account\Entity\Account a
+		ORDER BY a.description ASC
 DQL;
 		
 		$query = $this->getEntityManager()->createQuery($dql);
@@ -45,6 +46,7 @@ DQL;
 			a 
 		FROM 
 			\Account\Entity\Account a
+		ORDER BY a.name ASC
 DQL;
 		
 		$query = $this->getEntityManager()->createQuery($dql);
@@ -72,6 +74,7 @@ DQL;
 			a
 		FROM
 			\Account\Entity\Account a
+		ORDER BY a.name ASC
 DQL;
 		
 		$query = $this->getEntityManager()->createQuery($dql);
