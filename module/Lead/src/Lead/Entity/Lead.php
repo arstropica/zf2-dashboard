@@ -67,6 +67,7 @@ class Lead
 	 * referencedColumnName="id",
 	 * nullable=true,
 	 * )
+	 * @ORM\OrderBy({"name" = "ASC"})
 	 * @Annotation\Instance("\Account\Entity\Account")
 	 * @Annotation\Type("DoctrineModule\Form\Element\ObjectSelect")
 	 * @Annotation\Filter({"name":"StripTags"})
