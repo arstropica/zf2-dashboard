@@ -249,20 +249,16 @@ class RestController extends AbstractRestfulController
 					case 'attributes':
 						{
 							foreach ($values as $attributeName => $attributeValue) {
-								switch ($attributeName) {
-									default:
-										$leadAttribute = $leadAttributeRepository->findOneBy(
-												[
-														'attributeName' => $attributeName
-												]);
-										break;
-									case 'Question':
-										$leadAttribute = $leadAttributeRepository->findOneBy(
-												[
-														'attributeDesc' => $attributeValue,
-														'attributeName' => 'Question'
-												]);
-										break;
+								$leadAttribute = $leadAttributeRepository->findOneBy(
+										[
+												'attributeName' => $attributeName
+										]);
+								if (! $leadAttribute) {
+									$leadAttribute = $leadAttributeRepository->findOneBy(
+											[
+													'attributeDesc' => $attributeName,
+													'attributeName' => 'Question'
+											]);
 								}
 								if (! $leadAttribute) {
 									$leadAttribute = new LeadAttribute();
