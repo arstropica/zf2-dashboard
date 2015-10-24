@@ -11,3 +11,5 @@ vendor
 composer.phar
 /assets/
 /cgi-bin/
+/deployment.properties
+/deployment.xml
