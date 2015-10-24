@@ -50,10 +50,12 @@ class FilterForm extends Form implements InputFilterAwareInterface
 		
 		$rq = $this->serviceLocator->get('Request');
 		
-		$this->setAttribute('action', $this->url->__invoke($r->getMatchedRouteName(), [], [
-				'query' => $rq->getQuery()
-					->toArray()
-		], true));
+		$this->setAttribute('action', 
+				$this->url->__invoke($r->getMatchedRouteName(), [], 
+						[
+								'query' => $rq->getQuery()
+									->toArray()
+						], true));
 		
 		$this->setAttribute('method', 'GET');
 		
