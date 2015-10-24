@@ -366,12 +366,14 @@ return array(
 		'service_manager' => array(
 				'factories' => array(
 						'Lead\Form\AddFormFactory' => 'Lead\Form\Factory\AddFormFactory',
+						'Lead\Form\EditFormFactory' => 'Lead\Form\Factory\EditFormFactory',
 						'Lead\Form\Attribute\AddFormFactory' => 'Lead\Form\Factory\Attribute\AddFormFactory'
 				)
 		),
 		'form_elements' => array(
 				'invokables' => array(
 						'Lead\Form\AddForm' => 'Lead\Form\AddForm',
+						'Lead\Form\EditForm' => 'Lead\Form\EditForm',
 						'Lead\Form\Attribute\AddForm' => 'Lead\Form\Attribute\AddForm'
 				),
 				'factories' => array(

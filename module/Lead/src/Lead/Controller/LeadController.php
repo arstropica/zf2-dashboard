@@ -383,6 +383,8 @@ class LeadController extends AbstractCrudController
 		$em = $this->getEntityManager();
 		$objRepository = $em->getRepository($this->getEntityClass());
 		$entity = $objRepository->find($id);
+		$account_old = $entity->getAccount();
+		$account_old_id = $account_old instanceof Account ? $account_old->getId() : false;
 		
 		$this->getEventManager()->trigger('getForm', $this, 
 				[
@@ -414,11 +416,6 @@ class LeadController extends AbstractCrudController
 			];
 		}
 		
-		$this->createServiceEvent()
-			->setEntityId($id)
-			->setEntityClass($this->getEntityClass())
-			->setDescription("Lead Edited");
-		
 		$this->getEventManager()->trigger('edit', $this, 
 				[
 						'form' => $form,
@@ -431,11 +428,27 @@ class LeadController extends AbstractCrudController
 		
 		if ($savedEntity && $savedEntity instanceof Lead) {
 			$account = $savedEntity->getAccount();
-			$this->getServiceEvent()->setMessage(
-					"Lead #{$id} was " . ($account ? "assigned to " .
-							 $account->getName() : "unassigned") . ".");
+			$account_id = $account instanceof Account ? $account->getId() : false;
+			$this->createServiceEvent()
+				->setEntityId($id)
+				->setEntityClass($this->getEntityClass())
+				->setDescription("Lead Edited");
+			
+			$this->getServiceEvent()->setMessage("Lead #{$id} was edited.");
 			
 			$this->logEvent("EditAction.post");
+			if ($account_id != $account_old_id) {
+				$this->createServiceEvent()
+					->setEntityId($id)
+					->setEntityClass($this->getEntityClass())
+					->setDescription("Lead Edited");
+				
+				$this->getServiceEvent()->setMessage(
+						"Lead #{$id} was " . ($account ? "assigned to " .
+								 $account->getName() : "unassigned") . ".");
+				
+				$this->logEvent("EditAction.post");
+			}
 		} else {
 			return [
 					'entityForm' => $form,
@@ -675,12 +688,39 @@ class LeadController extends AbstractCrudController
 	 *
 	 * @see \LosBase\Controller\ORM\AbstractCrudController::getAddForm()
 	 *
-	 * @return /Zend/Form/Form
+	 * @return /Lead/Form/AddForm
 	 */
 	protected function getAddForm ($data = array())
 	{
 		$sl = $this->getServiceLocator();
 		$form = $sl->get('Lead\Form\AddFormFactory');
+		$form->get('cancel')->setAttributes(
+				[
+						'onclick' => 'top.location=\'' . $this->url()
+							->fromRoute($this->getActionRoute('list')) . '\''
+				]);
+		$form->setInputFilter($form->getInputFilter());
+		if ($data) {
+			$form->setData($data);
+			if (! $form->isValid()) {
+				$form->setData(array());
+			}
+		}
+		
+		return $form;
+	}
+
+	/**
+	 * (non-PHPdoc)
+	 *
+	 * @see \LosBase\Controller\ORM\AbstractCrudController::getEditForm()
+	 *
+	 * @return /Lead/Form/EditForm
+	 */
+	protected function getEditForm ($data = array())
+	{
+		$sl = $this->getServiceLocator();
+		$form = $sl->get('Lead\Form\EditFormFactory');
 		$form->get('cancel')->setAttributes(
 				[
 						'onclick' => 'top.location=\'' . $this->url()
