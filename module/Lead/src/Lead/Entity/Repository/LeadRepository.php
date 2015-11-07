@@ -12,7 +12,7 @@ use Lead\Entity\Lead;
 class LeadRepository extends EntityRepository
 {
 
-	public function getReferrers ($number = 0)
+	public function getReferrers ($number = 0, $mode = 'entity')
 	{
 		$querybuilder = $this->createQueryBuilder('c');
 		$results = $querybuilder->select('c')
@@ -20,13 +20,15 @@ class LeadRepository extends EntityRepository
 			->orderBy('c.referrer', 'ASC')
 			->getQuery()
 			->getResult();
+		
+		// return $results;
 		$unique = [];
 		$filtered = [];
 		foreach ($results as $lead) {
 			$referrer = parse_url($lead->getReferrer(), PHP_URL_HOST);
 			if (! in_array($referrer, $unique)) {
 				$unique[] = $referrer;
-				$filtered[$referrer] = $lead->setReferrer($referrer);
+				$filtered[$referrer] = $mode == 'entity' ? $lead->setReferrer($referrer) : $referrer;
 			}
 		}
 		return $filtered;
