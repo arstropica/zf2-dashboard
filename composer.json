@@ -1,6 +1,7 @@
 {
   "name" : "Target Media Partners",
   "description" : "Skeleton Application for ZF2",
+  "version" : "2.2",
   "require" : {
     "php" : ">=5.5",
     "zendframework/zendframework" : "~2.5",
