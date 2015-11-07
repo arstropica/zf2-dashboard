@@ -224,9 +224,9 @@ return array(
 												'action' => 'add'
 										),
 										array(
-												'label' => 'Add Attribute',
-												'route' => 'attribute/add',
-												'action' => 'add'
+												'label' => 'Display Attributes',
+												'route' => 'attribute',
+												'action' => 'list'
 										),
 										array(
 												'label' => 'View Lead',
@@ -470,6 +470,11 @@ return array(
 																'label' => 'Delete Attribute',
 																'route' => 'attribute/delete',
 																'action' => 'delete'
+														),
+														array(
+																'label' => 'Merge Attribute',
+																'route' => 'attribute/merge',
+																'action' => 'merge'
 														)
 												)
 										)
