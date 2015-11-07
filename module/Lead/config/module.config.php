@@ -350,6 +350,34 @@ return array(
 																'id' => 0
 														)
 												)
+										),
+										'merge' => array(
+												'type' => 'Segment',
+												'options' => array(
+														'route' => '/merge[/:id]',
+														'constraints' => array(
+																'id' => '[0-9]+'
+														),
+														'defaults' => array(
+																'controller' => 'Lead\Controller\Attribute',
+																'action' => 'merge',
+																'id' => 0
+														)
+												)
+										),
+										'sort' => array(
+												'type' => 'Segment',
+												'options' => array(
+														'route' => '/sort[/:id]',
+														'constraints' => array(
+																'id' => '[0-9]+'
+														),
+														'defaults' => array(
+																'controller' => 'Lead\Controller\Attribute',
+																'action' => 'sort',
+																'id' => 0
+														)
+												)
 										)
 								)
 						)
@@ -364,20 +392,27 @@ return array(
 				)
 		),
 		'service_manager' => array(
+				'invokables' => array(
+						'Lead\Entity\Listener\LeadListener' => 'Lead\Entity\Listener\LeadListener'
+				),
 				'factories' => array(
 						'Lead\Form\AddFormFactory' => 'Lead\Form\Factory\AddFormFactory',
 						'Lead\Form\EditFormFactory' => 'Lead\Form\Factory\EditFormFactory',
-						'Lead\Form\Attribute\AddFormFactory' => 'Lead\Form\Factory\Attribute\AddFormFactory'
+						'Lead\Form\Attribute\AddFormFactory' => 'Lead\Form\Factory\Attribute\AddFormFactory',
+						'Lead\Form\Attribute\MergeFormFactory' => 'Lead\Form\Factory\Attribute\MergeFormFactory',
+						'Lead\Model\LeadAttribute' => 'Lead\Model\Factory\LeadAttributeModelFactory'
 				)
 		),
 		'form_elements' => array(
 				'invokables' => array(
 						'Lead\Form\AddForm' => 'Lead\Form\AddForm',
 						'Lead\Form\EditForm' => 'Lead\Form\EditForm',
-						'Lead\Form\Attribute\AddForm' => 'Lead\Form\Attribute\AddForm'
+						'Lead\Form\Attribute\AddForm' => 'Lead\Form\Attribute\AddForm',
+						'Lead\Form\Attribute\MergeForm' => 'Lead\Form\Attribute\MergeForm'
 				),
 				'factories' => array(
 						'Lead\Form\FilterForm' => 'Lead\Form\Factory\FilterFormFactory',
+						'Lead\Form\Attribute\FilterForm' => 'Lead\Form\Factory\Attribute\FilterFormFactory',
 						'Lead\Form\ListForm' => 'Lead\Form\Factory\ListFormFactory',
 						'Lead\Form\ImportForm' => 'Lead\Form\Factory\ImportFormFactory'
 				)
