@@ -93,7 +93,7 @@ class User implements UserInterface, ProviderInterface
 	 *      )
 	 */
 	protected $accounts;
-	
+
 	/**
 	 * Initialies the roles & accounts variables.
 	 */
@@ -254,13 +254,27 @@ class User implements UserInterface, ProviderInterface
 	}
 
 	/**
-	 * Get role.
+	 * Get roles.
 	 *
 	 * @return array
 	 */
 	public function getRoles ()
 	{
 		return $this->roles->getValues();
+	}
+
+	/**
+	 * Get role.
+	 *
+	 * @return string
+	 */
+	public function getRole ()
+	{
+		$roles = $this->getRoles();
+		if ($roles) {
+			return $roles[0]->getRoleId();
+		}
+		return 'guest';
 	}
 
 	/**
@@ -298,15 +312,14 @@ class User implements UserInterface, ProviderInterface
 	}
 
 	/**
-	 * Generate API Key 
-	 * 
-	 * @param integer $len
-	 * @param boolean $readable
-	 * @param boolean $hash
-	 * 
-	 * @return string 
+	 * Generate API Key
+	 *
+	 * @param integer $len        	
+	 * @param boolean $readable        	
+	 * @param boolean $hash        	
+	 *
+	 * @return string
 	 */
-
 	public function addApiKey ($len = 16, $readable = true, $hash = false)
 	{
 		$key = '';
