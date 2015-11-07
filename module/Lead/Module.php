@@ -47,6 +47,22 @@ class Module implements AutoloaderProviderInterface
 		$moduleRouteListener->attach($eventManager);
 		
 		$sm = $e->getApplication()->getServiceManager();
+		
+		$em = $sm->get('Doctrine\ORM\EntityManager');
+		
+		// Register Entity Listeners
+		$config = $this->getConfig();
+		$invokables = isset($config['service_manager']['invokables']) ? $config['service_manager']['invokables'] : [];
+		foreach ($invokables as $invokable) {
+			// Verify the listener namespaces
+			if (strpos($invokable, 'Lead\Entity\Listener') !== false) {
+				$em->getConfiguration()
+					->getEntityListenerResolver()
+					->register($sm->get($invokable));
+			}
+		}
+		
+		// Register Event Listeners
 		$eventManager->attach(new LeadListener($sm));
 		$eventManager->attach(new AttributeListener($sm));
 	}
