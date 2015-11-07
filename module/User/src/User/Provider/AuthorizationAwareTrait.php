@@ -2,6 +2,7 @@
 namespace User\Provider;
 use OAuth2\Server as OAuth2Server;
 use OAuth2\Request as OAuth2Request;
+use User\Service\GoogleAuth;
 
 /**
  *
@@ -24,7 +25,10 @@ trait AuthorizationAwareTrait
 			$request = $this->getServiceLocator()->get('Request');
 			$token = $request->getPost('token', false);
 			if ($token) {
-				$googleAuth = $this->getServiceLocator()->get('GoogleAuth');
+				/* @var $googleAuth GoogleAuth */
+				$googleAuth = $this->getServiceLocator()
+					->get('ControllerPluginManager')
+					->get('isGoogleAuthorized');
 				$authorized = $googleAuth->isGoogleAuthorized($token);
 			}
 		}

@@ -64,6 +64,7 @@ class GoogleAuth implements ServiceLocatorAwareInterface
 			return false;
 		$email = $gUser->email;
 		$authorized_roles = array(
+				'user',
 				'administrator',
 				'moderator'
 		);
