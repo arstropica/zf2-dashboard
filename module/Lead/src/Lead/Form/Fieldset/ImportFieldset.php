@@ -10,15 +10,20 @@ class ImportFieldset extends AbstractFieldset implements
 
 	protected $_fieldNames;
 
-	public function __construct (ObjectManager $objectManager, $fields = array())
+	protected $isAdmin;
+
+	public function __construct (ObjectManager $objectManager, $fields = array(), 
+			$isAdmin = false)
 	{
 		parent::__construct('form');
+		
+		$this->isAdmin = $isAdmin;
 		
 		$this->setObjectManager($objectManager);
 		
 		foreach ($fields as $field) {
 			$attributeFieldset = new AttributeValueFieldset($objectManager, 
-					$field);
+					$field, $isAdmin);
 			$attributeFieldset->setName($field);
 			$this->add($attributeFieldset);
 		}
