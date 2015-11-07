@@ -11,20 +11,24 @@ use OAuth2\Request as OAuth2Request;
 trait AuthorizationAwareTrait
 {
 
-	/**
-	 *
-	 * @var OAuth2Server
-	 */
-	protected $server;
-
 	protected function authorize ()
 	{
-		if (! $this->getOAuth2Server()->verifyResourceRequest(
-				OAuth2Request::createFromGlobals())) {
-			// Not authorized
-			return false;
+		$authorized = false;
+		
+		/* @var $server OAuth2Server */
+		$server = $this->getServiceLocator()->get('OAuth2Server');
+		if ($server->verifyResourceRequest(OAuth2Request::createFromGlobals())) {
+			// authorized
+			$authorized = true;
+		} else {
+			$request = $this->getServiceLocator()->get('Request');
+			$token = $request->getPost('token', false);
+			if ($token) {
+				$googleAuth = $this->getServiceLocator()->get('GoogleAuth');
+				$authorized = $googleAuth->isGoogleAuthorized($token);
+			}
 		}
-		return true;
+		return $authorized ? true : false;
 	}
 
 	/**
@@ -32,7 +36,8 @@ trait AuthorizationAwareTrait
 	 *
 	 * @return boolean
 	 */
-	protected function isUserAuthorized ($_roles = ['user', 'moderator', 'administrator'])
+	protected function isUserAuthorized (
+			$_roles = ['user', 'moderator', 'administrator'])
 	{
 		$authorized = false;
 		if ($this->getServiceLocator()
@@ -54,32 +59,6 @@ trait AuthorizationAwareTrait
 			}
 		}
 		return $authorized;
-	}
-
-	/**
-	 * Get OAuth2Server from Service Manager
-	 *
-	 * @return OAuth2Server
-	 */
-	protected function getOAuth2Server ()
-	{
-		if (! $this->server) {
-			$server = $this->getServiceLocator()->get('OAuth2Server');
-			$this->setOAuth2Server($server);
-		}
-		return $this->server;
-	}
-
-	/**
-	 * Set OAuth2Server
-	 *
-	 * @param OAuth2Server $server        	
-	 *
-	 * @return void
-	 */
-	protected function setOAuth2Server (OAuth2Server $server)
-	{
-		$this->server = $server;
 	}
 }
 
