@@ -34,12 +34,19 @@ class SoapClientController extends AbstractActionController
 
 	protected function authorize ()
 	{
-		if (! $this->server->verifyResourceRequest(
+		$authorized = false;
+		if ($this->server->verifyResourceRequest(
 				OAuth2Request::createFromGlobals())) {
-			// Not authorized return 401 error
-			return false;
+			// authorized
+			$authorized = true;
+		} else {
+			$request = $this->getRequest();
+			$token = $request->getPost('token', false);
+			if ($token) {
+				$authorized = $this->isGoogleAuthorized($token);
+			}
 		}
-		return true;
+		return $authorized ? true : false;
 	}
 
 	public function indexAction ()
@@ -66,8 +73,7 @@ class SoapClientController extends AbstractActionController
 			->get('TenStreet\Service\PostClientData')
 			->send($id);
 		
-		return $this->getJsonErrorResponse(
-				'json')->successOperation($result);
+		return $this->getJsonErrorResponse('json')->successOperation($result);
 	}
 
 	public function preDispatch ()
