@@ -47,12 +47,19 @@ class RestController extends AbstractRestfulController
 
 	protected function authorize ()
 	{
-		if (! $this->server->verifyResourceRequest(
+		$authorized = false;
+		if ($this->server->verifyResourceRequest(
 				OAuth2Request::createFromGlobals())) {
-			// Not authorized return 401 error
-			return false;
+			// authorized
+			$authorized = true;
+		} else {
+			$request = $this->getRequest();
+			$token = $request->getPost('token', false);
+			if ($token) {
+				$authorized = $this->isGoogleAuthorized($token);
+			}
 		}
-		return true;
+		return $authorized ? true : false;
 	}
 
 	public function indexAction ()
@@ -213,19 +220,14 @@ class RestController extends AbstractRestfulController
 		$this->createServiceEvent()
 			->setEntityId($id)
 			->setEntityClass($this->getEntityClass());
-		$access_token = $this->getRequest()->getPost('access_token');
+		$token = $this->getRequest()->getPost('token');
 		$response = false;
 		try {
 			$response = $this->forward()->dispatch('Lead\Controller\Services', 
 					array(
 							'action' => 'process',
 							'id' => $id
-					), 
-					array(
-							"query" => array(
-									"access_token" => $access_token
-							)
-					), true);
+					), array(), true);
 		} catch (\Exception $e) {
 			$this->logError($e);
 			return $this->getJsonErrorResponse('json')->errorHandler(400, 
@@ -445,9 +447,12 @@ class RestController extends AbstractRestfulController
 		}
 		
 		if ($lead) {
+			$referrer = $lead->getReferrer();
 			$this->getServiceEvent()
 				->setEntityId($lead->getId())
-				->setMessage("Lead #" . $lead->getId() . " created.");
+				->setMessage(
+					"Lead #" . $lead->getId() . " submitted from " . $referrer .
+							 ".");
 			$this->logEvent("AddAction.post");
 			$result = $lead;
 		}
