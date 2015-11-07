@@ -11,6 +11,9 @@ use Zend\View\Helper\Navigation\AbstractHelper as ZendViewHelperNavigation;
 use Zend\Session\Config\SessionConfig;
 use Zend\Session\Container;
 use Zend\Session\SessionManager;
+use User\Controller\Plugin\GoogleUser;
+use User\Controller\Plugin\GoogleAuth;
+use User\Service\GoogleAuth as GoogleAuthService;
 
 class Module implements AutoloaderProviderInterface
 {
@@ -48,7 +51,8 @@ class Module implements AutoloaderProviderInterface
 						'namespaces' => array(
 								// if we're in a namespace deeper than one level
 								// we need to fix the \ in the path
-								__NAMESPACE__ => __DIR__ . '/src/' . str_replace('\\', '/', __NAMESPACE__)
+								__NAMESPACE__ => __DIR__ . '/src/' .
+										 str_replace('\\', '/', __NAMESPACE__)
 						)
 				)
 		);
@@ -79,12 +83,88 @@ class Module implements AutoloaderProviderInterface
 						{
 							$options = $sm->get('zfcuser_module_options');
 							$mapper = new Mapper\User();
-							$mapper->setDbAdapter($sm->get('zfcuser_zend_db_adapter'));
+							$mapper->setDbAdapter(
+									$sm->get('zfcuser_zend_db_adapter'));
 							$entityClass = $options->getUserEntityClass();
 							$mapper->setEntityPrototype(new $entityClass());
 							$mapper->setHydrator(new Mapper\UserHydrator());
 							$mapper->setTableName($options->getTableName());
 							return $mapper;
+						},
+						'GoogleClient' => function  ($sm)
+						{
+							$config = $sm->get('Config');
+							$gapi_settings = isset($config['User']['gapi']) ? $config['User']['gapi'] : false;
+							if ($gapi_settings) {
+								$client = new \Google_Client();
+								$client->setAccessType('offline');
+								$client->setApplicationName(
+										'Target Media Partners');
+								$client->setClientId(
+										$gapi_settings['CLIENT_ID']);
+								$client->setClientSecret(
+										$gapi_settings['CLIENT_SECRET']);
+								$client->setRedirectUri(
+										$gapi_settings['CALLBACK']);
+								$client->setDeveloperKey(
+										$gapi_settings['DEVELOPER_KEY']);
+								$client->setScopes(
+										array(
+												'profile',
+												'email'
+										));
+								return $client;
+							} else {
+								throw new \Exception(
+										'Settings for the Google Application were not found.');
+							}
+						},
+						'GoogleAuth' => function  ($sm)
+						{
+							$serviceLocator = $sm;
+							$googleAuth = new GoogleAuthService($serviceLocator);
+							return $googleAuth;
+						},
+						'User\Cache' => function  ($sm)
+						{
+							$cache = \Zend\Cache\StorageFactory::factory(
+									array(
+											'adapter' => 'filesystem',
+											'plugins' => array(
+													'exception_handler' => array(
+															'throw_exceptions' => FALSE
+													),
+													'serializer'
+											)
+									));
+							
+							$cache->setOptions(
+									array(
+											'cache_dir' => './data/cache',
+											'ttl' => 60 * 60
+									));
+							
+							return $cache;
+						}
+				)
+		);
+	}
+
+	public function getControllerPluginConfig ()
+	{
+		return array(
+				'factories' => array(
+						'GoogleUser' => function  ($sm)
+						{
+							$serviceLocator = $sm->getServiceLocator();
+							$googleUser = new GoogleUser($serviceLocator);
+							return $googleUser;
+						},
+						'isGoogleAuthorized' => function  ($sm)
+						{
+							$serviceLocator = $sm->getServiceLocator();
+							$googleAuth = new GoogleAuth($serviceLocator);
+							return $googleAuth;
 						}
 				)
 		);
