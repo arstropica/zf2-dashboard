@@ -127,7 +127,7 @@ class ImportForm extends Form implements InputFilterAwareInterface,
 		$this->addInputFilter();
 	}
 
-	public function addImportFieldset ($options = array())
+	public function addImportFieldset ($options = array(), $isAdmin = false)
 	{
 		$objectManager = $this->getObjectManager();
 		$this->add(
@@ -144,7 +144,7 @@ class ImportForm extends Form implements InputFilterAwareInterface,
 						'name' => 'Company'
 				));
 		
-		$leadImportFieldset = new ImportFieldset($objectManager, $options);
+		$leadImportFieldset = new ImportFieldset($objectManager, $options, $isAdmin);
 		$leadImportFieldset->setName('match')->setOptions(
 				array(
 						'label' => "Enter or Select matching fields for your data.",
@@ -180,10 +180,10 @@ class ImportForm extends Form implements InputFilterAwareInterface,
 		return $leadAttributeValuesFieldset;
 	}
 
-	public function getImportFieldset ($options = [])
+	public function getImportFieldset ($options = [], $isAdmin = false)
 	{
 		$objectManager = $this->getObjectManager();
-		return new ImportFieldset($objectManager, $options);
+		return new ImportFieldset($objectManager, $options, $isAdmin);
 	}
 
 	public function addInputFilter ()
@@ -259,13 +259,29 @@ class ImportForm extends Form implements InputFilterAwareInterface,
 		return $this->objectManager;
 	}
 
-    public function __sleep()
-    {
-        return $this->getData();
-    }
-    
-    public function __wakeup()
-    {
-        // ...
-    }
+	public function __sleep ()
+	{
+		$data = false;
+		try {
+			if ($this->isValid()) {
+				$data = $this->getData();
+			} else {
+				$data = false;
+			}
+		} catch (\Exception $e) {
+			$data = false;
+		}
+		if ($data) {
+			$this->storage = array_filter($data);
+			return [
+					'storage'
+			];
+		}
+		return [];
+	}
+
+	public function __wakeup ()
+	{
+		// ...
+	}
 }
