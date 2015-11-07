@@ -82,7 +82,7 @@ class EmailController extends AbstractCrudController
 				'table' => [
 						"description" => [
 								"col" => 3,
-								"label" => "Lead",
+								"label" => "Name",
 								"sort" => false
 						],
 						"event" => [
