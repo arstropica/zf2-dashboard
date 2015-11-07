@@ -2,11 +2,18 @@
 namespace Lead\Controller;
 use Application\Controller\AbstractCrudController;
 use Zend\Paginator\Paginator;
-use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator;
-use LosBase\ORM\Tools\Pagination\Paginator as LosPaginator;
+use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator as DoctrinePaginatorAdapter;
+use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
+// use LosBase\ORM\Tools\Pagination\Paginator as LosPaginator;
 use Zend\Stdlib\ResponseInterface as Response;
 use Lead\Entity\LeadAttribute;
 use DoctrineORMModule\Stdlib\Hydrator\DoctrineEntity as DoctrineHydrator;
+use Lead\Form\Attribute\MergeForm;
+use User\Provider\IdentityAwareTrait;
+use Doctrine\ORM\QueryBuilder as Builder;
+use Zend\View\Model\JsonModel;
+use Lead\Model\LeadAttributeModel;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  *
@@ -15,8 +22,10 @@ use DoctrineORMModule\Stdlib\Hydrator\DoctrineEntity as DoctrineHydrator;
  */
 class AttributeController extends AbstractCrudController
 {
+	
+	use IdentityAwareTrait;
 
-	protected $defaultSort = 'id';
+	protected $defaultSort = 'attributeOrder';
 
 	protected $defaultOrder = 'asc';
 
@@ -38,6 +47,8 @@ class AttributeController extends AbstractCrudController
 
 	protected $successDeleteMessage = 'The Lead Attribute(s) were successfully deleted.';
 
+	protected $successMergeMessage = 'The Lead Attribute(s) were successfully merged.';
+
 	protected $errorEditMessage = 'There was a problem assigning your Lead Attribute(s).';
 
 	protected $errorAssignMessage = 'There was a problem assigning your Lead Attribute(s).';
@@ -45,6 +56,8 @@ class AttributeController extends AbstractCrudController
 	protected $errorSubmitMessage = 'There was a problem submitting your Lead Attribute(s).';
 
 	protected $errorDeleteMessage = 'There was a problem deleting your Lead Attribute(s).';
+
+	protected $errorMergeMessage = 'There was a problem merging your Lead Attribute(s).';
 
 	public function listAction ()
 	{
@@ -68,41 +81,78 @@ class AttributeController extends AbstractCrudController
 		$qb = $this->getEntityManager()->createQueryBuilder();
 		$qb->add('select', 'e')
 			->add('from', $this->getEntityClass() . ' e')
-			->orderBy('e.' . $sort, $order)
 			->setFirstResult($offset)
 			->setMaxResults($limit);
 		
+		$sortable = false;
+		if ($sort == 'count') {
+			$qb->groupBy('e');
+			$qb->addSelect('COUNT(v.id) AS HIDDEN vcount');
+			$qb->leftJoin('e.values', 'v');
+			$qb->orderBy('vcount', $order);
+		} elseif ($sort == 'attributeOrder') {
+			$sortable = true;
+			$qb->addSelect('-e.attributeOrder AS HIDDEN vcount');
+			$qb->orderBy('vcount', $this->reverseOrder($order));
+		} else {
+			$qb->orderBy('e.' . $sort, $order);
+		}
+		
+		$qb = $this->handleSearch($qb);
+		
 		$pager = $this->getPagerForm($limit);
 		
+		$q = $qb->getQuery();
+		
+		$q->setMaxResults($limit);
+		$q->setFirstResult($offset);
+		
 		$paginator = new Paginator(
-				new DoctrinePaginator(new LosPaginator($qb, false)));
+				new DoctrinePaginatorAdapter(
+						new DoctrinePaginator($q, $fetchJoin = true)));
 		$paginator->setDefaultItemCountPerPage($limit);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setPageRange($this->paginatorRange);
 		
 		$ui = [
 				'table' => [
-						"name" => [
-								"col" => 2,
-								"label" => "Name",
+						"attributeOrder" => [
+								"col" => 1,
+								"label" => "Order",
 								"sort" => true
 						],
-						"description" => [
-								"col" => 9,
+						"attributeName" => [
+								"col" => 2,
+								"label" => "Field ID",
+								"sort" => true
+						],
+						"attributeDesc" => [
+								"col" => $sortable ? 5 : 6,
 								"label" => "Description",
-								"sort" => false
+								"sort" => true
+						],
+						"count" => [
+								"col" => 1,
+								"label" => "# Leads",
+								"sort" => true
 						]
 				]
 		];
 		
+		$filters = $this->getFilterForm($this->params()
+			->fromQuery());
+		
 		return [
 				'paginator' => $paginator,
+				'filters' => $filters,
 				'sort' => $sort,
 				'order' => $order,
 				'page' => $page,
 				'pager' => $pager,
 				'query' => $this->params()->fromQuery(),
-				'ui' => $ui
+				'ui' => $ui,
+				'isAdmin' => $this->isAdmin(),
+				'sortable' => $sortable
 		];
 	}
 
@@ -134,7 +184,11 @@ class AttributeController extends AbstractCrudController
 		
 		$form->bind($entity);
 		
-		$redirectUrl = $this->url()->fromRoute($this->getActionRoute(), [], true);
+		$redirectUrl = $this->url()->fromRoute($this->getActionRoute(), [], 
+				[
+						'query' => $this->params()
+							->fromQuery()
+				], true);
 		$prg = $this->fileprg($form, $redirectUrl, true);
 		
 		if ($prg instanceof Response) {
@@ -192,8 +246,11 @@ class AttributeController extends AbstractCrudController
 			$action = 'list';
 		}
 		
-		return $this->redirect()->toRoute($this->getActionRoute($action), [], 
-				true);
+		return $this->redirect()->toRoute($this->getActionRoute('list'), [], 
+				[
+						'query' => $this->params()
+							->fromQuery()
+				], true);
 	}
 
 	/**
@@ -247,7 +304,11 @@ class AttributeController extends AbstractCrudController
 		
 		$form->bind($entity);
 		
-		$redirectUrl = $this->url()->fromRoute($this->getActionRoute(), [], true);
+		$redirectUrl = $this->url()->fromRoute($this->getActionRoute(), [], 
+				[
+						'query' => $this->params()
+							->fromQuery()
+				], true);
 		$prg = $this->fileprg($form, $redirectUrl, true);
 		
 		if ($prg instanceof Response) {
@@ -301,7 +362,276 @@ class AttributeController extends AbstractCrudController
 					->translate($this->successEditMessage));
 		
 		return $this->redirect()->toRoute($this->getActionRoute('list'), [], 
-				true);
+				[
+						'query' => $this->params()
+							->fromQuery()
+				], true);
+	}
+
+	/**
+	 * (non-PHPdoc)
+	 *
+	 * @see \LosBase\Controller\ORM\AbstractCrudController::deleteAction()
+	 */
+	public function deleteAction ()
+	{
+		$id = $this->getEvent()
+			->getRouteMatch()
+			->getParam('id', 0);
+		
+		$redirectUrl = $this->url()->fromRoute($this->getActionRoute(), [], 
+				[
+						'query' => $this->params()
+							->fromQuery()
+				], true);
+		$prg = $this->prg($redirectUrl, true);
+		
+		if ($prg instanceof Response) {
+			return $prg;
+		} elseif ($prg === false) {
+			$em = $this->getEntityManager();
+			$objRepository = $em->getRepository($this->getEntityClass());
+			$entity = $objRepository->find($id);
+			
+			return [
+					'entity' => $entity
+			];
+		}
+		
+		$post = $prg;
+		
+		$em = $this->getEntityManager();
+		$objRepository = $em->getRepository($this->getEntityClass());
+		$entity = $objRepository->find($id);
+		
+		if ($this->validateDelete($post)) {
+			if ($this->getEntityService()->delete($entity)) {
+				$this->flashMessenger()->addSuccessMessage(
+						$this->getServiceLocator()
+							->get('translator')
+							->translate($this->successDeleteMessage));
+				
+				return $this->redirect()->toRoute($this->getActionRoute('list'), 
+						[], 
+						[
+								'query' => $this->params()
+									->fromQuery()
+						], true);
+			}
+		}
+		
+		$this->flashMessenger()->addErrorMessage(
+				$this->getServiceLocator()
+					->get('translator')
+					->translate($this->errorDeleteMessage));
+		
+		return [
+				'entity' => $entity
+		];
+	}
+
+	public function mergeAction ()
+	{
+		$id = $this->getEvent()
+			->getRouteMatch()
+			->getParam('id', 0);
+		
+		$form = $this->getMergeForm();
+		
+		$form->get('attribute')->setValue($id);
+		
+		$em = $this->getEntityManager();
+		$objRepository = $em->getRepository($this->getEntityClass());
+		$entity = $objRepository->find($id);
+		
+		$this->getEventManager()->trigger('getForm', $this, 
+				[
+						'form' => $form,
+						'entityClass' => $this->getEntityClass(),
+						'id' => $id,
+						'entity' => $entity
+				]);
+		
+		$redirectUrl = $this->url()->fromRoute($this->getActionRoute(), [], 
+				[
+						'query' => $this->params()
+							->fromQuery()
+				], true);
+		$prg = $this->fileprg($form, $redirectUrl, true);
+		
+		if ($prg instanceof Response) {
+			return $prg;
+		} elseif ($prg === false) {
+			$message = "Note: an attribute that is merged with another is deleted afterwards.";
+			$this->flashMessenger()->addInfoMessage($message);
+			
+			$this->getEventManager()->trigger('getForm', $this, 
+					[
+							'form' => $form,
+							'entityClass' => $this->getEntityClass(),
+							'id' => $id,
+							'entity' => $entity
+					]);
+			
+			return [
+					'entityForm' => $form,
+					'entity' => $entity
+			];
+		}
+		
+		$merge_success = false;
+		$delete_success = false;
+		
+		$merge_attribute_id = $prg['merge'];
+		
+		if ($merge_attribute_id) {
+			
+			$entity_description = $entity->getAttributeDesc();
+			$merged_attribute = $objRepository->find($merge_attribute_id);
+			
+			if ($merged_attribute) {
+				$merged_description = $merged_attribute->getAttributeDesc();
+				
+				$attribute_values = new ArrayCollection(
+						$entity->getValues(false));
+				
+				try {
+					if ($attribute_values->count() > 0) {
+						$entity->removeValues($attribute_values);
+						$em->merge($entity);
+						$merged_attribute->addValues($attribute_values);
+						$em->persist($merged_attribute);
+						$em->flush();
+						$merge_success = true;
+					}
+					
+					if ($this->getEntityService()->delete($entity)) {
+						$em->flush();
+						$delete_success = true;
+					}
+				} catch (\Exception $e) {
+					$this->createServiceEvent()
+						->setEntityId($merge_attribute_id)
+						->setEntityClass($this->getEntityClass())
+						->setDescription("Lead Attribute Merged");
+					$this->logError($e);
+				}
+			}
+		}
+		
+		if ($merge_success) {
+			$this->createServiceEvent()
+				->setEntityId($merge_attribute_id)
+				->setEntityClass($this->getEntityClass())
+				->setDescription("Lead Attribute Merged")
+				->setMessage(
+					"Lead Attribute: {$entity_description} was merged with {$merged_description}.");
+			$this->logEvent("EditAction.post");
+			$this->flashMessenger()->addSuccessMessage(
+					$this->getServiceLocator()
+						->get('translator')
+						->translate($this->successMergeMessage));
+		} else {
+			$this->flashMessenger()->addErrorMessage(
+					$this->getServiceLocator()
+						->get('translator')
+						->translate($this->errorMergeMessage));
+		}
+		
+		if ($delete_success) {
+			$this->createServiceEvent()
+				->setEntityId($id)
+				->setEntityClass($this->getEntityClass())
+				->setDescription("Lead Attribute Deleted")
+				->setMessage(
+					"Lead Attribute: {$entity_description} was deleted.");
+			$this->logEvent("DeleteAction.post");
+			$this->flashMessenger()->addSuccessMessage(
+					$this->getServiceLocator()
+						->get('translator')
+						->translate($this->successDeleteMessage));
+		} else {
+			$this->flashMessenger()->addErrorMessage(
+					$this->getServiceLocator()
+						->get('translator')
+						->translate($this->errorDeleteMessage));
+		}
+		
+		$this->getEventManager()->trigger('edit', $this, 
+				[
+						'form' => $form,
+						'entityClass' => $this->getEntityClass(),
+						'id' => $id,
+						'entity' => $entity
+				]);
+		
+		if (! $merge_success || ! $delete_success) {
+			return [
+					'entityForm' => $form,
+					'entity' => $entity
+			];
+		}
+		
+		return $this->redirect()->toRoute($this->getActionRoute('list'), 
+				[
+						'query' => $this->params()
+							->fromQuery()
+				], true);
+	}
+
+	public function sortAction ()
+	{
+		$result = false;
+		$key = 'attributeOrder';
+		$updated = 0;
+		$id = $this->getEvent()
+			->getRouteMatch()
+			->getParam('id', 0);
+		
+		$index = $this->params()->fromPost('index', null);
+		$order = $this->params()->fromPost('order', 'asc');
+		$global = $this->params()->fromPost('domUpdate', false);
+		
+		if (isset($index)) {
+			$index = $index ? ++ $index : -- $index;
+			$model = $this->getModel();
+			
+			$resultset = $model->fetch($id);
+			if ($resultset) {
+				$entity = current($resultset);
+				$entity[$key] = $index;
+				$update = $model->update($id, $entity);
+				
+				if ($update) {
+					$result = 1;
+					if ($global) {
+						$sorted = $model->fetchByOrder($key, $order);
+						$updated = $model->bulkUpdate($sorted);
+						if (! $updated) {
+							$result = false;
+						}
+					}
+				}
+			}
+		}
+		
+		return new JsonModel(
+				[
+						'result' => $result,
+						'collection' => $model->fetchByOrder($key, $order, 
+								false),
+						'updated' => $updated
+				]);
+	}
+
+	/**
+	 * Get LeadAttribute Model
+	 *
+	 * @return LeadAttributeModel
+	 */
+	protected function getModel ()
+	{
+		return $this->getServiceLocator()->get('Lead\Model\LeadAttribute');
 	}
 
 	public function getForm ($entityClass = null)
@@ -325,7 +655,7 @@ class AttributeController extends AbstractCrudController
 		return $form;
 	}
 
-	protected function getAddForm ($data = array())
+	public function getAddForm ($data = array())
 	{
 		$sl = $this->getServiceLocator();
 		$form = $sl->get('Lead\Form\Attribute\AddFormFactory');
@@ -343,6 +673,84 @@ class AttributeController extends AbstractCrudController
 		}
 		
 		return $form;
+	}
+
+	/**
+	 * Get Attribute Merge Form
+	 *
+	 * @param array $data        	
+	 * @return MergeForm
+	 */
+	public function getMergeForm ($data = array())
+	{
+		$sl = $this->getServiceLocator();
+		$form = $sl->get('Lead\Form\Attribute\MergeFormFactory');
+		$form->get('cancel')->setAttributes(
+				[
+						'onclick' => 'top.location=\'' . $this->url()
+							->fromRoute($this->getActionRoute('list'), [], 
+								[
+										'query' => $this->params()
+											->fromQuery()
+								], true) . '\''
+				]);
+		$form->setInputFilter($form->getInputFilter());
+		if ($data) {
+			$form->setData($data);
+			if (! $form->isValid()) {
+				$form->setData(array());
+			}
+		}
+		
+		return $form;
+	}
+
+	public function getFilterForm ($data = array())
+	{
+		$sl = $this->getServiceLocator();
+		$form = $sl->get('FormElementManager')->get(
+				'Lead\Form\Attribute\FilterForm');
+		$form->setInputFilter($form->getInputFilter());
+		if ($data) {
+			$form->setData($data);
+			if (! $form->isValid()) {
+				$form->setData(array());
+			}
+		}
+		return $form;
+	}
+
+	public function handleSearch (Builder $qb)
+	{
+		$query = $this->getRequest()->getQuery();
+		$filters = [
+				'attributeDesc'
+		];
+		if ($query) {
+			$where = [];
+			$params = [];
+			foreach ($filters as $condition) {
+				if (isset($query[$condition]) && "" !== $query[$condition]) {
+					switch ($condition) {
+						case 'attributeDesc':
+							$where['attributeDesc'] = "%{$query[$condition]}%";
+							$qb->andWhere("e.attributeDesc LIKE :attributeDesc");
+							break;
+					}
+				}
+			}
+			if ($where) {
+				foreach ($where as $key => $value) {
+					$qb->setParameter($key, $value);
+				}
+			}
+		}
+		return $qb;
+	}
+
+	protected function reverseOrder ($order)
+	{
+		return strtolower($order) == 'asc' ? 'desc' : 'asc';
 	}
 
 	public function getRouteName ()
