@@ -13,3 +13,4 @@ composer.phar
 /cgi-bin/
 /deployment.properties
 /deployment.xml
+/bower_components/
