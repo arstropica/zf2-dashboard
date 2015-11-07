@@ -65,7 +65,10 @@ HTML;
 				array_map(
 						function  ($h) use( $data, $TD)
 						{
-							$v = is_array($data[$h]) ? current($data[$h]) : $data[$h];
+							$v = "N/A";
+							if (isset($data[$h])) {
+								$v = is_array($data[$h]) ? current($data[$h]) : $data[$h];
+							}
 							
 							return sprintf($TD, $v);
 						}, $headings));
