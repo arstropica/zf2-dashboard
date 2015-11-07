@@ -27,6 +27,35 @@ class AbstractCrudController extends BaseController
 		return $routeMatch->getMatchedRouteName();
 	}
 
+	public function getEntityService ()
+	{
+		$args = func_get_args();
+		$entityClass = isset($args[0]) ? $args[0] : false;
+		if (! isset($this->entityService)) {
+			$entityServiceClass = $this->getEntityServiceClass($entityClass);
+			if (! class_exists($entityServiceClass)) {
+				throw new \RuntimeException(
+						"Classe $entityServiceClass inexistente!");
+			}
+			$this->entityService = new $entityServiceClass();
+			$this->entityService->setServiceLocator($this->getServiceLocator());
+		}
+		
+		return $this->entityService;
+	}
+
+	public function getEntityServiceClass ()
+	{
+		$args = func_get_args();
+		$entityClass = isset($args[0]) ? $args[0] : false;
+		
+		$module = $this->getModuleName();
+		
+		$entityClass = $entityClass ?  : $module;
+		
+		return "$module\Service\\$entityClass";
+	}
+
 	public function getSession ($name)
 	{
 		if (null === $this->sessionContainers) {
