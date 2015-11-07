@@ -1,0 +1,27 @@
+<?php
+$title = 'Merge Attribute';
+$this->headTitle($title);
+?>
+<h1>
+<?php echo $this->escapeHtml($title); ?>
+<span class="pull-right"> <a
+		href="<?php echo $this->losUrl()->from('attribute', ['action'=>'list'], true);?>"
+		class="btn btn-success" title="Display Attributes">Back</a>
+	</span>
+</h1>
+<hr class="small">
+<br>
+<h3>Attribute: <?php echo $this->entity->getAttributeDesc(); ?></h3>
+<hr class="small">
+<div class="row">
+	<div class="col-xs-12 col-sm-10 col-md-8">
+		<?php echo $this->losForm($this->entityForm, true); ?>
+	</div>
+</div>
+<?php echo $this->losHeadLink()->setBasePath('/js')->appendChosen()?>
+<?php echo $this->losHeadScript()->setBasePath('/js')->appendChosen()?>
+<script type="text/javascript">
+	$('#merge').find('OPTION[value=<?php echo $this->entity->getId(); ?>]').remove();
+	$('#merge').prop('multiple', 'multiple').prop("selected", false).val([]);
+	<?= $this->losChosen('#merge',['disable_search_threshold'=>2, 'max_selected_options'=>1, 'placeholder_text_multiple' => 'Select Attribute', 'allow_single_deselect'=>true])?>
+</script>
