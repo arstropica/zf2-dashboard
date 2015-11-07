@@ -1,6 +1,7 @@
 <?php
 namespace Application\Provider;
 use Doctrine\ORM\EntityManager;
+use Zend\ServiceManager\ServiceLocatorInterface;
 
 trait EntityManagerAwareTrait
 {
@@ -30,7 +31,8 @@ trait EntityManagerAwareTrait
 	{
 		$em = isset($this->em) ? $this->em : null;
 		if (null === $em) {
-			$em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
+			$em = $this->getServiceLocator()->get(
+					'doctrine.entitymanager.orm_default');
 		}
 		if (! $em->isOpen()) {
 			$em = $em->create($em->getConnection(), $em->getConfiguration());
@@ -38,4 +40,9 @@ trait EntityManagerAwareTrait
 		$this->em = $em;
 		return $this->em;
 	}
+
+	abstract public function getServiceLocator ();
+
+	abstract public function setServiceLocator (
+			ServiceLocatorInterface $serviceLocator);
 }
