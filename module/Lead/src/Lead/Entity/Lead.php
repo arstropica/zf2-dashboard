@@ -10,6 +10,7 @@ use Application\Provider\EntityDataTrait;
  *
  * @ORM\Table(name="lead", indexes={@ORM\Index(name="id", columns={"id"})})
  * @ORM\Entity(repositoryClass="Lead\Entity\Repository\LeadRepository")
+ * @ORM\EntityListeners({ "Lead\Entity\Listener\LeadListener" })
  * @Annotation\Instance("\Lead\Entity\Lead")
  */
 class Lead
@@ -358,8 +359,9 @@ class Lead
 		return $this->getAttributes(true)->filter(
 				function  ($leadAttribute) use( $attributeName)
 				{
-					return $leadAttribute->getAttribute()
-						->getAttributeName() == $attributeName;
+					$attribute = $leadAttribute->getAttribute();
+					return $attribute ? $leadAttribute->getAttribute()
+						->getAttributeName() == $attributeName : false;
 				});
 	}
 
@@ -404,6 +406,18 @@ class Lead
 	public function getAttributes ($ac = false)
 	{
 		return $ac ? $this->attributes : $this->attributes->getValues();
+	}
+
+	/**
+	 * @param \Doctrine\Common\Collections\Collection $attributes
+	 * 
+	 * @return Lead
+	 */
+	public function setAttributes ($attributes)
+	{
+		$this->attributes = $attributes;
+		
+		return $this;
 	}
 
 	/**
