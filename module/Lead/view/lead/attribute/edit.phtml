@@ -5,7 +5,7 @@ $this->headTitle($title);
 <h1>
 <?php echo $this->escapeHtml($title); ?>
 <span class="pull-right"> <a
-		href="<?php echo $this->url('attribute', array('action' => 'list')); ?>"
+		href="<?php echo $this->losUrl()->from('attribute', ['action'=>'list'], true);?>"
 		class="btn btn-success" title="Display Attributes">Back</a>
 	</span>
 </h1>
