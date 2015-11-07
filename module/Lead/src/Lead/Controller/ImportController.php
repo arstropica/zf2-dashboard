@@ -14,6 +14,7 @@ use Account\Entity\Account;
 use Event\Entity\Event;
 use Account\Utility\IdGenerator;
 use Zend\Form\Form;
+use User\Provider\IdentityAwareTrait;
 
 /**
  *
@@ -23,6 +24,8 @@ use Zend\Form\Form;
 class ImportController extends AbstractCrudController
 {
 
+	use IdentityAwareTrait;
+	
 	protected $successImportMessage = 'The Lead(s) were successfully imported.';
 
 	protected $errorImportMessage = 'There was a problem importing your Leads.';
@@ -89,7 +92,11 @@ class ImportController extends AbstractCrudController
 			}
 		} else {
 			$this->results['form'] = $form;
-			$this->setImportCache($this->stage, $this->results);
+			try {
+				$this->setImportCache($this->stage, $this->results);
+			} catch (\Exception $e) {
+				// ...
+			}
 			$form->addUploadField();
 			return $this->results;
 		}
@@ -122,7 +129,7 @@ class ImportController extends AbstractCrudController
 	 * Handle Uploads (Stage 2)
 	 *
 	 * @param array $post        	
-	 * @param Form $form        	
+	 * @param ImportForm $form        	
 	 * @param boolean $reload        	
 	 * @return boolean
 	 */
@@ -150,7 +157,7 @@ class ImportController extends AbstractCrudController
 						// Setup Import Form
 						$fieldSet = $form->addImportFieldset(
 								array_combine($csv['headings'], 
-										$csv['headings']));
+										$csv['headings']), $this->isAdmin());
 						$this->setTypeAhead('Company', 
 								"Account\\Entity\\Account", "name");
 						$form->get('leadTmpFile')->setValue($tmp_file);
@@ -352,6 +359,12 @@ class ImportController extends AbstractCrudController
 		$output = false;
 		$form = $this->getImportForm();
 		$results = $this->getImportCache($stage);
+		if (isset($results['form']) && (($stform = $results['form']) == true)) {
+			if (isset($stform->storage) && $stform->storage) {
+				$form->setData($stform->storage);
+				$results['form'] = $form;
+			}
+		}
 		$this->stage = $this->getImportCache($stage, 'stage');
 		return $results ?  : $this->getRedirect();
 	}
@@ -775,12 +788,11 @@ JTPL;
 			$required_fields = [
 				'timecreated',
 				'referrer',
-				'ipaddress'
+				'ipaddress',
 		])
 	{
 		$matched_fields = is_array($data) && is_array(current($data)) ? array_keys(
 				current($data)) : [];
-		
 		$valid = true;
 		foreach ($required_fields as $required_field) {
 			if (! in_array($required_field, $matched_fields)) {
