@@ -89,10 +89,13 @@ class FilterForm extends Form implements InputFilterAwareInterface
 						)
 				));
 		
-		$this->add(
-				array(
+    	$repository = $this->getEntityManager()->getRepository('Lead\Entity\Lead');
+		$referrers = $repository->getReferrers(0, 'array');
+		
+		$this->add (
+					array(
 						'name' => 'referrer',
-						'type' => 'DoctrineModule\Form\Element\ObjectSelect',
+						'type' => 'Zend\Form\Element\Select',
 						'required' => false,
 						'allow_empty' => true,
 						'filters' => array(
@@ -105,19 +108,14 @@ class FilterForm extends Form implements InputFilterAwareInterface
 								'label_attributes' => array(
 										'class' => 'sr-only'
 								),
+								'value_options' => $referrers,
 								'empty_option' => 'All Sources',
-								'object_manager' => $this->entityManager,
-								'target_class' => 'Lead\Entity\Lead',
-								'property' => 'referrer',
-								'is_method' => true,
-								'find_method' => array(
-										'name' => 'getReferrers'
-								)
 						),
 						'attributes' => array(
-								'id' => 'accountfilter'
+								'id' => 'sourcefilter'
 						)
-				));
+
+					));
 		
 		$this->add(
 				array(
@@ -163,4 +161,25 @@ class FilterForm extends Form implements InputFilterAwareInterface
 		}
 		return $this->inputFilter;
 	}
+	
+	/**
+	 *
+	 * @return EntityManager
+	 */
+	public function getEntityManager ()
+	{
+		if (! $this->entityManager) {
+			$entityManager = $this->serviceLocator->get('doctrine.entitymanager.orm_default');
+			$this->setEntityManager($entityManager);
+		}
+		
+		return $this->entityManager;
+	}
+
+	public function setEntityManager (EntityManager $entityManager)
+	{
+		$this->entityManager = $entityManager;
+		return $this;
+	}
+	
 }
