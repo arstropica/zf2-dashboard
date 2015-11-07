@@ -3,6 +3,8 @@ namespace Lead\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Zend\Form\Annotation;
+use Doctrine\Common\Collections\Collection;
+use Zend\Db\Sql\Ddl\Column\Integer;
 
 /**
  * LeadAttribute
@@ -54,12 +56,27 @@ class LeadAttribute
 
 	/**
 	 *
+	 * @var integer @ORM\Column(name="attribute_order", type="integer",
+	 *      nullable=true)
+	 *      @Annotation\Exclude()
+	 */
+	private $attributeOrder;
+
+	/**
+	 *
 	 * @var \Doctrine\Common\Collections\Collection
 	 *      @ORM\OneToMany(targetEntity="Lead\Entity\LeadAttributeValue",
-	 *      mappedBy="attribute", cascade={"persist"}, fetch="EXTRA_LAZY")
+	 *      mappedBy="attribute", cascade={"persist", "remove"},
+	 *      fetch="EXTRA_LAZY")
 	 *      @Annotation\Exclude()
 	 */
 	protected $values;
+
+	/**
+	 *
+	 * @var Integer @Annotation\Exclude()
+	 */
+	protected $count;
 
 	/**
 	 * Initialies the array variables.
@@ -135,13 +152,36 @@ class LeadAttribute
 	}
 
 	/**
+	 * Get attributeOrder
+	 *
+	 * @return integer|null
+	 */
+	public function getAttributeOrder ()
+	{
+		return $this->attributeOrder;
+	}
+
+	/**
+	 *
+	 * @param integer $attributeOrder        	
+	 *
+	 * @return LeadAttribute
+	 */
+	public function setAttributeOrder ($attributeOrder)
+	{
+		$this->attributeOrder = $attributeOrder;
+		
+		return $this;
+	}
+
+	/**
 	 * Get values.
 	 *
 	 * @return array
 	 */
-	public function getValues ()
+	public function getValues ($ac = false)
 	{
-		return $this->values->getValues();
+		return $ac ? $this->values : $this->values->getValues();
 	}
 
 	/**
@@ -160,11 +200,11 @@ class LeadAttribute
 	/**
 	 * Add values to attribute.
 	 *
-	 * @param \Doctrine\Common\Collections\ArrayCollection $values        	
+	 * @param Collection $values        	
 	 *
 	 * @return void
 	 */
-	public function addValues (ArrayCollection $values)
+	public function addValues (Collection $values)
 	{
 		foreach ($values as $value) {
 			if (! $this->values->contains($value)) {
@@ -176,11 +216,24 @@ class LeadAttribute
 
 	/**
 	 *
-	 * @param \Doctrine\Common\Collections\ArrayCollection $values        	
+	 * @param \Doctrine\Common\Collections\Collection $values        	
 	 *
 	 * @return LeadAttribute
 	 */
-	public function removeValues (ArrayCollection $values)
+	public function setValues ($values)
+	{
+		$this->values = $values;
+		
+		return $this;
+	}
+
+	/**
+	 *
+	 * @param Collection $values        	
+	 *
+	 * @return LeadAttribute
+	 */
+	public function removeValues (Collection $values)
 	{
 		foreach ($values as $value) {
 			if ($this->values->contains($value)) {
@@ -190,5 +243,15 @@ class LeadAttribute
 		}
 		
 		return $this;
+	}
+
+	/**
+	 * Get values count
+	 *
+	 * @return integer
+	 */
+	public function getCount ()
+	{
+		return $this->getValues(true)->count();
 	}
 }
