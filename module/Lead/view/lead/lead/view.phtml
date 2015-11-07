@@ -22,7 +22,7 @@ $this->headTitle($title);
 	</span>
 </h1>
 <?php
-$detail = $entity->getAttributes();
+$detail = $entity->getAttributes(false);
 $account = $entity->getAccount();
 $events = $entity->getEvents();
 ?>
@@ -66,12 +66,16 @@ $events = $entity->getEvents();
 			</div>
 			<div class="panel-body">
 				<table class="table table-hover table-condensed nomargin">
-					<?php foreach ($detail as $attribute) : ?>
-						<tr>
-						<th><?php echo $attribute->getAttribute()->getAttributeDesc(); ?></th>
-						<td><?php echo $attribute->getValue(); ?></td>
+					<?php foreach ($detail as $attributeValue) : 
+						if ($attributeValue) :
+							$attribute = $attributeValue->getAttribute();
+							if ($attribute) :
+					?>
+					<tr>
+						<th><?php echo $attribute->getAttributeDesc(); ?></th>
+						<td><?php echo $attributeValue->getValue(); ?></td>
 					</tr>
-					<?php endforeach; ?>
+					<?php endif; endif; endforeach; ?>
 				</table>
 			</div>
 		</div>
