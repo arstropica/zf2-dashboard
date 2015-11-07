@@ -1,6 +1,91 @@
 <?php
 $env = getenv('APPLICATION_ENV') ?  : 'development';
 return array(
+		'controllers' => array(
+				'invokables' => array(
+						'User\Controller\User' => 'User\Controller\UserController',
+				)
+		),
+		'router' => array(
+				'routes' => array(
+						'gapi' => array(
+								'type' => 'Literal',
+								'options' => array(
+										'route' => '/gapi',
+										'defaults' => array(
+												'controller' => 'User\Controller\User',
+												'action' => 'index'
+										)
+								),
+								'may_terminate' => true,
+								'child_routes' => array(
+										'auth' => array(
+												'type' => 'Literal',
+												'options' => array(
+														'route' => '/auth',
+														'defaults' => array(
+																'controller' => 'User\Controller\User',
+																'action' => 'auth'
+														)
+												)
+										),
+										'token' => array(
+												'type' => 'Literal',
+												'options' => array(
+														'route' => '/token',
+														'defaults' => array(
+																'controller' => 'User\Controller\User',
+																'action' => 'token'
+														)
+												),
+												'may_terminate' => true,
+												'child_routes' => array(
+														'exchange' => array(
+																'type' => 'Literal',
+																'options' => array(
+																		'route' => '/exchange',
+																		'defaults' => array(
+																				'controller' => 'User\Controller\User',
+																				'action' => 'exchange'
+																		)
+																)
+														),
+														'refresh' => array(
+																'type' => 'Literal',
+																'options' => array(
+																		'route' => '/refresh',
+																		'defaults' => array(
+																				'controller' => 'User\Controller\User',
+																				'action' => 'refresh'
+																		)
+																)
+														),
+														'valid' => array(
+																'type' => 'Literal',
+																'options' => array(
+																		'route' => '/valid',
+																		'defaults' => array(
+																				'controller' => 'User\Controller\User',
+																				'action' => 'valid'
+																		)
+																)
+														),
+														'revoke' => array(
+																'type' => 'Literal',
+																'options' => array(
+																		'route' => '/revoke',
+																		'defaults' => array(
+																				'controller' => 'User\Controller\User',
+																				'action' => 'revoke'
+																		)
+																)
+														),
+												),
+										),
+								),
+						),
+				),
+		),
 		'view_manager' => array(
 				'display_exceptions' => true, // ($env == 'production') ? false : true,
 				'template_map' => array(
@@ -11,7 +96,10 @@ return array(
 				'template_path_stack' => array(
 						'zfcuser' => __DIR__ . '/../view',
 						'User' => __DIR__ . '/../view'
-				)
+				),
+				'strategies' => array(
+					'ViewJsonStrategy',
+				),
 		),
 		'doctrine' => array(
 				'driver' => array(
@@ -172,6 +260,13 @@ return array(
 												'user',
 												'moderator',
 												'administrator'
+										)
+								),
+								
+								array(
+										'controller' => 'User\Controller\User',
+										'roles' => array(
+												'guest'
 										)
 								),
 								
