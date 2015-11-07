@@ -1,6 +1,10 @@
 <?php
 use Application\Form\View\Helper\Form as FormHelper;
 
+// $this->headScript()->appendFile('/js/RowSorter.js');
+$this->headScript()->appendFile('/js/jquery-ui.min.js');
+$this->headLink()->appendStylesheet('/css/jquery-ui/jquery-ui.min.css');
+
 $title = 'Display Attributes';
 $this->headTitle($title);
 ?>
@@ -30,10 +34,46 @@ $this->headTitle($title);
 		</div>
 		<div class="questionsgrid clearfix">
 			<hr class="small">
-			<table class="table table-hover table-striped sel"
-				id="questionstable">
+			<div class="view-header row">
+				<div class="col-xs-12 col-sm-10 col-md-8">
+					<div class="formtable-header pull-left" style="width: 100%;">
+						<?php
+						if (isset($this->filters)) {
+							$filters = $this->filters;
+							
+							$filters->setAttribute('class', 'leadattributeform');
+							
+							$filters->setAttribute('id', 
+									'leadAttributeFilterForm');
+							
+							echo $this->form(null, 
+									\Application\Form\View\Helper\Form::LAYOUT_INLINE)->openTag(
+									$filters);
+							
+							foreach ($filters as $filter) {
+								echo $this->formRow($filter);
+							}
+							
+							echo $this->form()->closeTag($filter);
+						}
+						?>
+					</div>
+				</div>
+				<?php if ($this->sort == 'attributeOrder'): ?>
+					<div class="col-xs-12 col-sm-2 col-md-4">
+					<div class="formtable-header pull-right">
+						<form class="form-inline">
+							<button id="refresh" type="button" class="btn btn-info">Refresh</button>
+						</form>
+					</div>
+				</div>
+				<?php endif; ?>
+			</div>
+			<hr class="small">
+			<table class="table table-hover table-striped" id="questionstable">
 				<thead>
 					<tr>
+						<?php if ($this->sortable): ?><th class="handle"></th><?php endif; ?>
 						<?php
 						foreach ($this->ui['table'] as $field => $ui) :
 							$selected = $this->sort == $field;
@@ -53,22 +93,43 @@ $this->headTitle($title);
 						<?php else: echo $ui['label']; endif; ?>
 						</th>
 						<?php endforeach; ?>
-						<th class="action col-xs-1 text-right">Action</th>
+						<th class="action col-xs-2 text-right">Actions</th>
 					</tr>
 				</thead>
-				<tbody>
-	    		<?php foreach ($this->paginator as $entity):?>
-	        		<tr class="attributeitem">
-						<td class="col-xs-2 name"><?php echo $entity->getAttributeName(); ?></td>
-						<td class="col-xs-9 description"><?php echo $entity->getAttributeDesc(); ?></td>
-						<td class="action col-xs-1 text-right"><a
-							href="<?php echo $this->losUrl()->from('attribute/edit',['id'=>$entity->getId()], false)?>"
-							title="Edit Question" class="btn btn-xs btn-warning"><?php echo $this->losIcon('glyphicon-edit') ?></a>
-						</td>
+				<tbody class="sortable">
+	    		<?php foreach ($this->paginator as $entity): $numleads = $entity->getCount(); ?>
+	        		<tr class="attributeitem"
+						id="<?php echo $entity->getId(); ?>">
+						<?php if ($this->sortable): ?><td class="handle"></td><?php endif; ?>
+						<td class="col-xs-1 attributeOrder"><div class="sortable-order"><?php echo $entity->getAttributeOrder(); ?></div></td>
+						<td class="col-xs-2 attributeName"><?php echo $entity->getAttributeName(); ?></td>
+						<td class="col-xs-<?php echo $this->ui['table']['attributeDesc']['col']; ?> attributeDesc"><?php echo $entity->getAttributeDesc(); ?></td>
+						<td class="col-xs-1 count"><?php echo $numleads; ?></td>
+						<td class="action col-xs-2 text-right">
+							<?php if ($this->isAdmin) : ?><a <?php if (! $numleads) : ?>
+							class="disabled btn btn-xs btn-info" onclick="return false;"
+							<?php else: ?> class="btn btn-xs btn-info" <?php endif; ?>
+							href="<?php echo $this->losUrl()->from('attribute/merge',['id'=>$entity->getId()], true)?>"
+							title="Merge Attribute" class="btn btn-xs btn-info"><?php echo $this->losIcon('glyphicon-duplicate') ?></a><?php endif; ?>
+							
+							<a href="<?php echo $this->losUrl()->from('attribute/edit',['id'=>$entity->getId()], true)?>"
+							title="Edit Attribute" class="btn btn-xs btn-warning"><?php echo $this->losIcon('glyphicon-edit') ?></a>
+							
+							<?php if ($this->isAdmin) : ?><a <?php if ($numleads) : ?>
+							class="disabled btn btn-xs btn-danger" onclick="return false;"
+							<?php else: ?> class="btn btn-xs btn-danger" <?php endif; ?>
+							href="<?php echo $this->losUrl()->from('attribute/delete',['id'=>$entity->getId()], true)?>"
+							title="Delete Attribute" class="btn btn-xs btn-danger"><?php echo $this->losIcon('glyphicon-remove') ?></a><?php endif; ?>
+							<input type="hidden" class="identifier"
+							value="<?php echo $entity->getId();?>" /></td>
 					</tr>
 				<?php endforeach;?>
 				</tbody>
 			</table>
+			<input id="page" type="hidden" value="<?php echo $this->page; ?>" />
+			<input id="order" type="hidden" value="<?php echo $this->order; ?>" />
+			<input id="limit" type="hidden"
+				value="<?php echo $this->pager->get('limit')->getValue(); ?>" />
 			<hr>
 		</div>
 	</div>
@@ -78,3 +139,22 @@ $this->headTitle($title);
 	<div class="col-xs-12 text-center"><?php echo $this->losPaginationControl($this->paginator,'Sliding',null,['query'=>$this->query]); ?></div>
 </div>
 <?php endif?>
+<?php if ($this->sort == 'attributeOrder'): ?>
+<script type="text/javascript">
+	$(function(){
+		var pageNo = $('#page').val() ? Math.max(0, parseInt($('#page').val()) - 1) : 0;
+		var pageLimit = $('#limit').val() ? parseInt($('#limit').val()) : 10;
+		var _start = (pageNo && pageLimit) ? (pageNo * pageLimit) : 0;
+		var _order = $('#order').val() ? $('#order').val() : 'asc'; 
+		$(".sortable").sortTable({
+			revert: true,
+			handle: '.handle',
+			_start: _start,
+			_order: _order
+		});
+		$('#refresh').click(function(){
+			location.reload(true);
+		});
+	});
+</script>
+<?php endif; ?>
