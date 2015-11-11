@@ -11,6 +11,19 @@ return array(
 										'dbname' => 'dbname'
 								)
 						)
+				),
+				'configuration' => array(
+						'orm_default' => array(
+								'metadata_cache' => 'redis',
+								'query_cache' => 'redis',
+								'result_cache' => 'redis',
+								'hydration_cache' => 'redis',
+						)
+				),
+				'cache' => array(
+						'redis' => array(
+								'instance' => 'doctrine.cache.redis'
+						)
 				)
 		)
 );
