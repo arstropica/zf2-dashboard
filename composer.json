@@ -10,14 +10,14 @@
     "radnan/rdn-csv" : "=v1.1.0",
     "muriloamaral/easyxml" : "dev-master",
     "zfcampus/zf-oauth2" : "~1.0",
-    "bjyoungblood/BjyProfiler" : "dev-master",
     "los/losbase" : "=2.5.6",
     "los/losui" : "=1.0.24",
-    "zf-commons/zfc-rbac" : "=v2.5.2"
+    "zf-commons/zfc-rbac" : "=v2.5.2",
+    "google/apiclient" : "1.1.6",
+    "doctrine/migrations" : "v1.1.0"
   },
   "require-dev" : {
-    "zendframework/zftool" : "dev-master",
-    "zendframework/zend-developer-tools" : "dev-master"
+    "zendframework/zftool" : "dev-master"
   },
   "license" : "BSD-3-Clause",
   "keywords" : [ "framework", "zf2" ],

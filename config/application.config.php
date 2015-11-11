@@ -29,10 +29,6 @@ $modules = array(
 		'TenStreet',
 		'User'
 );
-if ($env == 'development') {
-	$modules[] = 'ZendDeveloperTools';
-	$modules[] = 'BjyProfiler';
-}
 
 return array(
 		// This should be an array of module namespaces used in the application.
