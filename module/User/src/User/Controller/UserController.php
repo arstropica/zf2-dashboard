@@ -87,7 +87,7 @@ class UserController extends AbstractCrudController
 		$id = $this->params()->fromPost('id', 0);
 		$origin = $this->params()->fromPost('origin', '');
 		
-		if ($id && $origin || true) {
+		if ($id && $origin) {
 			try {
 				$client = $this->getClient();
 				$cache = $this->getCache();
@@ -100,7 +100,7 @@ class UserController extends AbstractCrudController
 						$token = $state['token'];
 						$cache->removeItem($id);
 					} else {
-						$result['error'] = $this->default_error_message;
+						$result['error'] = $this->default_error_message . " The Token was not saved.";
 					}
 					if ($token) {
 						try {
@@ -121,19 +121,19 @@ class UserController extends AbstractCrudController
 								$result['error'] = 'Access could not be granted.  This is a result of an invalid access token or user.';
 							}
 						} catch (\Exception $e) {
-							$result['error'] = $this->default_error_message;
+							$result['error'] = $this->default_error_message . " " . $e->getMessage();
 						}
 					} else {
-						$result['error'] = $this->default_error_message;
+						$result['error'] = $this->default_error_message . " No Token could be found.";
 					}
 				} else {
-					$result['error'] = $this->default_error_message;
+					$result['error'] = $this->default_error_message . " The cache was not saved.";
 				}
 			} catch (\Exception $e) {
 				$result['error'] = $e->getMessage();
 			}
 		} else {
-			$result['error'] = $this->default_error_message;
+			$result['error'] = $this->default_error_message . " The ID or Origin are missing.";
 		}
 		if (! isset($result['outcome'])) {
 			$result['outcome'] = 0;
