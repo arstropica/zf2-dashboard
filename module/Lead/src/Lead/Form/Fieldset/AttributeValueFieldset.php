@@ -21,7 +21,8 @@ class AttributeValueFieldset extends AbstractFieldset implements
 	 */
 	protected $objectManager;
 
-	public function __construct (ObjectManager $objectManager, $label = "", $isAdmin = false)
+	public function __construct (ObjectManager $objectManager, $label = "", 
+			$isAdmin = false)
 	{
 		parent::__construct('lead_attribute_value_fieldset');
 		
@@ -41,6 +42,11 @@ class AttributeValueFieldset extends AbstractFieldset implements
 								'find_method' => array(
 										'name' => $isAdmin ? 'getAdminImportOptions' : 'getImportOptions'
 								)
+						),
+						'attributes' => array(
+								'class' => 'importSelect',
+								'data-placeholder' => 'Choose ' . $label .
+										 ' Field'
 						)
 				));
 	}

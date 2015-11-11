@@ -98,6 +98,29 @@ class ImportForm extends Form implements InputFilterAwareInterface,
 				));
 	}
 
+	public function addCancelField ()
+	{
+		$url = $this->serviceLocator->get('viewhelpermanager')->get('url');
+		$this->add(
+				array(
+						'name' => 'cancel',
+						'type' => 'button',
+						'class' => 'btn btn-default',
+						'options' => array(
+								'label' => 'Cancel',
+								'label_attributes' => array(
+										'sr-only'
+								)
+						),
+						'attributes' => array(
+								'value' => 'Cancel',
+								'class' => 'btn btn-default',
+								'onClick' => 'top.location=\'' . $url(
+										'import', [], true) . '\''
+						)
+				));
+	}
+
 	public function addHiddenField ($name, $value, $options = [])
 	{
 		$this->add(
@@ -144,7 +167,8 @@ class ImportForm extends Form implements InputFilterAwareInterface,
 						'name' => 'Company'
 				));
 		
-		$leadImportFieldset = new ImportFieldset($objectManager, $options, $isAdmin);
+		$leadImportFieldset = new ImportFieldset($objectManager, $options, 
+				$isAdmin);
 		$leadImportFieldset->setName('match')->setOptions(
 				array(
 						'label' => "Enter or Select matching fields for your data.",
