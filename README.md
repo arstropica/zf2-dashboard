@@ -26,6 +26,14 @@ Homepage
 ### Lead - Lead
 CRUD operations and submit lead information to API/Email.
 
+* Lead - main CRUD Controller
+* Attribute - SCRUD Controller for lead attributes
+* Import - Import Controller handling lead import wizard
+* REST - REST Endpoint Controller
+* Services - Central API Operations Controller
+* Email - Email Leads Controller (List only) 
+* TenStreet - TenStreet Leads Controller (List/Submit)
+
 ### Account - Account
 CRUD operations for Client Accounts
 
@@ -40,6 +48,9 @@ CRUD Operations and ORM Entities for eventing functionality.
 
 ### TenStreet - SoapClient
 SOAP Client for data submission to TenStreet API.
+
+### Email - SendMail
+SendMail Service for email functionality.
 
 ### User - User
 ORM Entities and configuration for user access and role capability.
