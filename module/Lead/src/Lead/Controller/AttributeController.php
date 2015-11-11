@@ -121,14 +121,14 @@ class AttributeController extends AbstractCrudController
 								"label" => "Order",
 								"sort" => true
 						],
-						"attributeName" => [
+						/* "attributeName" => [
 								"col" => 2,
 								"label" => "Field ID",
 								"sort" => true
-						],
+						], */
 						"attributeDesc" => [
-								"col" => $sortable ? 5 : 6,
-								"label" => "Description",
+								"col" => $sortable ? 7 : 8,
+								"label" => "Attribute",
 								"sort" => true
 						],
 						"count" => [
@@ -572,7 +572,7 @@ class AttributeController extends AbstractCrudController
 			];
 		}
 		
-		return $this->redirect()->toRoute($this->getActionRoute('list'), 
+		return $this->redirect()->toRoute($this->getActionRoute('list'), [], 
 				[
 						'query' => $this->params()
 							->fromQuery()
@@ -593,7 +593,6 @@ class AttributeController extends AbstractCrudController
 		$global = $this->params()->fromPost('domUpdate', false);
 		
 		if (isset($index)) {
-			$index = $index ? ++ $index : -- $index;
 			$model = $this->getModel();
 			
 			$resultset = $model->fetch($id);
@@ -605,7 +604,7 @@ class AttributeController extends AbstractCrudController
 				if ($update) {
 					$result = 1;
 					if ($global) {
-						$sorted = $model->fetchByOrder($key, $order);
+						$sorted = $model->fetchByOrder($key, $order, true, $id);
 						$updated = $model->bulkUpdate($sorted);
 						if (! $updated) {
 							$result = false;
@@ -684,7 +683,15 @@ class AttributeController extends AbstractCrudController
 	public function getMergeForm ($data = array())
 	{
 		$sl = $this->getServiceLocator();
+		/* @var $form MergeForm */
 		$form = $sl->get('Lead\Form\Attribute\MergeFormFactory');
+		$form->setAttribute('action', 
+				$this->url()
+					->fromRoute($this->getActionRoute('merge'), [], 
+						[
+								'query' => $this->params()
+									->fromQuery()
+						], true));
 		$form->get('cancel')->setAttributes(
 				[
 						'onclick' => 'top.location=\'' . $this->url()
