@@ -26,6 +26,9 @@ DQL;
 			$query->setMaxResults($number);
 		}
 		
+		$query->useQueryCache(true);
+		$query->useResultCache(true, 3600, md5($dql));
+		
 		$results = $query->getResult();
 		$no_account = new \Account\Entity\Account();
 		$no_account->setDescription('Unassigned');
@@ -54,6 +57,9 @@ DQL;
 			$query->setMaxResults($number);
 		}
 		
+		$query->useQueryCache(true);
+		$query->useResultCache(true, 3600, md5($dql));
+		
 		$results = $query->getResult();
 		$no_account = new \Account\Entity\Account();
 		$no_account->setName('Unassigned');
@@ -78,6 +84,9 @@ DQL;
 DQL;
 		
 		$query = $this->getEntityManager()->createQuery($dql);
+		
+		$query->useQueryCache(true);
+		$query->useResultCache(true, 3600, md5($dql));
 		
 		$results = $query->getResult();
 		$accounts = [];
@@ -109,6 +118,9 @@ DQL;
 DQL;
 		
 		$query = $this->getEntityManager()->createQuery($dql);
+		
+		$query->useQueryCache(true);
+		$query->useResultCache(true, 3600, md5($dql));
 		
 		$results = $query->getResult();
 		$leads = [];
