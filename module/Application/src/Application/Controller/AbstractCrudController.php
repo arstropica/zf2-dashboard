@@ -117,6 +117,18 @@ class AbstractCrudController extends BaseController
 						'action' => $this->params('action')
 				], $options, $reuseMatchedParams);
 	}
+
+	protected function formatFormMessages ($form, $glue = ". <br>\n")
+	{
+		$messages = $form->getMessages();
+		$output = [];
+		foreach ($messages as $field => $notice) {
+			foreach ($notice as $rule => $message) {
+				$output[] = "The field \"{$field}\" is invalid. {$message}";
+			}
+		}
+		return implode($glue, $output);
+	}
 }
 
 ?>
