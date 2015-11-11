@@ -22,6 +22,8 @@ use Zend\View\Model\JsonModel;
 class LeadController extends AbstractCrudController
 {
 
+	protected $batchSize = 20;
+
 	protected $defaultSort = 'id';
 
 	protected $defaultOrder = 'desc';
@@ -164,12 +166,25 @@ class LeadController extends AbstractCrudController
 			$res = true;
 			$count = 0;
 			$total = 0;
-			foreach (array_filter($prg['sel']) as $lead_id => $one) {
-				if ($one) {
-					$res = $this->editLead($lead_id, $account_id, $action) ? $res : false;
-					$count = $res ? $count + 1 : $count;
-					$total ++;
+			$em = $this->getEntityManager();
+			$i = 1;
+			try {
+				foreach (array_filter($prg['sel']) as $lead_id => $one) {
+					if ($one) {
+						$res = $this->editLead($lead_id, $account_id, $action) ? $res : false;
+						$count = $res ? $count + 1 : $count;
+						$total ++;
+						if (($i % $this->batchSize) == 0) {
+							$em->flush();
+							$em->clear();
+						}
+						$i ++;
+					}
 				}
+				$em->flush();
+				$em->clear();
+			} catch (\Exception $e) {
+				$res = false;
 			}
 			$message = $this->successEditMessage;
 			if ($res) {
@@ -793,7 +808,8 @@ class LeadController extends AbstractCrudController
 		return $qb;
 	}
 
-	protected function editLead ($lead_id, $account_id = false, $action = 'assign')
+	protected function editLead ($lead_id, $account_id = false, $action = 'assign', 
+			$flush = false)
 	{
 		$result = true;
 		$account = false;
@@ -845,7 +861,10 @@ class LeadController extends AbstractCrudController
 							try {
 								$em->persist($account);
 								$em->persist($lead);
-								$em->flush();
+								if ($flush) {
+									$em->flush();
+									$em->detach($lead);
+								}
 								$this->getServiceEvent()->setMessage(
 										"Lead #{$lead_id} was assigned to " .
 												 $account->getName());
@@ -871,6 +890,10 @@ class LeadController extends AbstractCrudController
 								$em->persist($account);
 								$em->persist($lead);
 								$em->flush();
+								if ($flush) {
+									$em->flush();
+									$em->detach($lead);
+								}
 								$this->getServiceEvent()->setMessage(
 										"Lead #{$lead_id} was unassigned");
 								$shouldLog = true;
