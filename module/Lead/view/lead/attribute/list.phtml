@@ -102,8 +102,9 @@ $this->headTitle($title);
 						id="<?php echo $entity->getId(); ?>">
 						<?php if ($this->sortable): ?><td class="handle"></td><?php endif; ?>
 						<td class="col-xs-1 attributeOrder"><div class="sortable-order"><?php echo $entity->getAttributeOrder(); ?></div></td>
-						<td class="col-xs-2 attributeName"><?php echo $entity->getAttributeName(); ?></td>
-						<td class="col-xs-<?php echo $this->ui['table']['attributeDesc']['col']; ?> attributeDesc"><?php echo $entity->getAttributeDesc(); ?></td>
+						<!--  <td class="col-xs-2 attributeName"><?php echo $entity->getAttributeName(); ?></td> -->
+						<td
+							class="col-xs-<?php echo $this->ui['table']['attributeDesc']['col']; ?> attributeDesc"><?php echo $entity->getAttributeDesc(); ?></td>
 						<td class="col-xs-1 count"><?php echo $numleads; ?></td>
 						<td class="action col-xs-2 text-right">
 							<?php if ($this->isAdmin) : ?><a <?php if (! $numleads) : ?>
@@ -112,16 +113,29 @@ $this->headTitle($title);
 							href="<?php echo $this->losUrl()->from('attribute/merge',['id'=>$entity->getId()], true)?>"
 							title="Merge Attribute" class="btn btn-xs btn-info"><?php echo $this->losIcon('glyphicon-duplicate') ?></a><?php endif; ?>
 							
-							<a href="<?php echo $this->losUrl()->from('attribute/edit',['id'=>$entity->getId()], true)?>"
-							title="Edit Attribute" class="btn btn-xs btn-warning"><?php echo $this->losIcon('glyphicon-edit') ?></a>
+							<a
+							href="<?php echo $this->losUrl()->from('attribute/edit',['id'=>$entity->getId()], true)?>"
+							title="Edit Attribute" class="btn btn-xs btn-success"><?php echo $this->losIcon('glyphicon-edit') ?></a>
 							
-							<?php if ($this->isAdmin) : ?><a <?php if ($numleads) : ?>
-							class="disabled btn btn-xs btn-danger" onclick="return false;"
-							<?php else: ?> class="btn btn-xs btn-danger" <?php endif; ?>
-							href="<?php echo $this->losUrl()->from('attribute/delete',['id'=>$entity->getId()], true)?>"
-							title="Delete Attribute" class="btn btn-xs btn-danger"><?php echo $this->losIcon('glyphicon-remove') ?></a><?php endif; ?>
+							<?php if ($this->isAdmin) : ?>
+								<a <?php if ($numleads) : ?>
+									class="btn btn-xs btn-danger" onclick="warn_before_delete(this); return false;"
+								<?php else: ?> 
+									class="btn btn-xs btn-warning" 
+								<?php endif; ?>
+									href="<?php echo $this->losUrl()->from('attribute/delete',['id'=>$entity->getId()], true)?>"
+									title="Delete Attribute" 
+									<?php if ($numleads) : ?>
+										class="btn btn-xs btn-danger" 
+									<?php else: ?>
+										class="btn btn-xs btn-warning" 
+									<?php endif; ?>>
+										<?php echo $this->losIcon('glyphicon-remove') ?>
+									</a>
+								<?php endif; ?>
 							<input type="hidden" class="identifier"
-							value="<?php echo $entity->getId();?>" /></td>
+							value="<?php echo $entity->getId();?>" />
+						</td>
 					</tr>
 				<?php endforeach;?>
 				</tbody>
@@ -158,3 +172,15 @@ $this->headTitle($title);
 	});
 </script>
 <?php endif; ?>
+<script type="text/javascript">
+	function warn_before_delete(el)
+	{
+		var url = el.href;
+		var r = confirm('Deleting this attribute will remove it from live leads.  Are you sure?');
+		if (r == true) {
+		    window.location.href = url;
+		} else {
+		    return false;
+		}
+	}
+</script>
