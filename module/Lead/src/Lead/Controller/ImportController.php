@@ -23,9 +23,9 @@ use User\Provider\IdentityAwareTrait;
  */
 class ImportController extends AbstractCrudController
 {
-
-	use IdentityAwareTrait;
 	
+	use IdentityAwareTrait;
+
 	protected $successImportMessage = 'The Lead(s) were successfully imported.';
 
 	protected $errorImportMessage = 'There was a problem importing your Leads.';
@@ -43,6 +43,12 @@ class ImportController extends AbstractCrudController
 	 * @var int
 	 */
 	protected $stage = 1;
+
+	/**
+	 *
+	 * @var integer
+	 */
+	protected $batchSize = 20;
 
 	public function __construct ()
 	{}
@@ -67,17 +73,32 @@ class ImportController extends AbstractCrudController
 		$request = $this->getRequest();
 		$post = $request->getPost()->toArray();
 		
+		$result = $this->manageStages($post, $form, false);
+		return $result ?  : $this->rollBack();
+	}
+
+	/**
+	 * Kick-off stage handling
+	 *
+	 * @param array $post        	
+	 * @param ImportForm $form        	
+	 * @param boolean $reload        	
+	 *
+	 * @return array|boolean
+	 */
+	protected function manageStages ($post, $form, $reload = false)
+	{
 		if ($post) {
 			try {
 				// Stage 2
 				// Handle Uploads
-				if ($this->handleUpload($post, $form)) {
+				if ($this->handleUpload($post, $form, $reload)) {
 					return $this->results;
 				}
 				
 				// Stage 3
 				// Handle Field Matching
-				if ($this->handleMatch($post, $form)) {
+				if ($this->handleMatch($post, $form, $reload)) {
 					return $this->results;
 				}
 				
@@ -91,22 +112,22 @@ class ImportController extends AbstractCrudController
 				$this->flashMessenger()->addErrorMessage($e->getMessage());
 			}
 		} else {
-			$this->results['form'] = $form;
 			try {
-				$this->setImportCache($this->stage, $this->results);
+				$this->setImportCache($this->stage);
 			} catch (\Exception $e) {
 				// ...
 			}
 			$form->addUploadField();
+			$this->results['form'] = $form;
 			return $this->results;
 		}
-		
-		return $this->rollBack();
+		return false;
 	}
 
 	/**
 	 * Initialize Results (Stage 1)
 	 *
+	 * @param integer $stage        	
 	 * @return void
 	 */
 	protected function init ($stage = null)
@@ -143,7 +164,7 @@ class ImportController extends AbstractCrudController
 		// set data post and file ...
 		$form->setData($data);
 		
-		if ($form->isValid() || $reload) {
+		if ($form->isValid()) {
 			// Handle Uploads
 			if ($files) {
 				$file = isset($post['leadsUpload']) ? $post['leadsUpload'] : $this->params()->fromFiles(
@@ -171,13 +192,18 @@ class ImportController extends AbstractCrudController
 						$this->results['count'] = $csv['count'];
 						$this->results['headings'] = $csv['headings'];
 						$this->results['form'] = $form;
-						$this->setImportCache($this->stage, $this->results);
+						$this->setImportCache($this->stage, $data);
 					}
 				}
 			}
 		} else {
 			$message = "There seems to be a problem with reading your CSV file or it is invalid.";
 			$this->flashMessenger()->addErrorMessage($message);
+			$messages = $form->getMessages();
+			if ($messages) {
+				$this->flashMessenger()->addErrorMessage(
+						$this->formatFormMessages($form));
+			}
 		}
 		return $outcome;
 	}
@@ -197,7 +223,7 @@ class ImportController extends AbstractCrudController
 		
 		$form->setData($post);
 		
-		if ($form->isValid() || $reload) {
+		if ($form->isValid()) {
 			if ($post && isset($post['match'], $post['leadTmpFile'])) {
 				$match = $post['match'];
 				$company = $post['Company'];
@@ -214,6 +240,7 @@ class ImportController extends AbstractCrudController
 						if ($valid) {
 							$form = $this->addImportFields($form, $data, $valid);
 							$form->get('submit')->setValue('Confirm');
+							$form->addCancelField();
 							$form->addHiddenField('Company', $company);
 							$headings = array_intersect_key(
 									$form->getAttributeFields(), 
@@ -232,7 +259,7 @@ class ImportController extends AbstractCrudController
 							$this->results['valid'] = $valid;
 							$this->results['form'] = $form;
 							$this->results['headings'] = $headings;
-							$this->setImportCache($this->stage, $this->results);
+							$this->setImportCache($this->stage, $post);
 						}
 					}
 				}
@@ -245,6 +272,11 @@ class ImportController extends AbstractCrudController
 		} else {
 			$message = "You have invalid Form Entries.";
 			$this->flashMessenger()->addErrorMessage($message);
+			$messages = $form->getMessages();
+			if ($messages) {
+				$this->flashMessenger()->addErrorMessage(
+						$this->formatFormMessages($form));
+			}
 		}
 		return $outcome;
 	}
@@ -268,6 +300,7 @@ class ImportController extends AbstractCrudController
 		if ($form->isValid()) {
 			if (isset($post['leads'])) {
 				$accountName = empty($post['Company']) ? false : $post['Company'];
+				$account_id = false;
 				if ($accountName) {
 					$account = $accountName ? $this->findAccount($accountName) : false;
 					if (! $account) {
@@ -280,57 +313,82 @@ class ImportController extends AbstractCrudController
 							$em = $this->getEntityManager();
 							$em->persist($account);
 							$em->flush();
+							$account_id = $account->getId();
 						} catch (\Exception $e) {
 							$account = false;
 							$outcome = false;
 							$this->flashMessenger()->addErrorMessage(
 									$e->getMessage());
 						}
+					} else {
+						$account_id = $account->getId();
 					}
 				} else {
 					$account = false;
 				}
 				
-				$leads = $post['leads'];
+				$leads_json = $post['leads'];
+				$leads = @\Zend\Json\Json::decode($leads_json, 
+						\Zend\Json\Json::TYPE_ARRAY);
 				$company = $post['Company'];
 				if ($leads && is_array($leads)) {
-					foreach ($leads as $extract) {
-						$lead = null;
+					try {
 						$this->createServiceEvent()
 							->setEntityClass($this->getEntityClass())
 							->setDescription("Lead Import");
-						$entity = new Lead();
-						$lead = $this->hydrate($entity, $extract);
-						if ($lead) {
-							try {
-								$em = $this->getEntityManager();
-								$em->persist($lead);
-								$em->flush();
-								$lead_id = $lead->getId();
-								if ($account instanceof Account &&
-										 $account->getId() &&
-										 $lead instanceof Lead && $lead_id) {
-									$account->addLead($lead);
+						for ($i = 1; $i <= count($leads); ++ $i) {
+							// foreach ($leads as $extract) {
+							$extract = isset($leads[$i - 1]) ? $leads[$i - 1] : false;
+							if ($extract) {
+								$lead = null;
+								$this->createServiceEvent()
+									->setEntityClass($this->getEntityClass())
+									->setDescription("Lead Import");
+								$entity = new Lead();
+								$lead = $this->hydrate($entity, $extract);
+								if ($lead) {
+									try {
+										$em = $this->getEntityManager();
+										$em->persist($lead);
+										$em->flush();
+										$lead_id = $lead->getId();
+										if ($account_id && $lead instanceof Lead) {
+											$account = $this->findAccount(
+													$account_id, 'id');
+											$account->addLead($lead);
+										}
+										$message = 'Lead #' . $lead_id .
+												 ' was imported.';
+										$this->getServiceEvent()
+											->setEntityId($lead_id)
+											->setMessage($message);
+										$this->logEvent("ImportAction.post");
+										$em->flush();
+										$em->clear();
+									} catch (\Exception $e) {
+										$this->logError($e);
+										if ($outcome) {
+											$this->flashMessenger()->addErrorMessage(
+													$e->getMessage());
+										}
+										$outcome = false;
+										$em->clear();
+									}
+								} elseif ($outcome) {
+									$outcome = false;
 								}
-								$message = 'Lead #' . $lead_id . ' was imported.';
-								$this->getServiceEvent()
-									->setEntityId($lead_id)
-									->setMessage($message);
-								$this->logEvent("ImportAction.post");
-							} catch (\Exception $e) {
-								$this->logError($e);
-								if ($outcome) {
-									$this->flashMessenger()->addErrorMessage(
-											$e->getMessage());
-								}
-								$outcome = false;
 							}
-						} elseif ($outcome) {
-							$outcome = false;
 						}
+						$em->flush();
+						$em->clear();
+					} catch (\Exception $e) {
+						$this->logError($e);
+						if ($outcome) {
+							$this->flashMessenger()->addErrorMessage(
+									$e->getMessage());
+						}
+						$outcome = false;
 					}
-					$em->flush();
-					$em->clear();
 				}
 				if (! $outcome) {
 					$message = "One or more records could not be properly imported.";
@@ -343,6 +401,8 @@ class ImportController extends AbstractCrudController
 			} else {
 				$outcome = false;
 			}
+		} else {
+			$outcome = false;
 		}
 		
 		return $outcome;
@@ -356,17 +416,14 @@ class ImportController extends AbstractCrudController
 	 */
 	protected function rollBack ($stage = null)
 	{
-		$output = false;
+		$result = false;
 		$form = $this->getImportForm();
-		$results = $this->getImportCache($stage);
-		if (isset($results['form']) && (($stform = $results['form']) == true)) {
-			if (isset($stform->storage) && $stform->storage) {
-				$form->setData($stform->storage);
-				$results['form'] = $form;
-			}
-		}
+		$data = $this->getImportCache($stage);
 		$this->stage = $this->getImportCache($stage, 'stage');
-		return $results ?  : $this->getRedirect();
+		if ($data) {
+			$result = $this->manageStages($data, $form, true);
+		}
+		return $result ?  : $this->getRedirect();
 	}
 
 	/**
@@ -578,6 +635,7 @@ JTPL;
 
 	protected function addImportFields (ImportForm $form, $data, $valid = false)
 	{
+		$import = [];
 		if ($data) {
 			foreach ($data as $i => $row) {
 				if (! $valid || (isset($valid[$i]) && $valid[$i] == 'valid')) {
@@ -585,29 +643,49 @@ JTPL;
 						foreach ($fieldSet as $fieldName => $value) {
 							if (is_array($value)) {
 								foreach ($value as $_fieldName => $_value) {
-									$form->add(
-											array(
-													'name' => "leads[{$i}][{$field}][{$fieldName}][{$_fieldName}]",
-													'attributes' => array(
-															'value' => $_value,
-															'type' => 'hidden'
-													)
-											));
+									$import[$i][$field][$fieldName][$_fieldName] = $_value;
+									/*
+									 * $form->add(
+									 * array(
+									 * 'name' =>
+									 * "leads[{$i}][{$field}][{$fieldName}][{$_fieldName}]",
+									 * 'attributes' => array(
+									 * 'value' => $_value,
+									 * 'type' => 'hidden'
+									 * )
+									 * ));
+									 */
 								}
 							} else {
-								$form->add(
-										array(
-												'name' => "leads[{$i}][{$field}][{$fieldName}]",
-												'attributes' => array(
-														'value' => $value,
-														'type' => 'hidden'
-												)
-										));
+								$import[$i][$field][$fieldName] = $value;
+								/*
+								 * $form->add(
+								 * array(
+								 * 'name' =>
+								 * "leads[{$i}][{$field}][{$fieldName}]",
+								 * 'attributes' => array(
+								 * 'value' => $value,
+								 * 'type' => 'hidden'
+								 * )
+								 * ));
+								 */
 							}
 						}
 					}
 				}
 			}
+			$form->add(
+					array(
+							'name' => "leads",
+							'attributes' => array(
+									'value' => \Zend\Json\Json::encode($import, 
+											true, 
+											array(
+													'silenceCyclicalExceptions' => true
+											)),
+									'type' => 'hidden'
+							)
+					));
 		}
 		return $form;
 	}
@@ -774,13 +852,13 @@ JTPL;
 		return $hydrator->extract($lead);
 	}
 
-	protected function findAccount ($accountName)
+	protected function findAccount ($value, $field = 'name')
 	{
 		$em = $this->getEntityManager();
 		$accountRepository = $em->getRepository("Account\\Entity\\Account");
 		
 		return $accountRepository->findOneBy([
-				'name' => $accountName
+				$field => $value
 		]);
 	}
 
