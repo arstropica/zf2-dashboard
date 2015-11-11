@@ -12,13 +12,15 @@ hr.small {
 }
 
 .formtable-header {
+	
 }
 
 .formtable-header .pagination, .formtable-header .form-inline {
 	margin: 5px 0;
 }
 
-.formtable-header .pagination > li > a, .formtable-header .pagination > li > span {
+.formtable-header .pagination>li>a, .formtable-header .pagination>li>span
+	{
 	padding: 8px 14px;
 }
 
@@ -95,7 +97,8 @@ form.leadform #submitbutton {
 	background-color: #57A900;
 	background-image: -moz-linear-gradient(top, #70D900, #57A900);
 	background-image: -ms-linear-gradient(top, #70D900, #57A900);
-	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#70d900), to(#57a900));
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#70d900),
+		to(#57a900));
 	background-image: -webkit-linear-gradient(top, #70D900, #57A900);
 	background-image: -o-linear-gradient(top, #70D900, #57A900);
 	background-image: linear-gradient(top, #70d900, #57a900);
@@ -103,7 +106,8 @@ form.leadform #submitbutton {
 		endColorstr='#57a900', GradientType=0);
 }
 
-.btn-success:hover, .btn-success:active, .btn-success.active, .btn-success.disabled, .btn-success[disabled] {
+.btn-success:hover, .btn-success:active, .btn-success.active,
+	.btn-success.disabled, .btn-success[disabled] {
 	background-color: #57A900;
 }
 
@@ -112,12 +116,13 @@ form.leadform #submitbutton {
 }
 
 div.container a.brand {
-	background: url("../img/zf2-logo.png") no-repeat scroll 0 10px transparent;
+	background: url("../img/zf2-logo.png") no-repeat scroll 0 10px
+		transparent;
 	margin-left: 0;
 	padding: 8px 20px 12px 40px;
 }
 
-.navbar-brand > img {
+.navbar-brand>img {
 	display: inline;
 }
 
@@ -162,14 +167,15 @@ a.sort {
 	display: none;
 }
 
-.action-index.controller-error > .container .row.content .col-md-12 {
+.action-index.controller-error>.container .row.content .col-md-12 {
 	background-color: #D29656;
 	width: 100%;
 	min-height: 200px;
 	-moz-box-shadow: 0px 1px 1px 1px rgba(0, 0, 0, 0.4);
 	-webkit-box-shadow: 0px 1px 1px 1px rgba(0, 0, 0, 0.4);
 	box-shadow: 0px 1px 1px 1px rgba(0, 0, 0, 0.4);
-	-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=1, Direction=90, Color='#000000')";
+	-ms-filter:
+		"progid:DXImageTransform.Microsoft.Shadow(Strength=1, Direction=90, Color='#000000')";
 	filter: progid:DXImageTransform.Microsoft.Shadow(Strength=1, Direction=90,
 		Color='#000000');
 }
@@ -208,7 +214,7 @@ a.sort {
 	margin-left: 30px;
 }
 
-.navbar-nav > li > span.label {
+.navbar-nav>li>span.label {
 	padding-top: 15px;
 	padding-bottom: 15px;
 	line-height: 20px;
@@ -271,7 +277,7 @@ a.sort {
 	margin: 0;
 }
 
-#leadimport .import-fields > .col-xs-12 {
+#leadimport .import-fields>.col-xs-12 {
 	padding-top: 5px;
 	padding-bottom: 5px;
 }
@@ -280,6 +286,23 @@ a.sort {
 	display: block;
 	padding-top: 5px;
 	font-style: italic;
+}
+
+#leadimport .import-fields .chosen-container-multi .chosen-choices li.search-choice span
+	{
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	max-width: 210px;
+	display: block;
+}
+
+#leadimport .import-fields .importSelect.form-control, #leadimport .import-fields .importSelect.form-control option
+	{
+	max-width: 280px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
 #leadimport select.form-control.match {
@@ -327,15 +350,15 @@ a.sort {
 	margin-bottom: 60px;
 }
 
-.table-collapse > tbody > tr.accordion-toggle > td {
+.table-collapse>tbody>tr.accordion-toggle>td {
 	cursor: pointer;
 }
 
-.table-collapse > tbody > tr.accordion-toggle.invalid > td {
+.table-collapse>tbody>tr.accordion-toggle.invalid>td {
 	background: #F45025;
 }
 
-.table-collapse > tbody > tr.accordion-toggle:hover > td {
+.table-collapse>tbody>tr.accordion-toggle:hover>td {
 	background: #D6F8DF;
 }
 
@@ -343,7 +366,7 @@ a.sort {
 	border: none;
 }
 
-.table-collapse .hiddenRow > td {
+.table-collapse .hiddenRow>td {
 	padding: 0px;
 	border: none;
 }
@@ -352,15 +375,17 @@ a.sort {
 	margin: 0;
 }
 
-.pagination > .disabled > span.glyphicon-fast-backward, .pagination > .disabled > span.glyphicon-chevron-left {
+.pagination>.disabled>span.glyphicon-fast-backward, .pagination>.disabled>span.glyphicon-chevron-left
+	{
 	padding-right: 20px;
 }
 
-.pagination > .disabled > span.glyphicon-fast-forward, .pagination > .disabled > span.glyphicon-chevron-right {
+.pagination>.disabled>span.glyphicon-fast-forward, .pagination>.disabled>span.glyphicon-chevron-right
+	{
 	padding-right: 20px;
 }
 
-.pagination > li > * {
+.pagination>li>* {
 	height: 34px;
 }
 
@@ -389,7 +414,7 @@ input#accountfilter {
 	margin: 0 !important;
 }
 
-.panel-heading > .table, .panel-heading > .table th {
+.panel-heading>.table, .panel-heading>.table th {
 	margin: 0px;
 	border: 0px;
 }
@@ -406,12 +431,14 @@ a.underline {
 	text-decoration: underline;
 }
 
-.form-horizontal #apiSettings .form-group, .form-horizontal #options .form-group, .addremove .form-group {
+.form-horizontal #apiSettings .form-group, .form-horizontal #options .form-group,
+	.addremove .form-group {
 	margin-left: 0;
 	margin-right: 0;
 }
 
-.form-horizontal #apiSettings > fieldset, .form-horizontal #options > fieldset, .addremove fieldset fieldset {
+.form-horizontal #apiSettings>fieldset, .form-horizontal #options>fieldset,
+	.addremove fieldset fieldset {
 	margin: 15px;
 	padding-top: 15px;
 	position: relative;
@@ -420,7 +447,7 @@ a.underline {
 	border-radius: 5px;
 }
 
-.form-horizontal #apiSettings > fieldset, .addremove fieldset fieldset {
+.form-horizontal #apiSettings>fieldset, .addremove fieldset fieldset {
 	margin: 15px;
 	background: #EEE;
 	padding-top: 15px;
@@ -440,7 +467,7 @@ a.underline {
 	background: none;
 }
 
-.form-horizontal #options > fieldset {
+.form-horizontal #options>fieldset {
 	margin: 15px;
 	background: #FFF;
 	padding-top: 15px;
@@ -456,11 +483,11 @@ a.underline {
 	visibility: hidden;
 }
 
-#accountAPIEntityForm form > .form-group {
+#accountAPIEntityForm form>.form-group {
 	margin: 15px;
 }
 
-#accountAPIEntityForm form > .form-group > label {
+#accountAPIEntityForm form>.form-group>label {
 	display: block;
 	width: 100%;
 	padding: 0;
@@ -473,7 +500,7 @@ a.underline {
 	font-weight: normal;
 }
 
-#accountAPIEntityForm form > .form-group > #accountAPIs {
+#accountAPIEntityForm form>.form-group>#accountAPIs {
 	float: left;
 }
 
@@ -521,7 +548,7 @@ a.underline {
 	border-radius: 35px;
 }
 
-fieldset > .btn.removeSetting {
+fieldset>.btn.removeSetting {
 	position: absolute;
 	top: -10px;
 	right: -10px;
@@ -576,7 +603,7 @@ form#pagerform select.form-control {
 	border-bottom: 1px dashed #CCC !important;
 }
 
-.sortTable tbody.sortable > tr:hover > td {
+.sortTable tbody.sortable>tr:hover>td {
 	background: #DCF2E7;
 }
 
@@ -679,11 +706,14 @@ form#pagerform select.form-control {
 	border-bottom: 1px dashed #666;
 }
 
-.sortTable .sortable .sortable-order[contentEditable=true]:active, .sortTable .sortable .sortable-order[contentEditable=true]:focus, .sortTable .sortable td:hover .sortable-order[contentEditable=true] {
+.sortTable .sortable .sortable-order[contentEditable=true]:active,
+	.sortTable .sortable .sortable-order[contentEditable=true]:focus,
+	.sortTable .sortable td:hover .sortable-order[contentEditable=true] {
 	border: 1px solid #5BC0DE;
 }
 
-#questionstable:not(.sortTable) th:not([class*=col-]), #questionstable:not(.sortTable) td:not([class*=col-]) {
+#questionstable:not (.sortTable ) th:not ([class*=col-] ),
+	#questionstable:not (.sortTable ) td:not ([class*=col-] ) {
 	background-color: #FFF !important;
 	border: none;
 }
