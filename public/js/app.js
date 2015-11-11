@@ -81,8 +81,8 @@ $.fn.sortTable = function(options) {
 				if (data.hasOwnProperty('collection')) {
 					var collection = data.collection;
 					var $_sortable = $row.parent();
-					collection.forEach(function(a, i){
-						var $tr = $_sortable.find('TR#'+a.id);
+					collection.forEach(function(a, i) {
+						var $tr = $_sortable.find('TR#' + a.id);
 						if ($tr.length) {
 							$tr.find('.sortable-order').html(a.attributeOrder);
 							$_sortable.append($tr);
@@ -118,12 +118,12 @@ $.fn.sortTable = function(options) {
 						var new_index = order - _start;
 						var old_position = $sortable_order.data('old_position');
 						var new_position = order;
-						/*var $target = $_sortable.children().eq(new_position);
-						if ($target.length) {
-							$row.insertBefore($target);
-						} else {
-							$row.insertAfter($_sortable.children().last());
-						}*/
+						/*
+						 * var $target = $_sortable.children().eq(new_position);
+						 * if ($target.length) { $row.insertBefore($target); }
+						 * else {
+						 * $row.insertAfter($_sortable.children().last()); }
+						 */
 						$sortable_order.data('old_position', order);
 						ajaxUpdate($row, new_position, old_position, 0);
 						$_sortable.sortable('refresh');
@@ -159,16 +159,17 @@ $(function() {
 		var val = $(this).val();
 		var match = $(this).data('match');
 
+		
 		if (val === "Question") {
 			$(this).removeClass('custom match ignore').addClass("new").prop('title', 'You want this to be a new field.').after('<span class="desc new">New Field</span>');
 		} else if (val !== "" && val != match) {
 			$(this).removeClass('match new ignore').addClass('custom').prop('title', 'You have custom mapped this field.').after('<span class="desc custom">Custom Field</span>');
-		} else if (val !== "" && val == match) {
+		} else if (val !== "" && val !== null && val == match) {
 			$(this).removeClass('custom new ignore').addClass('match').prop('title', 'This field has been automatically mapped.').after('<span class="desc match">Matched Field</span>');
 		} else if (val === "ignore") {
 			$(this).removeClass('custom match new').addClass("ignore").prop('title', 'You have ignored this field.').after('<span class="desc ignore">Ignored Field</span>');
-		} else if (val === "") {
-			$(this).removeClass('custom match ignore new');
+		} else if (val === "" ||  val === null) {
+			$(this).removeClass('custom match ignore new').after('<span class="desc ignore">&nbsp;</span>');
 		}
 	}).trigger('change');
 	$('.table-collapse > TBODY > TR.collapsed').hover(function() {
