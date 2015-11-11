@@ -138,9 +138,12 @@ class Module implements AutoloaderProviderInterface
 						'BodyClass' => function  ($sm)
 						{
 							return new BodyClasses();
-						}
+						},
+						'doctrine.cache.redis' => 'Application\Service\Factory\DoctrineRedisCacheFactory'
 				)
-		);
+				
+		)
+		;
 	}
 
 	public function getViewHelperConfig ()
