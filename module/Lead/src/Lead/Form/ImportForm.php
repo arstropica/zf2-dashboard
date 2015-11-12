@@ -1,7 +1,6 @@
 <?php
 namespace Lead\Form;
 use Zend\Form\Form;
-use Zend\Form\Element;
 use Zend\Form\Fieldset;
 use Zend\InputFilter\InputFilter;
 use Zend\InputFilter\Factory as InputFactory;
@@ -66,9 +65,6 @@ class ImportForm extends Form implements InputFilterAwareInterface,
 								'type' => 'hidden'
 						)
 				));
-		
-		$csrf = new Element\Csrf('csrf');
-		$this->add($csrf);
 		
 		$this->add(
 				array(
