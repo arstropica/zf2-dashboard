@@ -35,7 +35,7 @@ class AttributeValueFieldset extends AbstractFieldset implements
 						'options' => array(
 								'column-size' => 'xs-12',
 								'label' => $label,
-								'empty_option' => 'Choose ' . $label . ' Field',
+								'empty_option' => 'Ignore Field',
 								'object_manager' => $this->getObjectManager(),
 								'target_class' => 'Lead\Entity\LeadAttribute',
 								'property' => 'attributeDesc',

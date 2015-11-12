@@ -62,10 +62,6 @@ DQL;
 						"name" => "Question",
 						"desc" => "Add New Field"
 				],
-				"ignore" => [
-						"name" => "ignore",
-						"desc" => "Ignore Field"
-				],
 				"timecreated" => [
 						"name" => "timecreated",
 						"desc" => "Time Created"
@@ -94,10 +90,6 @@ DQL;
 	{
 		$prepend = [];
 		$prepend_fields = [
-				"ignore" => [
-						"name" => "ignore",
-						"desc" => "Ignore Field"
-				],
 				"timecreated" => [
 						"name" => "timecreated",
 						"desc" => "Time Created"
