@@ -57,37 +57,40 @@ class Lead
 	private $description;
 
 	/**
-	 * @ORM\ManyToOne(
-	 * targetEntity="Account\Entity\Account",
-	 * inversedBy="leads",
-	 * cascade={"persist", "remove"},
-	 * fetch="EXTRA_LAZY",
-	 * )
-	 * @ORM\JoinColumn(
-	 * name="account_id",
-	 * referencedColumnName="id",
-	 * nullable=true,
-	 * )
-	 * @ORM\OrderBy({"name" = "ASC"})
-	 * @Annotation\Instance("\Account\Entity\Account")
-	 * @Annotation\Type("DoctrineModule\Form\Element\ObjectSelect")
-	 * @Annotation\Filter({"name":"StripTags"})
-	 * @Annotation\Filter({"name":"StringTrim"})
-	 * @Annotation\Validator({"name":"Digits"})
-	 * @Annotation\Required(false)
-	 * @Annotation\Options({
-	 * "required":"false",
-	 * "label":"Account",
-	 * "empty_option": "Select Account",
-	 * "target_class":"Account\Entity\Account",
-	 * "property": "description"
-	 * })
+	 *
+	 * @var \Account\Entity\Account
+	 *      @ORM\ManyToOne(
+	 *      targetEntity="Account\Entity\Account",
+	 *      inversedBy="leads",
+	 *      cascade={"persist", "remove"},
+	 *      fetch="EXTRA_LAZY",
+	 *      )
+	 *      @ORM\JoinColumn(
+	 *      name="account_id",
+	 *      referencedColumnName="id",
+	 *      nullable=true,
+	 *      )
+	 *      @ORM\OrderBy({"name" = "ASC"})
+	 *      @Annotation\Instance("\Account\Entity\Account")
+	 *      @Annotation\Type("DoctrineModule\Form\Element\ObjectSelect")
+	 *      @Annotation\Filter({"name":"StripTags"})
+	 *      @Annotation\Filter({"name":"StringTrim"})
+	 *      @Annotation\Validator({"name":"Digits"})
+	 *      @Annotation\Required(false)
+	 *      @Annotation\Options({
+	 *      "required":"false",
+	 *      "label":"Account",
+	 *      "empty_option": "Select Account",
+	 *      "target_class":"Account\Entity\Account",
+	 *      "property": "description"
+	 *      })
 	 */
 	private $account;
 
 	/**
 	 *
-	 * @var \Doctrine\Common\Collections\Collection @ORM\OneToMany(
+	 * @var \Doctrine\Common\Collections\Collection
+	 *      @ORM\OneToMany(
 	 *      targetEntity="Lead\Entity\LeadAttributeValue",
 	 *      mappedBy="lead",
 	 *      fetch="EXTRA_LAZY",
@@ -409,8 +412,9 @@ class Lead
 	}
 
 	/**
-	 * @param \Doctrine\Common\Collections\Collection $attributes
-	 * 
+	 *
+	 * @param \Doctrine\Common\Collections\Collection $attributes        	
+	 *
 	 * @return Lead
 	 */
 	public function setAttributes ($attributes)

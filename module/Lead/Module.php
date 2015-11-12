@@ -12,6 +12,9 @@ use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
 use Lead\Event\Listener\LeadListener;
 use Lead\Event\Listener\AttributeListener;
+use Zend\ServiceManager\ServiceLocatorInterface;
+use Doctrine\ORM\Configuration as DoctrineConfig;
+use Doctrine\ORM\Cache\DefaultCacheFactory;
 
 class Module implements AutoloaderProviderInterface
 {
@@ -50,8 +53,10 @@ class Module implements AutoloaderProviderInterface
 		
 		$em = $sm->get('Doctrine\ORM\EntityManager');
 		
+		// $this->configSecondLevelCache($sm, 'Lead\Cache\Lead');
+		
 		// Register Entity Listeners
-		$config = $this->getConfig();
+		/* $config = $this->getConfig();
 		$invokables = isset($config['service_manager']['invokables']) ? $config['service_manager']['invokables'] : [];
 		foreach ($invokables as $invokable) {
 			// Verify the listener namespaces
@@ -60,10 +65,30 @@ class Module implements AutoloaderProviderInterface
 					->getEntityListenerResolver()
 					->register($sm->get($invokable));
 			}
-		}
+		} */
 		
 		// Register Event Listeners
 		$eventManager->attach(new LeadListener($sm));
 		$eventManager->attach(new AttributeListener($sm));
+	}
+
+	/**
+	 *
+	 * @param ServiceLocatorInterface $sm        	
+	 * @param string $region        	
+	 */
+	public function configSecondLevelCache ($sm, $region)
+	{
+		$cache = $sm->get('doctrine.cache.redis');
+		$config = new DoctrineConfig();
+		$config->setSecondLevelCacheEnabled();
+		
+		$cacheConfig = $config->getSecondLevelCacheConfiguration();
+		
+		$regionConfig = $cacheConfig->getRegionsConfiguration();
+		$regionConfig->setLifetime($region, 3600);
+		$regionConfig->setDefaultLifetime(7200); // Default time to live; secs
+		$factory = new DefaultCacheFactory($regionConfig, $cache);
+		$cacheConfig->setCacheFactory($factory);
 	}
 }

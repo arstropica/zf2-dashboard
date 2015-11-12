@@ -11,7 +11,7 @@ use Application\Controller\AbstractCrudController;
 use Zend\Paginator\Paginator;
 use Doctrine\ORM\QueryBuilder as Builder;
 use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator;
-use LosBase\ORM\Tools\Pagination\Paginator as LosPaginator;
+use Application\ORM\Tools\Pagination\Doctrine\Paginator as FastPaginator;
 use DoctrineORMModule\Stdlib\Hydrator\DoctrineEntity as DoctrineHydrator;
 use Application\Hydrator\Strategy\DateTimeStrategy;
 use Zend\Stdlib\ResponseInterface as Response;
@@ -21,6 +21,8 @@ use Zend\View\Model\JsonModel;
 
 class LeadController extends AbstractCrudController
 {
+
+	protected $batchSize = 20;
 
 	protected $defaultSort = 'id';
 
@@ -87,7 +89,8 @@ class LeadController extends AbstractCrudController
 		$pager = $this->getPagerForm($limit);
 		
 		$paginator = new Paginator(
-				new DoctrinePaginator(new LosPaginator($qb, false)));
+				new DoctrinePaginator(new FastPaginator($qb, true)));
+		$paginator->setCacheEnabled(true);
 		$paginator->setDefaultItemCountPerPage($limit);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setPageRange($this->paginatorRange);
@@ -164,12 +167,25 @@ class LeadController extends AbstractCrudController
 			$res = true;
 			$count = 0;
 			$total = 0;
-			foreach (array_filter($prg['sel']) as $lead_id => $one) {
-				if ($one) {
-					$res = $this->editLead($lead_id, $account_id, $action) ? $res : false;
-					$count = $res ? $count + 1 : $count;
-					$total ++;
+			$em = $this->getEntityManager();
+			$i = 1;
+			try {
+				foreach (array_filter($prg['sel']) as $lead_id => $one) {
+					if ($one) {
+						$res = $this->editLead($lead_id, $account_id, $action) ? $res : false;
+						$count = $res ? $count + 1 : $count;
+						$total ++;
+						if (($i % $this->batchSize) == 0) {
+							$em->flush();
+							$em->clear();
+						}
+						$i ++;
+					}
 				}
+				$em->flush();
+				$em->clear();
+			} catch (\Exception $e) {
+				$res = false;
 			}
 			$message = $this->successEditMessage;
 			if ($res) {
@@ -793,7 +809,8 @@ class LeadController extends AbstractCrudController
 		return $qb;
 	}
 
-	protected function editLead ($lead_id, $account_id = false, $action = 'assign')
+	protected function editLead ($lead_id, $account_id = false, $action = 'assign', 
+			$flush = false)
 	{
 		$result = true;
 		$account = false;
@@ -845,7 +862,10 @@ class LeadController extends AbstractCrudController
 							try {
 								$em->persist($account);
 								$em->persist($lead);
-								$em->flush();
+								if ($flush) {
+									$em->flush();
+									$em->detach($lead);
+								}
 								$this->getServiceEvent()->setMessage(
 										"Lead #{$lead_id} was assigned to " .
 												 $account->getName());
@@ -871,6 +891,10 @@ class LeadController extends AbstractCrudController
 								$em->persist($account);
 								$em->persist($lead);
 								$em->flush();
+								if ($flush) {
+									$em->flush();
+									$em->detach($lead);
+								}
 								$this->getServiceEvent()->setMessage(
 										"Lead #{$lead_id} was unassigned");
 								$shouldLog = true;

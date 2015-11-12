@@ -83,7 +83,6 @@ return array(
 						'Application\Form\PagerForm' => 'Application\Form\PagerForm',
 						'Application\Controller\Plugin\JSONErrorResponse' => 'Application\Controller\Plugin\JSONErrorResponse',
 						'Application\Controller\Plugin\ErrorResponse' => 'Application\Controller\Plugin\ErrorResponse',
-						'Doctrine\ORM\Mapping\UnderscoreNamingStrategy' => 'Doctrine\ORM\Mapping\UnderscoreNamingStrategy'
 				),
 				'abstract_factories' => array(
 						'Zend\Navigation\Service\NavigationAbstractServiceFactory',

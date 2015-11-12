@@ -254,4 +254,14 @@ class LeadAttribute
 	{
 		return $this->getValues(true)->count();
 	}
+
+	/**
+	 * Get string equivalent.
+	 *
+	 * @return string
+	 */
+	public function __toString ()
+	{
+		return $this->getAttributeOrder();
+	}
 }

@@ -17,7 +17,7 @@ return array(
 				'driver' => array(
 						'Lead_driver' => array(
 								'class' => 'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
-								'cache' => 'array',
+								'cache' => 'redis',
 								'paths' => array(
 										__DIR__ . '/../src/Lead/Entity/'
 								)
@@ -27,7 +27,7 @@ return array(
 										'Lead\Entity' => 'Lead_driver'
 								)
 						)
-				)
+				),
 		),
 		'router' => array(
 				'routes' => array(

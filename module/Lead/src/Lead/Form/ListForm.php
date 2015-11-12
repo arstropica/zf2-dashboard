@@ -119,4 +119,9 @@ class ListForm extends Form implements InputFilterAwareInterface
 				)
 		);
 	}
+
+	public function __sleep ()
+	{
+		return array();
+	}
 }
