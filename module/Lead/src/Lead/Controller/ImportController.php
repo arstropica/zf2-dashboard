@@ -15,6 +15,7 @@ use Event\Entity\Event;
 use Account\Utility\IdGenerator;
 use Zend\Form\Form;
 use User\Provider\IdentityAwareTrait;
+use Zend\Validator\File\MimeType;
 
 /**
  *
@@ -171,14 +172,13 @@ class ImportController extends AbstractCrudController
 						'leadsUpload');
 				$tmp_file = $this->validateImportFile($file);
 				if ($tmp_file) {
-					$csv = $this->extractCSV(
+					$extract = $this->parseFile(
 							$this->getUploadPath() . '/' . $tmp_file);
-					
-					if ($csv['count']) {
+					if ($extract && $extract['count']) {
 						// Setup Import Form
 						$fieldSet = $form->addImportFieldset(
-								array_combine($csv['headings'], 
-										$csv['headings']), $this->isAdmin());
+								array_combine($extract['headings'], 
+										$extract['headings']), $this->isAdmin());
 						$this->setTypeAhead('Company', 
 								"Account\\Entity\\Account", "name");
 						$form->get('leadTmpFile')->setValue($tmp_file);
@@ -189,10 +189,13 @@ class ImportController extends AbstractCrudController
 						$this->results['stage'] = $this->stage;
 						$this->results['fields'] = $form->getLeadAttributes();
 						$this->results['_tmp'] = $tmp_file;
-						$this->results['count'] = $csv['count'];
-						$this->results['headings'] = $csv['headings'];
+						$this->results['count'] = $extract['count'];
+						$this->results['headings'] = $extract['headings'];
 						$this->results['form'] = $form;
 						$this->setImportCache($this->stage, $data);
+					} else {
+						$message = "There seems to be a problem with reading your CSV file or it is invalid.";
+						$this->flashMessenger()->addErrorMessage($message);
 					}
 				}
 			}
@@ -231,7 +234,7 @@ class ImportController extends AbstractCrudController
 				
 				$importFieldset = $form->getImportFieldset();
 				$form->addConfirmField();
-				$csv = $this->extractCSV($tmp_file);
+				$csv = $this->parseFile($tmp_file);
 				if ($csv['count']) {
 					$data = $this->mapImportedValues($csv['body'], $match, 
 							false);
@@ -332,12 +335,13 @@ class ImportController extends AbstractCrudController
 						\Zend\Json\Json::TYPE_ARRAY);
 				$company = $post['Company'];
 				if ($leads && is_array($leads)) {
+					$leads = array_values($leads);
 					try {
 						$this->createServiceEvent()
 							->setEntityClass($this->getEntityClass())
 							->setDescription("Lead Import");
+						$em = $this->getEntityManager();
 						for ($i = 1; $i <= count($leads); ++ $i) {
-							// foreach ($leads as $extract) {
 							$extract = isset($leads[$i - 1]) ? $leads[$i - 1] : false;
 							if ($extract) {
 								$lead = null;
@@ -394,7 +398,7 @@ class ImportController extends AbstractCrudController
 					$message = "One or more records could not be properly imported.";
 					$this->flashMessenger()->addErrorMessage($message);
 				} else {
-					$message = count($leads) . " records were imported.";
+					$message = count($leads) . " record(s) were imported.";
 					$this->flashMessenger()->addSuccessMessage($message);
 					$this->stage = 4;
 				}
@@ -416,11 +420,13 @@ class ImportController extends AbstractCrudController
 	 */
 	protected function rollBack ($stage = null)
 	{
+		// disable state caching
+		return $this->getRedirect();
 		$result = false;
 		$form = $this->getImportForm();
 		$data = $this->getImportCache($stage);
 		$this->stage = $this->getImportCache($stage, 'stage');
-		if ($data) {
+		if ($data && $this->stage > 1) {
 			$result = $this->manageStages($data, $form, true);
 		}
 		return $result ?  : $this->getRedirect();
@@ -531,13 +537,13 @@ class ImportController extends AbstractCrudController
 			var substringMatcher = function(strs) {
 			  return function findMatches(q, cb) {
 			    var matches, substringRegex;
-			
+		
 			    // an array that will be populated with substring matches
 			    matches = [];
-			
+		
 			    // regex used to determine if a string contains the substring `q`
 			    substrRegex = new RegExp(q, 'i');
-			
+		
 			    // iterate through the pool of strings and for any string that
 			    // contains the substring `q`, add it to the `matches` array
 			    $.each(strs, function(i, str) {
@@ -545,7 +551,7 @@ class ImportController extends AbstractCrudController
 			        matches.push(str);
 			      }
 			    });
-			
+		
 			    cb(matches);
 			  };
 			};
@@ -575,19 +581,32 @@ JTPL;
 	{
 		$size = new Size(array(
 				'min' => 128,
-				'max' => 2048000
+				'max' => 20480000
 		)); // min/max bytes filesize
 		
-		$adapter = new FileHttp();
 		$ext = new FileExt(
 				array(
 						'extension' => array(
+								'xls',
+								'xlsx',
 								'csv'
 						)
 				));
+		
+		$mime = new MimeType(
+				array(
+						'application/vnd.ms-excel',
+						'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+						'application/zip',
+						'text/plain',
+						'text/csv'
+				));
+		
+		$adapter = new FileHttp();
 		$adapter->setValidators(array(
 				$size,
-				$ext
+				$ext,
+				$mime
 		), $file['name']);
 		$isValid = $adapter->isValid();
 		if (! $isValid) {
@@ -610,25 +629,46 @@ JTPL;
 		return $config['upload_location'];
 	}
 
-	protected function extractCSV ($filepath)
+	protected function parseFile ($file)
 	{
-		$result = [
-				'body' => false,
-				'headings' => false,
-				'count' => false
-		];
-		$csv = $this->csvImport($filepath);
-		if ($csv && $csv instanceof \Iterator) {
-			$result['body'] = [];
-			foreach ($csv as $_csv) {
-				$_row = [];
-				foreach ($_csv as $k => $v) {
-					$_row[$this->clean_bom($k)] = $v;
-				}
-				$result['body'][] = $_row;
+		$rows = [];
+		$result = false;
+		try {
+			$objPHPExcel = \PHPExcel_IOFactory::load($file);
+			$rows = $objPHPExcel->getActiveSheet()->toArray();
+		} catch (\Exception $e) {
+			$this->flashMessenger()->addErrorMessage($e->getMessage());
+			return false;
+		}
+		if ($rows) {
+			$result = [
+					'count' => 0,
+					'headings' => [],
+					'body' => []
+			];
+			$headings = array_shift($rows);
+			if (array_filter($headings) !== $headings) {
+				$message = "There seems to be a problem with your file. One or more headings are missing.";
+				$this->flashMessenger()->addErrorMessage($message);
+				return false;
 			}
-			$result['headings'] = array_keys(current($result['body']));
-			$result['count'] = count($result['body']);
+			$csv = [];
+			$i = 0;
+			$row_count = count($rows);
+			foreach ($rows as $row) {
+				if (count($headings) == count($row)) {
+					$csv[] = array_combine($headings, $row);
+					$i ++;
+				}
+			}
+			if ($row_count !== $i) {
+				$error_message = ($row_count - $i) . " of " . $row_count .
+						 " records could not be imported.";
+				$this->flashMessenger()->addErrorMessage($error_message);
+			}
+			$result['headings'] = $headings;
+			$result['count'] = $i;
+			$result['body'] = $csv;
 		}
 		return $result;
 	}
@@ -757,11 +797,6 @@ JTPL;
 			}
 		}
 		return $result;
-	}
-
-	protected function clean_bom ($str)
-	{
-		return trim(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $str), '"');
 	}
 
 	protected function hydrate (Lead $lead, $data = [])

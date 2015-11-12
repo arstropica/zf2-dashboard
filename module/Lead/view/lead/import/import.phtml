@@ -1,6 +1,6 @@
 <?php
-// module/Application/view/application/index/import.phtml:
-$title = 'Import Gravity Form Leads';
+// module/Lead/view/lead/import/import.phtml:
+$title = 'Import Leads';
 $this->headTitle($title);
 ?>
 <h1>
@@ -89,6 +89,7 @@ if ($form->has('match') && 2 === $this->stage) :
 			<div class="row import-fields">
 				<div class="col-md-12">
 						<?php echo $this->formRow($upload); ?>
+						<small><i>Accepts:</i> <code>.csv, .xls, .xlsx</code> files.</small>
 						<hr>
 				</div>
 				<div class="col-md-12"><?php echo $this->formRow($form->get('submit')); ?></div>
@@ -121,7 +122,6 @@ if ($form->has('match') && 2 === $this->stage) :
 	foreach ($form as $name => $element) {
 		switch ($name) {
 			case 'submit':
-			case 'csrf':
 				break;
 			default:
 				echo $this->formHidden($element);
@@ -131,7 +131,6 @@ if ($form->has('match') && 2 === $this->stage) :
 	?>
 <?php endif; ?>
 </div>
-<?php echo $this->formHidden($form->get('csrf')); ?>
 <?php echo $this->form()->closeTag(); ?>
 <?php if (2 === $this->stage): ?>
 	<?php echo $this->losHeadLink()->setBasePath('/js')->appendChosen()?>
