@@ -178,7 +178,7 @@ class Lead
 	 */
 	public function getReferrer ()
 	{
-		return $this->referrer;
+		return $this->add_http($this->referrer);
 	}
 
 	/**
@@ -409,8 +409,9 @@ class Lead
 	}
 
 	/**
-	 * @param \Doctrine\Common\Collections\Collection $attributes
-	 * 
+	 *
+	 * @param \Doctrine\Common\Collections\Collection $attributes        	
+	 *
 	 * @return Lead
 	 */
 	public function setAttributes ($attributes)
@@ -546,6 +547,19 @@ class Lead
 		}
 		
 		return $this;
+	}
+
+	/**
+	 * Add http
+	 *
+	 * @param string $referrer        	
+	 */
+	protected function add_http ($referrer)
+	{
+		if (! preg_match("~^(?:f|ht)tps?://~i", $referrer)) {
+			$referrer = "http://" . $referrer;
+		}
+		return $referrer;
 	}
 
 	/**
