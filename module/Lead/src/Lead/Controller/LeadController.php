@@ -793,7 +793,7 @@ class LeadController extends AbstractCrudController
 							}
 							break;
 						case 'referrer':
-							$where['referrer'] = "%://{$query[$condition]}%";
+							$where['referrer'] = "%{$query[$condition]}%";
 							$qb->andWhere("e.referrer LIKE :referrer");
 							break;
 					}
