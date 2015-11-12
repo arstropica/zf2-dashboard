@@ -157,18 +157,26 @@ $(function() {
 	$('#leadimport .import-fields SELECT').on('change', function(e) {
 		$(this).closest('.form-group').find('.desc').remove();
 		var val = $(this).val();
+		if ($.isArray(val)) {
+			val = val[0];
+		}
+		if (val === null || val === "") {
+			val = null;
+		} else if (val.length == 0) {
+			val = null;
+		}
+		var text = $(this).find('OPTION:selected').text();
 		var match = $(this).data('match');
 
-		
 		if (val === "Question") {
 			$(this).removeClass('custom match ignore').addClass("new").prop('title', 'You want this to be a new field.').after('<span class="desc new">New Field</span>');
-		} else if (val !== "" && val != match) {
+		} else if (val !== null && val != match) {
 			$(this).removeClass('match new ignore').addClass('custom').prop('title', 'You have custom mapped this field.').after('<span class="desc custom">Custom Field</span>');
-		} else if (val !== "" && val !== null && val == match) {
+		} else if (val !== null && val == match) {
 			$(this).removeClass('custom new ignore').addClass('match').prop('title', 'This field has been automatically mapped.').after('<span class="desc match">Matched Field</span>');
-		} else if (val === "ignore") {
+		} else if (text === "Ignore Field" && val === null) {
 			$(this).removeClass('custom match new').addClass("ignore").prop('title', 'You have ignored this field.').after('<span class="desc ignore">Ignored Field</span>');
-		} else if (val === "" ||  val === null) {
+		} else if (val === null) {
 			$(this).removeClass('custom match ignore new').after('<span class="desc ignore">&nbsp;</span>');
 		}
 	}).trigger('change');
