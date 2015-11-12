@@ -18,6 +18,19 @@ return array(
 								'query_cache' => 'redis',
 								'result_cache' => 'redis',
 								'hydration_cache' => 'redis',
+								'second_level_cache' => array(
+										'enabled' => true,
+										'default_lifetime' => 200,
+										'default_lock_lifetime' => 500,
+										'file_lock_region_directory' => __DIR__ .
+												 '/../../data/filelock',
+												'regions' => array(
+														'Lead\Cache\Lead' => array(
+																'lifetime' => 800,
+																'lock_lifetime' => 1000
+														)
+												)
+								)
 						)
 				),
 				'cache' => array(
