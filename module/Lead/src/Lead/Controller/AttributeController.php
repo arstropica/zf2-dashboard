@@ -218,6 +218,12 @@ class AttributeController extends AbstractCrudController
 						'entity' => $entity
 				]);
 		
+		$attribute_count = $this->getEntityManager()
+			->getRepository($this->getEntityClass())
+			->getCount();
+		
+		$entity->setAttributeOrder($attribute_count);
+		
 		$savedEntity = $this->getEntityService()->save($form, $entity);
 		
 		if ($savedEntity && $savedEntity instanceof LeadAttribute) {

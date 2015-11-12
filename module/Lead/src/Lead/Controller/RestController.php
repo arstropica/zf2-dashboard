@@ -246,6 +246,7 @@ class RestController extends AbstractRestfulController
 		$accountRepository = $em->getRepository("Account\\Entity\\Account");
 		
 		if (isset($data['attributes'], $data['lead'])) {
+			$attribute_count = $leadAttributeRepository->getCount();
 			foreach ($data as $section => $values) {
 				switch ($section) {
 					case 'attributes':
@@ -267,6 +268,8 @@ class RestController extends AbstractRestfulController
 									$leadAttribute->setAttributeName('Question');
 									$leadAttribute->setAttributeDesc(
 											$attributeName);
+									$leadAttribute->setAttributeOrder(
+											$attribute_count ++);
 								}
 								if ($leadAttribute) {
 									$leadAttributeValue = new LeadAttributeValue();

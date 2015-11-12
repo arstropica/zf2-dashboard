@@ -113,4 +113,17 @@ DQL;
 		
 		return array_merge($prepend, $attributes);
 	}
+
+	public function getCount ()
+	{
+		$dql = <<<DQL
+		SELECT 
+			COUNT(a.id)
+		FROM
+			\Lead\Entity\LeadAttribute a
+DQL;
+		
+		$query = $this->getEntityManager()->createQuery($dql);
+		return $query->getSingleScalarResult();
+	}
 }
