@@ -97,7 +97,7 @@ $this->headTitle($title);
 	        		<tr class="leaditem">
 						<td class="lead.id col-xs-1"><div class="checkbox"><?php echo $this->formElement($form->get("sel[" . $entity->getId() . "]")); ?></div></td>
 						<td class="col-xs-3 description"><a
-							href="<?php echo $this->losUrl()->from('lead/view',['id'=>$entity->getId()], false)?>"><?php echo $entity->getFullName(); ?></a></td>
+							href="<?php echo $this->losUrl()->from('lead/view',['id'=>$entity->getId()], true)?>"><?php echo $entity->getFullName(); ?></a></td>
 						<td class="col-xs-2 account"><?php $account = $entity->getAccount(); echo $account ? '<a href="' . $this->url('account/view', ['action'=>'view', 'id' => $account->getId()]) . '">' . $account->getName() . '</a>' : 'None'; ?></td>
 						<td class="col-xs-3 source"><a
 							href="<?php echo $entity->getReferrer(); ?>"><?php echo $entity->getReferrer(); ?></a></td>
