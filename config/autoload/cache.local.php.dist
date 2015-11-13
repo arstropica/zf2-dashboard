@@ -1,0 +1,64 @@
+<?php
+return [
+		// Zend\Cache\Storage\Adapter\Memcached
+		'caches' => [
+				'memcached' => [
+						// can be called directly via SM in the name of
+						// 'memcached'
+						'adapter' => [
+								'name' => 'memcached',
+								'options' => [
+										// 2 hours
+										'ttl' => 7200,
+										'servers' => [
+												[
+														'127.0.0.1',
+														11211
+												]
+										],
+										'namespace' => 'ASB2',
+										'liboptions' => [
+												'COMPRESSION' => true,
+												'binary_protocol' => true,
+												'no_block' => true,
+												'connect_timeout' => 100
+										]
+								]
+						],
+						'plugins' => [
+								'exception_handler' => [
+										'throw_exceptions' => false
+								]
+						],
+						'serializer'
+				],
+				// Zend\Cache\Storage\Adapter\Redis
+				'redis' => [
+						'adapter' => [
+								'name' => 'redis',
+								'options' => [
+										// 2 hours
+										'ttl' => 7200,
+										'server' => [
+												'host' => 'localhost',
+												'port' => 6379
+										],
+										'server' => [
+												'host' => '127.0.0.1',
+												'port' => 6379
+										],
+										'namespace' => 'ASB2',
+										'liboptions' => [
+												'serializer' => \Redis::SERIALIZER_PHP
+										]
+								]
+						],
+						'plugins' => [
+								'exception_handler' => [
+										'throw_exceptions' => false
+								]
+						],
+						'serializer'
+				]
+		]
+];
