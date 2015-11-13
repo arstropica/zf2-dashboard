@@ -82,7 +82,7 @@ return array(
 				'invokables' => array(
 						'Application\Form\PagerForm' => 'Application\Form\PagerForm',
 						'Application\Controller\Plugin\JSONErrorResponse' => 'Application\Controller\Plugin\JSONErrorResponse',
-						'Application\Controller\Plugin\ErrorResponse' => 'Application\Controller\Plugin\ErrorResponse'
+						'Application\Controller\Plugin\ErrorResponse' => 'Application\Controller\Plugin\ErrorResponse',
 				),
 				'abstract_factories' => array(
 						'Zend\Navigation\Service\NavigationAbstractServiceFactory',
