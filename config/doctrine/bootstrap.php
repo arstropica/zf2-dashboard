@@ -9,7 +9,7 @@ $dbParams = [];
  */
 $devdir = 'zf2';
 $cwd = getcwd();
-$isDevMode = strstr($cwd, "/{$devdir}/");
+$isDevMode = strstr($cwd, "{$devdir}");
 
 require_once __DIR__ . "/../../vendor/autoload.php";
 require_once __DIR__ . "/" . ($isDevMode ? "development" : "local") . ".db.php";
