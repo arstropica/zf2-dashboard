@@ -89,11 +89,12 @@ class FilterForm extends Form implements InputFilterAwareInterface
 						)
 				));
 		
-    	$repository = $this->getEntityManager()->getRepository('Lead\Entity\Lead');
-		$referrers = $repository->getReferrers(0, 'array');
+		$repository = $this->getEntityManager()->getRepository(
+				'Lead\Entity\Lead');
+		$referrers = $repository->getReferrers(0);
 		
-		$this->add (
-					array(
+		$this->add(
+				array(
 						'name' => 'referrer',
 						'type' => 'Zend\Form\Element\Select',
 						'required' => false,
@@ -109,13 +110,13 @@ class FilterForm extends Form implements InputFilterAwareInterface
 										'class' => 'sr-only'
 								),
 								'value_options' => $referrers,
-								'empty_option' => 'All Sources',
+								'empty_option' => 'All Sources'
 						),
 						'attributes' => array(
 								'id' => 'sourcefilter'
 						)
-
-					));
+				)
+				);
 		
 		$this->add(
 				array(
@@ -161,7 +162,7 @@ class FilterForm extends Form implements InputFilterAwareInterface
 		}
 		return $this->inputFilter;
 	}
-	
+
 	/**
 	 *
 	 * @return EntityManager
@@ -169,7 +170,8 @@ class FilterForm extends Form implements InputFilterAwareInterface
 	public function getEntityManager ()
 	{
 		if (! $this->entityManager) {
-			$entityManager = $this->serviceLocator->get('doctrine.entitymanager.orm_default');
+			$entityManager = $this->serviceLocator->get(
+					'doctrine.entitymanager.orm_default');
 			$this->setEntityManager($entityManager);
 		}
 		
@@ -181,5 +183,9 @@ class FilterForm extends Form implements InputFilterAwareInterface
 		$this->entityManager = $entityManager;
 		return $this;
 	}
-	
+
+	public function __sleep ()
+	{
+		return array();
+	}
 }
