@@ -39,7 +39,14 @@ class DataDump extends AbstractPlugin implements ServiceLocatorAwareInterface
 
 	public function dumpConsole ($mixed)
 	{
-		echo "<script>console.dir(" . json_encode($mixed) . ");</script>\n\n";
+		if (is_object($mixed)) {
+			echo "<script>console.dir(" .
+					 @json_encode(
+							json_decode(json_encode((array) $mixed), true)) .
+					 ");</script>\n\n";
+		} else {
+			echo "<script>console.dir(" . json_encode($mixed) . ");</script>\n\n";
+		}
 		return $this;
 	}
 
