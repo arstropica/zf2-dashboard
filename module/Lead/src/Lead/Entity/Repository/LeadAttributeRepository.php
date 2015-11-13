@@ -26,7 +26,8 @@ class LeadAttributeRepository extends EntityRepository
 DQL;
 		
 		$query = $this->getEntityManager()->createQuery($dql);
-		
+		$query->useQueryCache(true);
+		$query->useResultCache(true, 3600, md5($dql));
 		$results = $query->getResult();
 		if ($reindex) {
 			$attributes = [];
