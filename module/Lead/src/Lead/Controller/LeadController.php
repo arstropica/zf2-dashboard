@@ -11,7 +11,7 @@ use Application\Controller\AbstractCrudController;
 use Zend\Paginator\Paginator;
 use Doctrine\ORM\QueryBuilder as Builder;
 use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator;
-use LosBase\ORM\Tools\Pagination\Paginator as LosPaginator;
+use Application\ORM\Tools\Pagination\Doctrine\Paginator as FastPaginator;
 use DoctrineORMModule\Stdlib\Hydrator\DoctrineEntity as DoctrineHydrator;
 use Application\Hydrator\Strategy\DateTimeStrategy;
 use Zend\Stdlib\ResponseInterface as Response;
@@ -89,7 +89,8 @@ class LeadController extends AbstractCrudController
 		$pager = $this->getPagerForm($limit);
 		
 		$paginator = new Paginator(
-				new DoctrinePaginator(new LosPaginator($qb, false)));
+				new DoctrinePaginator(new FastPaginator($qb, true)));
+		$paginator->setCacheEnabled(true);
 		$paginator->setDefaultItemCountPerPage($limit);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setPageRange($this->paginatorRange);
