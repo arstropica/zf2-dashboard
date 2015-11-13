@@ -52,8 +52,8 @@ class Paginator extends DoctrinePaginator implements \Countable,
 			} else {
 				$q = $query;
 			}
-			$q->useResultCache(true, 3600, md5($q->getDQL()))
-				->useQueryCache(true);
+			$q->useQueryCache(true)->useResultCache(true, 3600, 
+					md5($q->getDQL()));
 		}
 		parent::__construct($q, $fetchJoinCollection);
 	}
