@@ -376,6 +376,7 @@ class LeadController extends AbstractCrudController
         $objRepository = $em->getRepository($this->getEntityClass());
         $entity = $objRepository->find($id);
         $account_old = $entity->getAccount();
+        $account_old_name = $account_old instanceof Account ? $account_old->getName() : false;
         $account_old_id = $account_old instanceof Account ? $account_old->getId() : false;
         
         $this->getEventManager()->trigger('getForm', $this, [
@@ -432,7 +433,7 @@ class LeadController extends AbstractCrudController
                     ->setEntityClass($this->getEntityClass())
                     ->setDescription("Lead Edited");
                 
-                $this->getServiceEvent()->setMessage("Lead #{$id} was " . ($account ? "assigned to " . $account->getName() : "unassigned") . ".");
+                $this->getServiceEvent()->setMessage("Lead #{$id} was " . ($account ? "assigned to " . $account->getName() : "unassigned") . ($account_old_name ? " from " . $account_old_name : "") . ".");
                 
                 $this->logEvent("EditAction.post");
             }
