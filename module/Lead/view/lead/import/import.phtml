@@ -1,5 +1,9 @@
 <?php
 // module/Lead/view/lead/import/import.phtml:
+if (3 === $this->stage) {
+    $this->headLink()->appendStylesheet('/css/bootstrap-switch.min.css');
+    $this->headScript()->appendFile('/js/bootstrap-switch.min.js');
+}
 $title = 'Import Leads';
 $this->headTitle($title);
 ?>
@@ -18,127 +22,35 @@ $this->headTitle($title);
 			class="nav-wedge"></div> <a href="javacript:void()">Match</a>
 		<div class="nav-arrow"></div></li>
 	<li <?php echo ($this->stage == 3) ? ' class="active"' : ''; ?>><div
+			class="nav-wedge"></div> <a href="javacript:void()">Review</a>
+		<div class="nav-arrow"></div></li>
+	<li <?php echo ($this->stage == 4) ? ' class="active"' : ''; ?>><div
 			class="nav-wedge"></div> <a href="javacript:void()">Confirm</a></li>
 </ul>
 <?php
 $form = $this->form;
-$form->setAttribute('action', 
-		$this->url('import', array(
-				'action' => 'import'
-		)))
-	->prepare();
+$form->setAttribute('action', $this->url('import', array(
+    'action' => 'import'
+)));
+$form->prepare();
 
 echo $this->form()->openTag($form);
 ?>
 <div class="row content-row">
 <?php
 if ($form->has('match') && 2 === $this->stage) :
-	// Stage 2
-	$match = $form->get('match');
-	?>
-	<div class="col-md-12">
-		<?php echo $this->formRow($form->get('Company')); ?>
-
-		<fieldset class="fieldset import-fields">
-			<legend><?php echo $match->getLabel(); ?></legend>
-			<?php if ($match instanceof Zend\Form\Fieldset) : ?>
-				<?php  foreach ($match as $fieldName => $fieldSet) : ?>
-					<?php foreach ($fieldSet as $element) : ?>
-						<?php
-				$match = array_search(strtolower($fieldName), 
-						array_map('strtolower', $this->fields));
-				if (($match !== false) && empty($element->getValue())) {
-					$element->setValue($match)
-						->setAttribute("class", 
-							$element->getAttribute("class") . " match")
-						->setAttribute('data-match', $match)
-						->setAttribute('required', 'required');
-				}
-				?>
-						<div class="col-xs-12 col-sm-6 col-md-4 importField">
-							 <?php echo $this->formRow($element); ?>
-						</div>
-					<?php endforeach; ?>
-				<?php endforeach; ?>
-			<?php endif; ?>
-			<div class="row import-fields">
-				<div class="col-md-12">
-					<div class="well">
-						<code>Leads Found: <?php echo $this->count; ?></code>
-					</div>
-				</div>
-			</div>
-		</fieldset>
-		<hr>
-		<div class="row">
-			<div class="col-md-12"><?php echo $this->formRow($form->get('submit')); ?></div>
-		</div>
-	</div>
-	<?php echo $this->formelement($form->get('leadTmpFile')); ?>
-
-
-
-
-<?php elseif ($form->has('leadsUpload') && 1 === $this->stage) :
-	// Stage 1
-	$upload = $form->get('leadsUpload');
-	?>
-	<div class="col-md-12">
-		<fieldset class="fieldset">
-			<legend><?php echo $upload->getLabel(); ?></legend>
-			<div class="row import-fields">
-				<div class="col-md-12">
-						<?php echo $this->formRow($upload); ?>
-						<small><i>Accepts:</i> <code>.csv, .xls, .xlsx</code> files.</small>
-						<hr>
-				</div>
-				<div class="col-md-12"><?php echo $this->formRow($form->get('submit')); ?></div>
-			</div>
-		</fieldset>
-	</div>
-
-
-
-<?php elseif ($this->data && 3 === $this->stage) :
-	// Stage 3
-	$confirm = $form->get('confirm');
-	?>
-	<div class="col-md-12">
-		<fieldset class="fieldset">
-			<legend><?php echo $confirm->getLabel(); ?></legend>
-			<div class="row import-fields">
-				<div class="col-md-12">
-						<?php echo $this->tableCollapse($this->data, $this->headings, $this->valid); ?>
-					</div>
-				<div class="col-md-12">
-					<div class="form-group">
-						<?php echo $this->formElement($form->get('submit')) . "&nbsp;&nbsp;&nbsp;" . $this->formElement($form->get('cancel')); ?>
-					</div>
-				</div>
-			</div>
-		</fieldset>
-	</div>
-<?php
-	foreach ($form as $name => $element) {
-		switch ($name) {
-			case 'submit':
-				break;
-			default:
-				echo $this->formHidden($element);
-				break;
-		}
-	}
-	?>
+    // Stage 2
+    include __DIR__ . '/partial/match.php';
+ elseif ($form->has('leadsUpload') && 1 === $this->stage) :
+    // Stage 1
+    include __DIR__ . '/partial/import.php';
+ elseif ($this->data && 3 === $this->stage) :
+    // Stage 3
+    include __DIR__ . '/partial/review.php';
+ elseif ($this->data && 4 === $this->stage) :
+    // Stage 4
+    include __DIR__ . '/partial/confirm.php';
+    ?>
 <?php endif; ?>
 </div>
 <?php echo $this->form()->closeTag(); ?>
-<?php if (2 === $this->stage): ?>
-	<?php echo $this->losHeadLink()->setBasePath('/js')->appendChosen()?>
-	<?php echo $this->losHeadScript()->setBasePath('/js')->appendChosen()?>
-<script type="text/javascript">
-		$('.importSelect').prop('multiple', 'multiple').filter(function() {
-            return $.trim( $(this).val() ) == '';
-        }).prop("selected", false).val([]);
-		<?= $this->losChosen('.importSelect',['disable_search_threshold'=>2, 'max_selected_options'=>1, 'allow_single_deselect'=>true])?>
-	</script>
-<?php endif; ?>
