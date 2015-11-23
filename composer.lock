@@ -4,57 +4,9 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "98379cc132b102392a3843932c305ead",
-    "content-hash": "8eec5165b4d18fc7e552d5c7d81a7472",
+    "hash": "215f32c2462171969740c9e9eeaa78a7",
+    "content-hash": "726254866bc68d814271161b2d617daf",
     "packages": [
-        {
-            "name": "bjyoungblood/BjyProfiler",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/bjyoungblood/BjyProfiler.git",
-                "reference": "1d05f9b740fd1d8d840686fea257c8c26d3f757b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/bjyoungblood/BjyProfiler/zipball/1d05f9b740fd1d8d840686fea257c8c26d3f757b",
-                "reference": "1d05f9b740fd1d8d840686fea257c8c26d3f757b",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3",
-                "zendframework/zend-db": ">=2.1.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "BjyProfiler": "src/"
-                },
-                "classmap": [
-                    "./Module.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ben Youngblood",
-                    "email": "bx.youngblood@gmail.com",
-                    "homepage": "http://bjyoungblood.com/"
-                }
-            ],
-            "description": "Database profiler for Zend\\Db (also plugin for ZendDeveloperTools)",
-            "homepage": "https://github.com/bjyoungblood/BjyProfiler",
-            "keywords": [
-                "db",
-                "profiler",
-                "zdt",
-                "zf2"
-            ],
-            "time": "2014-09-04 01:22:02"
-        },
         {
             "name": "bjyoungblood/bjy-authorize",
             "version": "1.4.0",
@@ -5114,6 +5066,68 @@
             "time": "2015-06-03 15:32:03"
         },
         {
+            "name": "zendframework/zenddiagnostics",
+            "version": "v1.0.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zendframework/ZendDiagnostics.git",
+                "reference": "6ffffbeec9a9d69aad394a9ceee55cf4bcdd4b2d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zendframework/ZendDiagnostics/zipball/6ffffbeec9a9d69aad394a9ceee55cf4bcdd4b2d",
+                "reference": "6ffffbeec9a9d69aad394a9ceee55cf4bcdd4b2d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "doctrine/migrations": "~1.0@dev",
+                "guzzle/http": "3.*",
+                "guzzle/plugin-mock": "3.*",
+                "phpunit/phpunit": "4.7.*",
+                "predis/predis": "0.8.*",
+                "sensiolabs/security-checker": "1.3.*@dev",
+                "symfony/yaml": "v2.3.11",
+                "videlalvaro/php-amqplib": "2.*",
+                "zendframework/zend-loader": "2.*"
+            },
+            "suggest": {
+                "doctrine/migrations": "Required by Check\\DoctrineMigration",
+                "ext-bcmath": "Required by Check\\CpuPerformance",
+                "guzzle/http": "Required by Check\\GuzzleHttpService",
+                "predis/predis": "Required by Check\\Redis",
+                "sensiolabs/security-checker": "Required by Check\\SecurityAdvisory",
+                "symfony/yaml": "Required by Check\\YamlFile",
+                "videlalvaro/php-amqplib": "Required by Check\\RabbitMQ"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "ZendDiagnostics\\": "src/",
+                    "ZendDiagnosticsTest\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "A set of components for performing diagnostic tests in PHP applications",
+            "homepage": "https://github.com/zendframework/ZendDiagnostics",
+            "keywords": [
+                "diagnostics",
+                "php",
+                "test"
+            ],
+            "time": "2015-10-01 15:37:41"
+        },
+        {
             "name": "zendframework/zendframework",
             "version": "2.5.2",
             "source": {
@@ -5252,6 +5266,66 @@
                 "zf2"
             ],
             "time": "2015-08-03 14:50:10"
+        },
+        {
+            "name": "zendframework/zftool",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zendframework/ZFTool.git",
+                "reference": "840c3eecd58454396983d84d1da293813af484af"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zendframework/ZFTool/zipball/840c3eecd58454396983d84d1da293813af484af",
+                "reference": "840c3eecd58454396983d84d1da293813af484af",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3",
+                "zendframework/zend-code": ">=2.2.2",
+                "zendframework/zend-config": ">=2.2.2",
+                "zendframework/zend-console": ">=2.2.2",
+                "zendframework/zend-file": ">=2.2.2",
+                "zendframework/zend-form": ">=2.2.2",
+                "zendframework/zend-http": ">=2.2.2",
+                "zendframework/zend-i18n": ">=2.2.2",
+                "zendframework/zend-loader": ">=2.2.2",
+                "zendframework/zend-log": ">=2.2.2",
+                "zendframework/zend-modulemanager": ">=2.2.2",
+                "zendframework/zend-mvc": ">=2.2.2",
+                "zendframework/zend-serializer": ">=2.2.2",
+                "zendframework/zend-servicemanager": ">=2.2.2",
+                "zendframework/zend-stdlib": ">=2.2.2",
+                "zendframework/zend-text": ">=2.2.2",
+                "zendframework/zend-version": ">=2.2.2 ",
+                "zendframework/zend-view": ">=2.2.2",
+                "zendframework/zenddiagnostics": ">=1.0.0"
+            },
+            "require-dev": {
+                "fabpot/php-cs-fixer": "1.7.*",
+                "phpunit/phpunit": "4.*"
+            },
+            "bin": [
+                "zf.php"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "ZFTool\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "Utility module for Zend Framework 2 applications.",
+            "homepage": "http://framework.zend.com/",
+            "keywords": [
+                "tool",
+                "zf2"
+            ],
+            "time": "2015-10-21 07:40:59"
         },
         {
             "name": "zf-commons/zfc-base",
@@ -5758,6 +5832,54 @@
     ],
     "packages-dev": [
         {
+            "name": "bjyoungblood/BjyProfiler",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bjyoungblood/BjyProfiler.git",
+                "reference": "1d05f9b740fd1d8d840686fea257c8c26d3f757b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bjyoungblood/BjyProfiler/zipball/1d05f9b740fd1d8d840686fea257c8c26d3f757b",
+                "reference": "1d05f9b740fd1d8d840686fea257c8c26d3f757b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3",
+                "zendframework/zend-db": ">=2.1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "BjyProfiler": "src/"
+                },
+                "classmap": [
+                    "./Module.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ben Youngblood",
+                    "email": "bx.youngblood@gmail.com",
+                    "homepage": "http://bjyoungblood.com/"
+                }
+            ],
+            "description": "Database profiler for Zend\\Db (also plugin for ZendDeveloperTools)",
+            "homepage": "https://github.com/bjyoungblood/BjyProfiler",
+            "keywords": [
+                "db",
+                "profiler",
+                "zdt",
+                "zf2"
+            ],
+            "time": "2014-09-04 01:22:02"
+        },
+        {
             "name": "zendframework/zend-developer-tools",
             "version": "dev-master",
             "source": {
@@ -5824,128 +5946,6 @@
                 "zf2"
             ],
             "time": "2015-07-21 09:14:24"
-        },
-        {
-            "name": "zendframework/zenddiagnostics",
-            "version": "v1.0.8",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/zendframework/ZendDiagnostics.git",
-                "reference": "6ffffbeec9a9d69aad394a9ceee55cf4bcdd4b2d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/ZendDiagnostics/zipball/6ffffbeec9a9d69aad394a9ceee55cf4bcdd4b2d",
-                "reference": "6ffffbeec9a9d69aad394a9ceee55cf4bcdd4b2d",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3"
-            },
-            "require-dev": {
-                "doctrine/migrations": "~1.0@dev",
-                "guzzle/http": "3.*",
-                "guzzle/plugin-mock": "3.*",
-                "phpunit/phpunit": "4.7.*",
-                "predis/predis": "0.8.*",
-                "sensiolabs/security-checker": "1.3.*@dev",
-                "symfony/yaml": "v2.3.11",
-                "videlalvaro/php-amqplib": "2.*",
-                "zendframework/zend-loader": "2.*"
-            },
-            "suggest": {
-                "doctrine/migrations": "Required by Check\\DoctrineMigration",
-                "ext-bcmath": "Required by Check\\CpuPerformance",
-                "guzzle/http": "Required by Check\\GuzzleHttpService",
-                "predis/predis": "Required by Check\\Redis",
-                "sensiolabs/security-checker": "Required by Check\\SecurityAdvisory",
-                "symfony/yaml": "Required by Check\\YamlFile",
-                "videlalvaro/php-amqplib": "Required by Check\\RabbitMQ"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "ZendDiagnostics\\": "src/",
-                    "ZendDiagnosticsTest\\": "tests/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "description": "A set of components for performing diagnostic tests in PHP applications",
-            "homepage": "https://github.com/zendframework/ZendDiagnostics",
-            "keywords": [
-                "diagnostics",
-                "php",
-                "test"
-            ],
-            "time": "2015-10-01 15:37:41"
-        },
-        {
-            "name": "zendframework/zftool",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/zendframework/ZFTool.git",
-                "reference": "840c3eecd58454396983d84d1da293813af484af"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/ZFTool/zipball/840c3eecd58454396983d84d1da293813af484af",
-                "reference": "840c3eecd58454396983d84d1da293813af484af",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3",
-                "zendframework/zend-code": ">=2.2.2",
-                "zendframework/zend-config": ">=2.2.2",
-                "zendframework/zend-console": ">=2.2.2",
-                "zendframework/zend-file": ">=2.2.2",
-                "zendframework/zend-form": ">=2.2.2",
-                "zendframework/zend-http": ">=2.2.2",
-                "zendframework/zend-i18n": ">=2.2.2",
-                "zendframework/zend-loader": ">=2.2.2",
-                "zendframework/zend-log": ">=2.2.2",
-                "zendframework/zend-modulemanager": ">=2.2.2",
-                "zendframework/zend-mvc": ">=2.2.2",
-                "zendframework/zend-serializer": ">=2.2.2",
-                "zendframework/zend-servicemanager": ">=2.2.2",
-                "zendframework/zend-stdlib": ">=2.2.2",
-                "zendframework/zend-text": ">=2.2.2",
-                "zendframework/zend-version": ">=2.2.2 ",
-                "zendframework/zend-view": ">=2.2.2",
-                "zendframework/zenddiagnostics": ">=1.0.0"
-            },
-            "require-dev": {
-                "fabpot/php-cs-fixer": "1.7.*",
-                "phpunit/phpunit": "4.*"
-            },
-            "bin": [
-                "zf.php"
-            ],
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "ZFTool\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "description": "Utility module for Zend Framework 2 applications.",
-            "homepage": "http://framework.zend.com/",
-            "keywords": [
-                "tool",
-                "zf2"
-            ],
-            "time": "2015-10-21 07:40:59"
         }
     ],
     "aliases": [],
@@ -5953,9 +5953,9 @@
     "stability-flags": {
         "zf-commons/zfc-user-doctrine-orm": 20,
         "muriloamaral/easyxml": 20,
-        "bjyoungblood/bjyprofiler": 20,
         "zendframework/zftool": 20,
-        "zendframework/zend-developer-tools": 20
+        "zendframework/zend-developer-tools": 20,
+        "bjyoungblood/bjyprofiler": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

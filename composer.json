@@ -16,9 +16,13 @@
     "google/apiclient" : "1.1.6",
     "phpoffice/phpexcel" : "1.8.1",
     "doctrine/doctrine-orm-module" : "0.9.2",
-    "doctrine/orm" : "v2.5.1"
+    "doctrine/orm" : "v2.5.1",
+    "zendframework/zftool" : "dev-master",
+    "phpunit/phpunit" : "4.8.18"
   },
   "require-dev" : {
+    "zendframework/zend-developer-tools" : "dev-master",
+    "bjyoungblood/BjyProfiler" : "dev-master"
   },
   "license" : "BSD-3-Clause",
   "keywords" : [ "framework", "zf2" ],
