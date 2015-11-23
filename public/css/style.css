@@ -12,15 +12,13 @@ hr.small {
 }
 
 .formtable-header {
-	
 }
 
 .formtable-header .pagination, .formtable-header .form-inline {
 	margin: 5px 0;
 }
 
-.formtable-header .pagination>li>a, .formtable-header .pagination>li>span
-	{
+.formtable-header .pagination > li > a, .formtable-header .pagination > li > span {
 	padding: 8px 14px;
 }
 
@@ -97,8 +95,7 @@ form.leadform #submitbutton {
 	background-color: #57A900;
 	background-image: -moz-linear-gradient(top, #70D900, #57A900);
 	background-image: -ms-linear-gradient(top, #70D900, #57A900);
-	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#70d900),
-		to(#57a900));
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#70d900), to(#57a900));
 	background-image: -webkit-linear-gradient(top, #70D900, #57A900);
 	background-image: -o-linear-gradient(top, #70D900, #57A900);
 	background-image: linear-gradient(top, #70d900, #57a900);
@@ -106,8 +103,7 @@ form.leadform #submitbutton {
 		endColorstr='#57a900', GradientType=0);
 }
 
-.btn-success:hover, .btn-success:active, .btn-success.active,
-	.btn-success.disabled, .btn-success[disabled] {
+.btn-success:hover, .btn-success:active, .btn-success.active, .btn-success.disabled, .btn-success[disabled] {
 	background-color: #57A900;
 }
 
@@ -116,13 +112,12 @@ form.leadform #submitbutton {
 }
 
 div.container a.brand {
-	background: url("../img/zf2-logo.png") no-repeat scroll 0 10px
-		transparent;
+	background: url("../img/zf2-logo.png") no-repeat scroll 0 10px transparent;
 	margin-left: 0;
 	padding: 8px 20px 12px 40px;
 }
 
-.navbar-brand>img {
+.navbar-brand > img {
 	display: inline;
 }
 
@@ -167,15 +162,14 @@ a.sort {
 	display: none;
 }
 
-.action-index.controller-error>.container .row.content .col-md-12 {
+.action-index.controller-error > .container .row.content .col-md-12 {
 	background-color: #D29656;
 	width: 100%;
 	min-height: 200px;
 	-moz-box-shadow: 0px 1px 1px 1px rgba(0, 0, 0, 0.4);
 	-webkit-box-shadow: 0px 1px 1px 1px rgba(0, 0, 0, 0.4);
 	box-shadow: 0px 1px 1px 1px rgba(0, 0, 0, 0.4);
-	-ms-filter:
-		"progid:DXImageTransform.Microsoft.Shadow(Strength=1, Direction=90, Color='#000000')";
+	-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=1, Direction=90, Color='#000000')";
 	filter: progid:DXImageTransform.Microsoft.Shadow(Strength=1, Direction=90,
 		Color='#000000');
 }
@@ -214,7 +208,7 @@ a.sort {
 	margin-left: 30px;
 }
 
-.navbar-nav>li>span.label {
+.navbar-nav > li > span.label {
 	padding-top: 15px;
 	padding-bottom: 15px;
 	line-height: 20px;
@@ -240,6 +234,10 @@ a.sort {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+}
+
+#leadimport .review .row.import-fields, #leadimport .confirm .row.import-fields {
+	position: relative;
 }
 
 #leadimport .fieldset {
@@ -277,9 +275,14 @@ a.sort {
 	margin: 0;
 }
 
-#leadimport .import-fields>.col-xs-12 {
+#leadimport .import-fields > .col-xs-12 {
 	padding-top: 5px;
 	padding-bottom: 5px;
+}
+
+#leadimport .import-fields .col-md-12 {
+	display: table;
+	width: 100%;
 }
 
 #leadimport .form-group .desc {
@@ -288,8 +291,7 @@ a.sort {
 	font-style: italic;
 }
 
-#leadimport .import-fields .chosen-container-multi .chosen-choices li.search-choice span
-	{
+#leadimport .import-fields .chosen-container-multi .chosen-choices li.search-choice span {
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
@@ -297,8 +299,7 @@ a.sort {
 	display: block;
 }
 
-#leadimport .import-fields .importSelect.form-control, #leadimport .import-fields .importSelect.form-control option
-	{
+#leadimport .import-fields .importSelect.form-control, #leadimport .import-fields .importSelect.form-control option {
 	max-width: 280px;
 	overflow: hidden;
 	white-space: nowrap;
@@ -350,42 +351,147 @@ a.sort {
 	margin-bottom: 60px;
 }
 
-.table-collapse>tbody>tr.accordion-toggle>td {
-	cursor: pointer;
+#leadimport .panel-heading {
+	position: relative;
 }
 
-.table-collapse>tbody>tr.accordion-toggle.invalid>td {
-	background: #F45025;
+#leadimport #accordion .panel-heading h4:before {
+	content: ' ';
+	background: #CFCFCF;
+	background-image: -webkit-linear-gradient(top, #F5F5F5 0, #CFCFCF 100%);
+	background-image: -o-linear-gradient(top, #F5F5F5 0, #CFCFCF 100%);
+	background-image: -webkit-gradient(linear,left top,left bottom,from(#f5f5f5),to(#CFCFCF));
+	background-image: linear-gradient(to bottom, #F5F5F5 0, #CFCFCF 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff5f5f5', endColorstr='#ffcfcfcf', GradientType=0);
+	background-repeat: repeat-x;
+	width: 33%;
+	height: 100%;
+	max-width: 400px;
+	position: absolute;
+	top: 0;
+	left: 0;
+	border-top-left-radius: 3px;
+	border-right: 1px solid #CBCBCB;
 }
 
-.table-collapse>tbody>tr.accordion-toggle:hover>td {
-	background: #D6F8DF;
+#leadimport .panel-heading h4 a {
+	text-align: right;
+	position: relative;
+	min-height: 22px;
+	display: block;
 }
 
-.table-collapse .hiddenRow {
-	border: none;
+#leadimport .panel-heading h4 .score span {
+	font-weight: bold;
+	color: #F40;
 }
 
-.table-collapse .hiddenRow>td {
-	padding: 0px;
-	border: none;
+#leadimport .panel-heading h4 .score i {
+	font-style: italic;
+	font-size: 80%;
+	font-weight: normal;
+	color: #AAA;
+	border-bottom: 1px dotted #AAA;
+	margin-right: 10px;
 }
 
-.table-collapse .hiddenRow table {
+#leadimport #accordion .panel {
+	margin-bottom: 20px;
+}
+
+#leadimport #accordion .record {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 30px;
+}
+
+#leadimport #accordion .record .name {
+	text-transform: uppercase;
+	font-size: 80%;
+	line-height: 24px;
+	text-shadow: 1px 1px 0px rgb(239, 239, 239);
+	font-weight: bold;
+	color: #656464;
+}
+
+#leadimport #accordion .record .score {
+	min-width: 110px;
+	text-align: left;
+	display: inline-block;
+}
+
+#leadimport #accordion .panel-heading a:after {
+	font-family: 'Glyphicons Halflings';
+	content: "\e114";
+	float: right;
+	color: grey;
+}
+
+#leadimport #accordion .panel-heading a.collapsed:after {
+	content: "\e080";
+}
+
+#leadimport #accordion .panel-body {
+	padding: 0;
+}
+
+#leadimport #accordion .panel-footer {
+	border-top: 1px solid #ddd;;
+}
+
+#leadimport #accordion .panel-footer {
+	background: #B3D7E3;
+}
+
+#leadimport #accordion .panel-footer .validate-record {
+	width: 100%;
+	display: table;
+}
+
+#leadimport #accordion .panel-footer .validate-record label {
+	font-size: 120%;
+	line-height: 24px;
+}
+
+#leadimport #accordion .panel-footer .validate-record .bootstrap-switch {
+	float: right;
+}
+
+#leadimport #accordion .table {
 	margin: 0;
 }
 
-.pagination>.disabled>span.glyphicon-fast-backward, .pagination>.disabled>span.glyphicon-chevron-left
-	{
+#leadimport #accordion .table td, #leadimport #accordion .table th {
+	padding-left: 10px;
+	padding-right: 10px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	-ms-word-break: break-all;
+	word-break: break-all;
+	-webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	hyphens: auto;
+	-webkit-hyphenate-before: 2;
+	-webkit-hyphenate-after: 3;
+	hyphenate-lines: 3;
+	font-size: 80%;
+}
+
+#leadimport #accordion .table .duplicate td {
+	background: #F4C725;
+}
+
+.pagination > .disabled > span.glyphicon-fast-backward, .pagination > .disabled > span.glyphicon-chevron-left {
 	padding-right: 20px;
 }
 
-.pagination>.disabled>span.glyphicon-fast-forward, .pagination>.disabled>span.glyphicon-chevron-right
-	{
+.pagination > .disabled > span.glyphicon-fast-forward, .pagination > .disabled > span.glyphicon-chevron-right {
 	padding-right: 20px;
 }
 
-.pagination>li>* {
+.pagination > li > * {
 	height: 34px;
 }
 
@@ -414,7 +520,7 @@ input#accountfilter {
 	margin: 0 !important;
 }
 
-.panel-heading>.table, .panel-heading>.table th {
+.panel-heading > .table, .panel-heading > .table th {
 	margin: 0px;
 	border: 0px;
 }
@@ -431,14 +537,12 @@ a.underline {
 	text-decoration: underline;
 }
 
-.form-horizontal #apiSettings .form-group, .form-horizontal #options .form-group,
-	.addremove .form-group {
+.form-horizontal #apiSettings .form-group, .form-horizontal #options .form-group, .addremove .form-group {
 	margin-left: 0;
 	margin-right: 0;
 }
 
-.form-horizontal #apiSettings>fieldset, .form-horizontal #options>fieldset,
-	.addremove fieldset fieldset {
+.form-horizontal #apiSettings > fieldset, .form-horizontal #options > fieldset, .addremove fieldset fieldset {
 	margin: 15px;
 	padding-top: 15px;
 	position: relative;
@@ -447,7 +551,7 @@ a.underline {
 	border-radius: 5px;
 }
 
-.form-horizontal #apiSettings>fieldset, .addremove fieldset fieldset {
+.form-horizontal #apiSettings > fieldset, .addremove fieldset fieldset {
 	margin: 15px;
 	background: #EEE;
 	padding-top: 15px;
@@ -467,7 +571,7 @@ a.underline {
 	background: none;
 }
 
-.form-horizontal #options>fieldset {
+.form-horizontal #options > fieldset {
 	margin: 15px;
 	background: #FFF;
 	padding-top: 15px;
@@ -483,11 +587,11 @@ a.underline {
 	visibility: hidden;
 }
 
-#accountAPIEntityForm form>.form-group {
+#accountAPIEntityForm form > .form-group {
 	margin: 15px;
 }
 
-#accountAPIEntityForm form>.form-group>label {
+#accountAPIEntityForm form > .form-group > label {
 	display: block;
 	width: 100%;
 	padding: 0;
@@ -500,7 +604,7 @@ a.underline {
 	font-weight: normal;
 }
 
-#accountAPIEntityForm form>.form-group>#accountAPIs {
+#accountAPIEntityForm form > .form-group > #accountAPIs {
 	float: left;
 }
 
@@ -548,7 +652,7 @@ a.underline {
 	border-radius: 35px;
 }
 
-fieldset>.btn.removeSetting {
+fieldset > .btn.removeSetting {
 	position: absolute;
 	top: -10px;
 	right: -10px;
@@ -603,7 +707,7 @@ form#pagerform select.form-control {
 	border-bottom: 1px dashed #CCC !important;
 }
 
-.sortTable tbody.sortable>tr:hover>td {
+.sortTable tbody.sortable > tr:hover > td {
 	background: #DCF2E7;
 }
 
@@ -706,14 +810,11 @@ form#pagerform select.form-control {
 	border-bottom: 1px dashed #666;
 }
 
-.sortTable .sortable .sortable-order[contentEditable=true]:active,
-	.sortTable .sortable .sortable-order[contentEditable=true]:focus,
-	.sortTable .sortable td:hover .sortable-order[contentEditable=true] {
+.sortTable .sortable .sortable-order[contentEditable=true]:active, .sortTable .sortable .sortable-order[contentEditable=true]:focus, .sortTable .sortable td:hover .sortable-order[contentEditable=true] {
 	border: 1px solid #5BC0DE;
 }
 
-#questionstable:not (.sortTable ) th:not ([class*=col-] ),
-	#questionstable:not (.sortTable ) td:not ([class*=col-] ) {
-	background-color: #FFF !important;
+#questionstable :not ( .sortTable ) th :not ( [ class *= "col-" ] ), #questionstable :not ( .sortTable ) td :not ( [ class *= "col-" ] ) {
+	background-color : #FFF ! important;
 	border: none;
 }
