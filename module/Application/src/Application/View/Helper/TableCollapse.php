@@ -58,7 +58,7 @@ HTML;
 	{
 		$TR = '<tr data-toggle="collapse" data-target="#data%2$s" class="accordion-toggle %5$s">%3$s</tr>' .
 				 '<tr class="hiddenRow"><td colspan="%1$d">' .
-				 '<div class="accordian-body collapse" id="data%2$s">%4$s</div>' .
+				 '<div class="accordion-body collapse" id="data%2$s">%4$s</div>' .
 				 '</td></tr>';
 		$TD = '<td>%s</td>';
 		$TDs = sprintf($TD, $index + 1) . implode("\n", 
