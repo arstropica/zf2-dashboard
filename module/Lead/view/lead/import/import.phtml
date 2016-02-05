@@ -1,8 +1,10 @@
 <?php
 // module/Lead/view/lead/import/import.phtml:
 if (3 === $this->stage) {
-    $this->headLink()->appendStylesheet('/css/bootstrap-switch.min.css');
-    $this->headScript()->appendFile('/js/bootstrap-switch.min.js');
+	$this->headLink()
+		->appendStylesheet('/css/bootstrap-switch.min.css');
+	$this->headScript()
+		->appendFile('/js/bootstrap-switch.min.js');
 }
 $title = 'Import Leads';
 $this->headTitle($title);
@@ -29,28 +31,29 @@ $this->headTitle($title);
 </ul>
 <?php
 $form = $this->form;
-$form->setAttribute('action', $this->url('import', array(
-    'action' => 'import'
+$form->setAttribute('action', $this->url('import', array (
+		'action' => 'import' 
 )));
 $form->prepare();
 
-echo $this->form()->openTag($form);
+echo $this->form()
+	->openTag($form);
 ?>
 <div class="row content-row">
 <?php
 if ($form->has('match') && 2 === $this->stage) :
-    // Stage 2
-    include __DIR__ . '/partial/match.php';
+	// Stage 2
+	include __DIR__ . '/partial/match.php';
  elseif ($form->has('leadsUpload') && 1 === $this->stage) :
-    // Stage 1
-    include __DIR__ . '/partial/import.php';
+	// Stage 1
+	include __DIR__ . '/partial/import.php';
  elseif ($this->data && 3 === $this->stage) :
-    // Stage 3
-    include __DIR__ . '/partial/review.php';
+	// Stage 3
+	include __DIR__ . '/partial/review.php';
  elseif ($this->data && 4 === $this->stage) :
-    // Stage 4
-    include __DIR__ . '/partial/confirm.php';
-    ?>
+	// Stage 4
+	include __DIR__ . '/partial/confirm.php';
+	?>
 <?php endif; ?>
 </div>
 <?php echo $this->form()->closeTag(); ?>
