@@ -1,5 +1,7 @@
 <?php
+
 namespace Application\ORM\Tools\Pagination\Doctrine;
+
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\NoResultException;
@@ -10,21 +12,25 @@ use Doctrine\ORM\QueryBuilder;
  * @author arstropica
  *        
  */
-class Paginator extends DoctrinePaginator implements \Countable, 
-		\IteratorAggregate
-{
-
+class Paginator extends DoctrinePaginator implements \Countable, \IteratorAggregate {
+	
 	/**
 	 *
 	 * @var Query
 	 */
 	private $countQuery;
-
+	
 	/**
 	 *
 	 * @var integer
 	 */
 	private $count;
+	
+	/**
+	 *
+	 * @var string
+	 */
+	private $cache_prefix;
 
 	/**
 	 * Constructor.
@@ -34,8 +40,7 @@ class Paginator extends DoctrinePaginator implements \Countable,
 	 * @param boolean $fetchJoinCollection
 	 *        	Whether the query joins a collection (true by default).
 	 */
-	public function __construct ($query, $fetchJoinCollection = true, $cached = true, 
-			$count = true)
+	public function __construct($query, $fetchJoinCollection = true, $cached = true, $count = true)
 	{
 		if ($count) {
 			$countQuery = clone ($query);
@@ -47,25 +52,31 @@ class Paginator extends DoctrinePaginator implements \Countable,
 			$this->countQuery = $countQuery;
 		}
 		if ($cached) {
+			$this->cache_prefix = '';
 			if ($query instanceof QueryBuilder) {
 				$q = $query->getQuery();
+				$entities = $query->getRootEntities();
+				if ($entities) {
+					$entity = $entities [0];
+					$this->cache_prefix = strtolower(substr(strrchr($entity, '\\'), 1) ?  : $entity) . '-';
+				}
 			} else {
 				$q = $query;
 			}
-			$q->useQueryCache(true)->useResultCache(true, 3600, 
-					md5($q->getDQL()));
+			$q->useQueryCache(true)
+				->useResultCache(true, 3600, $this->cache_prefix . md5($q->getDQL()));
 		}
 		parent::__construct($q, $fetchJoinCollection);
 	}
 
-	public function count ()
+	public function count()
 	{
 		if ($this->count === null) {
 			if ($this->countQuery) {
 				try {
 					$res = $this->countQuery->execute();
-					$this->count = $res[0]['c'];
-				} catch (NoResultException $e) {
+					$this->count = $res [0] ['c'];
+				} catch ( NoResultException $e ) {
 					$this->count = 0;
 				}
 			} else {
@@ -82,10 +93,10 @@ class Paginator extends DoctrinePaginator implements \Countable,
 	 * @param string $cacheItemKey        	
 	 * @return array|bool|mixed|string
 	 */
-	protected function getCachedResult (Query $query, $cacheItemKey = '', $ttl = 0)
+	protected function getCachedResult(Query $query, $cacheItemKey = '', $ttl = 0)
 	{
-		if (! $cacheItemKey) {
-			$cacheItemKey = get_called_class() . md5($query->getDQL());
+		if (!$cacheItemKey) {
+			$cacheItemKey = ($this->cache_prefix ? $this->cache_prefix : get_called_class()) . md5($query->getDQL());
 		}
 		
 		$cache = $this->getEntityManager()
