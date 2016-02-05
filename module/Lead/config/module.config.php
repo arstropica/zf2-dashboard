@@ -1,420 +1,466 @@
 <?php
-return array(
-		'controllers' => array(
-				'invokables' => array(
+return array (
+		'controllers' => array (
+				'invokables' => array (
 						'Lead\Controller\Lead' => 'Lead\Controller\LeadController',
 						'Lead\Controller\TenStreet' => 'Lead\Controller\TenStreetController',
 						'Lead\Controller\Email' => 'Lead\Controller\EmailController',
 						'Lead\Controller\Import' => 'Lead\Controller\ImportController',
 						'Lead\Controller\Services' => 'Lead\Controller\ServicesController',
-						'Lead\Controller\Attribute' => 'Lead\Controller\AttributeController'
+						'Lead\Controller\Attribute' => 'Lead\Controller\AttributeController',
+						'Lead\Controller\Ajax' => 'Lead\Controller\AjaxController' 
 				),
-				'factories' => array(
-						'Lead\Controller\Rest' => 'Lead\Controller\Factory\RestControllerFactory'
-				)
+				'factories' => array (
+						'Lead\Controller\Rest' => 'Lead\Controller\Factory\RestControllerFactory' 
+				) 
 		),
-		'doctrine' => array(
-				'driver' => array(
-						'Lead_driver' => array(
+		'doctrine' => array (
+				'driver' => array (
+						'Lead_driver' => array (
 								'class' => 'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
 								'cache' => 'redis',
-								'paths' => array(
-										__DIR__ . '/../src/Lead/Entity/'
-								)
+								'paths' => array (
+										__DIR__ . '/../src/Lead/Entity/' 
+								) 
 						),
-						'orm_default' => array(
-								'drivers' => array(
-										'Lead\Entity' => 'Lead_driver'
-								)
-						)
-				),
+						'orm_default' => array (
+								'drivers' => array (
+										'Lead\Entity' => 'Lead_driver' 
+								) 
+						) 
+				) 
 		),
-		'router' => array(
-				'routes' => array(
-						'lead' => array(
+		'router' => array (
+				'routes' => array (
+						'lead' => array (
 								'type' => 'Literal',
-								'options' => array(
+								'options' => array (
 										'route' => '/lead',
-										'defaults' => array(
+										'defaults' => array (
 												'controller' => 'Lead\Controller\Lead',
-												'action' => 'list'
-										)
+												'action' => 'list' 
+										) 
 								),
 								'may_terminate' => true,
-								'child_routes' => array(
-										'list' => array(
+								'child_routes' => array (
+										'list' => array (
 												'type' => 'Literal',
-												'options' => array(
+												'options' => array (
 														'route' => '/list',
-														'defaults' => array(
+														'defaults' => array (
 																'controller' => 'Lead\Controller\Lead',
-																'action' => 'list'
-														)
-												)
+																'action' => 'list' 
+														) 
+												) 
 										),
-										'add' => array(
+										'add' => array (
 												'type' => 'Literal',
-												'options' => array(
+												'options' => array (
 														'route' => '/add',
-														'defaults' => array(
+														'defaults' => array (
 																'controller' => 'Lead\Controller\Lead',
-																'action' => 'add'
-														)
-												)
+																'action' => 'add' 
+														) 
+												) 
 										),
-										'edit' => array(
+										'edit' => array (
 												'type' => 'Segment',
-												'options' => array(
+												'options' => array (
 														'route' => '/edit[/:id]',
-														'constraints' => array(
-																'id' => '[0-9]+'
+														'constraints' => array (
+																'id' => '[0-9]+' 
 														),
-														'defaults' => array(
+														'defaults' => array (
 																'controller' => 'Lead\Controller\Lead',
 																'action' => 'edit',
-																'id' => 0
-														)
-												)
+																'id' => 0 
+														) 
+												) 
 										),
-										'view' => array(
+										'view' => array (
 												'type' => 'Segment',
-												'options' => array(
+												'options' => array (
 														'route' => '/view[/:id]',
-														'constraints' => array(
-																'id' => '[0-9]+'
+														'constraints' => array (
+																'id' => '[0-9]+' 
 														),
-														'defaults' => array(
+														'defaults' => array (
 																'controller' => 'Lead\Controller\Lead',
 																'action' => 'view',
-																'id' => 0
-														)
-												)
+																'id' => 0 
+														) 
+												) 
 										),
-										'delete' => array(
+										'delete' => array (
 												'type' => 'Segment',
-												'options' => array(
+												'options' => array (
 														'route' => '/delete[/:id]',
-														'constraints' => array(
-																'id' => '[0-9]+'
+														'constraints' => array (
+																'id' => '[0-9]+' 
 														),
-														'defaults' => array(
+														'defaults' => array (
 																'controller' => 'Lead\Controller\Lead',
 																'action' => 'delete',
-																'id' => 0
-														)
-												)
+																'id' => 0 
+														) 
+												) 
 										),
-										'export' => array(
+										'export' => array (
 												'type' => 'Literal',
-												'options' => array(
+												'options' => array (
 														'route' => '/export',
-														'defaults' => array(
+														'defaults' => array (
 																'controller' => 'Lead\Controller\Lead',
-																'action' => 'export'
-														)
-												)
-										)
-								)
+																'action' => 'export' 
+														) 
+												) 
+										),
+										'ajax' => array (
+												'type' => 'Literal',
+												'options' => array (
+														'route' => '/ajax',
+														'defaults' => array (
+																'controller' => 'Lead\Controller\Ajax',
+																'action' => 'list' 
+														) 
+												),
+												'may_terminate' => true,
+												'child_routes' => array (
+														'tenstreet' => array (
+																'type' => 'Literal',
+																'options' => array (
+																		'route' => '/name',
+																		'defaults' => array (
+																				'controller' => 'Lead\Controller\Ajax',
+																				'action' => 'name' 
+																		) 
+																) 
+														) 
+												) 
+										) 
+								) 
 						),
-						'services' => array(
+						'services' => array (
 								'type' => 'Literal',
-								'options' => array(
+								'options' => array (
 										'route' => '/services',
-										'defaults' => array(
+										'defaults' => array (
 												'controller' => 'Lead\Controller\Lead',
-												'action' => 'list'
-										)
+												'action' => 'list' 
+										) 
 								),
 								'may_terminate' => true,
-								'child_routes' => array(
-										'tenstreet' => array(
+								'child_routes' => array (
+										'tenstreet' => array (
 												'type' => 'Literal',
-												'options' => array(
+												'options' => array (
 														'route' => '/tenstreet',
-														'defaults' => array(
+														'defaults' => array (
 																'controller' => 'Lead\Controller\TenStreet',
-																'action' => 'list'
-														)
+																'action' => 'list' 
+														) 
 												),
 												'may_terminate' => true,
-												'child_routes' => array(
-														'list' => array(
+												'child_routes' => array (
+														'list' => array (
 																'type' => 'Literal',
-																'options' => array(
+																'options' => array (
 																		'route' => '/list',
-																		'defaults' => array(
+																		'defaults' => array (
 																				'controller' => 'Lead\Controller\TenStreet',
-																				'action' => 'list'
-																		)
-																)
+																				'action' => 'list' 
+																		) 
+																) 
 														),
-														'view' => array(
+														'view' => array (
 																'type' => 'Segment',
-																'options' => array(
+																'options' => array (
 																		'route' => '/view[/:id]',
-																		'constraints' => array(
-																				'id' => '[0-9]+'
+																		'constraints' => array (
+																				'id' => '[0-9]+' 
 																		),
-																		'defaults' => array(
+																		'defaults' => array (
 																				'controller' => 'Lead\Controller\TenStreet',
 																				'action' => 'view',
-																				'id' => 0
-																		)
-																)
+																				'id' => 0 
+																		) 
+																) 
 														),
-														'edit' => array(
+														'edit' => array (
 																'type' => 'Segment',
-																'options' => array(
+																'options' => array (
 																		'route' => '/edit[/:id]',
-																		'constraints' => array(
-																				'id' => '[0-9]+'
+																		'constraints' => array (
+																				'id' => '[0-9]+' 
 																		),
-																		'defaults' => array(
+																		'defaults' => array (
 																				'controller' => 'Lead\Controller\TenStreet',
 																				'action' => 'edit',
-																				'id' => 0
-																		)
-																)
+																				'id' => 0 
+																		) 
+																) 
 														),
-														'submit' => array(
+														'submit' => array (
 																'type' => 'Segment',
-																'options' => array(
+																'options' => array (
 																		'route' => '/submit[/:id]',
-																		'defaults' => array(
+																		'defaults' => array (
 																				'controller' => 'Lead\Controller\TenStreet',
 																				'action' => 'submit',
-																				'id' => 0
-																		)
-																)
-														)
-												)
+																				'id' => 0 
+																		) 
+																) 
+														),
+														'export' => array (
+																'type' => 'Literal',
+																'options' => array (
+																		'route' => '/export',
+																		'defaults' => array (
+																				'controller' => 'Lead\Controller\TenStreet',
+																				'action' => 'export' 
+																		) 
+																) 
+														) 
+												) 
 										),
-										'email' => array(
+										'email' => array (
 												'type' => 'Literal',
-												'options' => array(
+												'options' => array (
 														'route' => '/email',
-														'defaults' => array(
+														'defaults' => array (
 																'controller' => 'Lead\Controller\Email',
-																'action' => 'list'
-														)
+																'action' => 'list' 
+														) 
 												),
 												'may_terminate' => true,
-												'child_routes' => array(
-														'list' => array(
+												'child_routes' => array (
+														'list' => array (
 																'type' => 'Literal',
-																'options' => array(
+																'options' => array (
 																		'route' => '/list',
-																		'defaults' => array(
+																		'defaults' => array (
 																				'controller' => 'Lead\Controller\Email',
-																				'action' => 'list'
-																		)
-																)
+																				'action' => 'list' 
+																		) 
+																) 
 														),
-														'view' => array(
+														'view' => array (
 																'type' => 'Segment',
-																'options' => array(
+																'options' => array (
 																		'route' => '/view[/:id]',
-																		'constraints' => array(
-																				'id' => '[0-9]+'
+																		'constraints' => array (
+																				'id' => '[0-9]+' 
 																		),
-																		'defaults' => array(
+																		'defaults' => array (
 																				'controller' => 'Lead\Controller\Email',
 																				'action' => 'view',
-																				'id' => 0
-																		)
-																)
+																				'id' => 0 
+																		) 
+																) 
 														),
-														'edit' => array(
+														'edit' => array (
 																'type' => 'Segment',
-																'options' => array(
+																'options' => array (
 																		'route' => '/edit[/:id]',
-																		'constraints' => array(
-																				'id' => '[0-9]+'
+																		'constraints' => array (
+																				'id' => '[0-9]+' 
 																		),
-																		'defaults' => array(
+																		'defaults' => array (
 																				'controller' => 'Lead\Controller\Email',
 																				'action' => 'edit',
-																				'id' => 0
-																		)
-																)
+																				'id' => 0 
+																		) 
+																) 
 														),
-														'submit' => array(
+														'submit' => array (
 																'type' => 'Segment',
-																'options' => array(
+																'options' => array (
 																		'route' => '/submit[/:id]',
-																		'defaults' => array(
+																		'defaults' => array (
 																				'controller' => 'Lead\Controller\Email',
 																				'action' => 'submit',
-																				'id' => 0
-																		)
-																)
-														)
-												)
-										),
-										'process' => array(
-												'type' => 'Segment',
-												'options' => array(
-														'route' => '/process[/:id]',
-														'constraints' => array(
-																'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
-																'id' => '[0-9]+'
+																				'id' => 0 
+																		) 
+																) 
 														),
-														'defaults' => array(
+														'export' => array (
+																'type' => 'Literal',
+																'options' => array (
+																		'route' => '/export',
+																		'defaults' => array (
+																				'controller' => 'Lead\Controller\Email',
+																				'action' => 'export' 
+																		) 
+																) 
+														) 
+												) 
+										),
+										'process' => array (
+												'type' => 'Segment',
+												'options' => array (
+														'route' => '/process[/:id]',
+														'constraints' => array (
+																'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+																'id' => '[0-9]+' 
+														),
+														'defaults' => array (
 																'controller' => 'Lead\Controller\Services',
 																'action' => 'process',
-																'id' => 0
-														)
-												)
-										)
-								)
+																'id' => 0 
+														) 
+												) 
+										) 
+								) 
 						),
-						'import' => array(
+						'import' => array (
 								'type' => 'Literal',
-								'options' => array(
+								'options' => array (
 										'route' => '/import',
-										'defaults' => array(
+										'defaults' => array (
 												'controller' => 'Lead\Controller\Import',
-												'action' => 'import'
-										)
-								)
+												'action' => 'import' 
+										) 
+								) 
 						),
-						'rest-api' => array(
+						'rest-api' => array (
 								'type' => 'Segment',
-								'options' => array(
+								'options' => array (
 										'route' => '/rest-api[/:action][/:id]',
-										'constraints' => array(
+										'constraints' => array (
 												'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
-												'id' => '[0-9]+'
+												'id' => '[0-9]+' 
 										),
-										'defaults' => array(
+										'defaults' => array (
 												'controller' => 'Lead\Controller\Rest',
-												'action' => 'index'
-										)
-								)
+												'action' => 'index' 
+										) 
+								) 
 						),
-						'attribute' => array(
+						'attribute' => array (
 								'type' => 'Literal',
-								'options' => array(
+								'options' => array (
 										'route' => '/attribute',
-										'defaults' => array(
+										'defaults' => array (
 												'controller' => 'Lead\Controller\Attribute',
-												'action' => 'list'
-										)
+												'action' => 'list' 
+										) 
 								),
 								'may_terminate' => true,
-								'child_routes' => array(
-										'list' => array(
+								'child_routes' => array (
+										'list' => array (
 												'type' => 'Literal',
-												'options' => array(
+												'options' => array (
 														'route' => '/list',
-														'defaults' => array(
+														'defaults' => array (
 																'controller' => 'Lead\Controller\Attribute',
-																'action' => 'list'
-														)
-												)
+																'action' => 'list' 
+														) 
+												) 
 										),
-										'add' => array(
+										'add' => array (
 												'type' => 'Literal',
-												'options' => array(
+												'options' => array (
 														'route' => '/add',
-														'defaults' => array(
+														'defaults' => array (
 																'controller' => 'Lead\Controller\Attribute',
-																'action' => 'add'
-														)
-												)
+																'action' => 'add' 
+														) 
+												) 
 										),
-										'edit' => array(
+										'edit' => array (
 												'type' => 'Segment',
-												'options' => array(
+												'options' => array (
 														'route' => '/edit[/:id]',
-														'constraints' => array(
-																'id' => '[0-9]+'
+														'constraints' => array (
+																'id' => '[0-9]+' 
 														),
-														'defaults' => array(
+														'defaults' => array (
 																'controller' => 'Lead\Controller\Attribute',
 																'action' => 'edit',
-																'id' => 0
-														)
-												)
+																'id' => 0 
+														) 
+												) 
 										),
-										'delete' => array(
+										'delete' => array (
 												'type' => 'Segment',
-												'options' => array(
+												'options' => array (
 														'route' => '/delete[/:id]',
-														'constraints' => array(
-																'id' => '[0-9]+'
+														'constraints' => array (
+																'id' => '[0-9]+' 
 														),
-														'defaults' => array(
+														'defaults' => array (
 																'controller' => 'Lead\Controller\Attribute',
 																'action' => 'delete',
-																'id' => 0
-														)
-												)
+																'id' => 0 
+														) 
+												) 
 										),
-										'merge' => array(
+										'merge' => array (
 												'type' => 'Segment',
-												'options' => array(
+												'options' => array (
 														'route' => '/merge[/:id]',
-														'constraints' => array(
-																'id' => '[0-9]+'
+														'constraints' => array (
+																'id' => '[0-9]+' 
 														),
-														'defaults' => array(
+														'defaults' => array (
 																'controller' => 'Lead\Controller\Attribute',
 																'action' => 'merge',
-																'id' => 0
-														)
-												)
+																'id' => 0 
+														) 
+												) 
 										),
-										'sort' => array(
+										'sort' => array (
 												'type' => 'Segment',
-												'options' => array(
+												'options' => array (
 														'route' => '/sort[/:id]',
-														'constraints' => array(
-																'id' => '[0-9]+'
+														'constraints' => array (
+																'id' => '[0-9]+' 
 														),
-														'defaults' => array(
+														'defaults' => array (
 																'controller' => 'Lead\Controller\Attribute',
 																'action' => 'sort',
-																'id' => 0
-														)
-												)
-										)
-								)
-						)
-				)
+																'id' => 0 
+														) 
+												) 
+										) 
+								) 
+						) 
+				) 
 		),
-		'view_manager' => array(
-				'template_path_stack' => array(
-						'Lead' => __DIR__ . '/../view'
+		'view_manager' => array (
+				'template_path_stack' => array (
+						'Lead' => __DIR__ . '/../view' 
 				),
-				'strategies' => array(
-						'ViewJsonStrategy'
-				)
+				'strategies' => array (
+						'ViewJsonStrategy' 
+				) 
 		),
-		'service_manager' => array(
-				'invokables' => array(
-						'Lead\Entity\Listener\LeadListener' => 'Lead\Entity\Listener\LeadListener'
+		'service_manager' => array (
+				'invokables' => array (
+						'Lead\Entity\Listener\LeadListener' => 'Lead\Entity\Listener\LeadListener',
+						'Lead\Entity\Listener\SearchableListener' => 'Lead\Entity\Listener\SearchableListener' 
 				),
-				'factories' => array(
+				'factories' => array (
 						'Lead\Form\AddFormFactory' => 'Lead\Form\Factory\AddFormFactory',
 						'Lead\Form\EditFormFactory' => 'Lead\Form\Factory\EditFormFactory',
 						'Lead\Form\Attribute\AddFormFactory' => 'Lead\Form\Factory\Attribute\AddFormFactory',
 						'Lead\Form\Attribute\MergeFormFactory' => 'Lead\Form\Factory\Attribute\MergeFormFactory',
-						'Lead\Model\LeadAttribute' => 'Lead\Model\Factory\LeadAttributeModelFactory'
-				)
+						'Lead\Model\LeadAttribute' => 'Lead\Model\Factory\LeadAttributeModelFactory' 
+				) 
 		),
-		'form_elements' => array(
-				'invokables' => array(
+		'form_elements' => array (
+				'invokables' => array (
 						'Lead\Form\AddForm' => 'Lead\Form\AddForm',
 						'Lead\Form\EditForm' => 'Lead\Form\EditForm',
 						'Lead\Form\Attribute\AddForm' => 'Lead\Form\Attribute\AddForm',
-						'Lead\Form\Attribute\MergeForm' => 'Lead\Form\Attribute\MergeForm'
+						'Lead\Form\Attribute\MergeForm' => 'Lead\Form\Attribute\MergeForm' 
 				),
-				'factories' => array(
+				'factories' => array (
 						'Lead\Form\FilterForm' => 'Lead\Form\Factory\FilterFormFactory',
+						'Lead\Form\HiddenFilterForm' => 'Lead\Form\Factory\HiddenFilterFormFactory',
 						'Lead\Form\Attribute\FilterForm' => 'Lead\Form\Factory\Attribute\FilterFormFactory',
 						'Lead\Form\ListForm' => 'Lead\Form\Factory\ListFormFactory',
-						'Lead\Form\ImportForm' => 'Lead\Form\Factory\ImportFormFactory'
-				)
-		)
+						'Lead\Form\ImportForm' => 'Lead\Form\Factory\ImportFormFactory' 
+				) 
+		) 
 );
