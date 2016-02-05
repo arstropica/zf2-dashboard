@@ -2,115 +2,162 @@
 // Body Classes
 $classes = "";
 try {
-	$sm = $this->getHelperPluginManager()->getServiceLocator();
+	$sm = $this->getHelperPluginManager()
+		->getServiceLocator();
 	$config = $sm->get('Config');
-	$title = $config['site']['title'];
+	$title = $config ['site'] ['title'];
 	$route = $sm->get('Application')
 		->getMvcEvent()
 		->getRouteMatch();
-	$routeArray = array();
+	$routeArray = array ();
+	$logged_in = $this->zfcUserIdentity();
+	
+	$cookie = $sm->get('Request')
+		->getHeaders()
+		->get('Cookie');
+	if ($cookie) {
+		$menu_collapse = $cookie->offsetExists('collapse-menu_collapse_folded') ? $cookie->offsetGet('collapse-menu_collapse_folded') != "false" : false;
+	} else {
+		$menu_collapse = false;
+	}
+	
 	if ($route instanceof \Zend\Mvc\Router\RouteMatch) {
 		$routeParams = $route->getParams();
-		$routeArray = array(
-				'action' => $routeParams['action']
+		$routeArray = array (
+				'action' => $routeParams ['action'] 
 		);
-		@list ($routeArray['module'], , $routeArray['controller']) = explode(
-				"\\", $routeParams['controller']);
-		foreach ($routeArray as $key => $value)
-			$routeArray[$key] = $key . "-" . strtolower($value);
+		@list ( $routeArray ['module'], , $routeArray ['controller'] ) = explode("\\", $routeParams ['controller']);
 	}
+	$routeArray ['user-logged'] = ($logged_in ? 'in' : 'out');
+	foreach ( $routeArray as $key => $value )
+		$routeArray [$key] = $key . "-" . strtolower($value);
+	
+	if ($menu_collapse) {
+		$routeArray [] = 'folded';
+	}
+	
 	$bodyClass = $sm->get('BodyClass');
 	$bodyClass->addClass($routeArray);
 	$classes = implode(" ", $bodyClass->getClasses());
-} catch (\Exception $e) {
-	// echo "<pre>" . print_r($routeParams, true) . "</pre>";
+} catch ( \Exception $e ) {
 }
 ?>
 <?php echo $this->doctype(); ?>
 
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <?php echo $this->headTitle($this->translate($title))->setSeparator(' - ')->setAutoEscape(false) ?>
+<head>
+<meta charset="utf-8">
+        <?php echo $this->headTitle($this->translate($title))->setSeparator(' - ')->setAutoEscape(false)?>
 
-        <?php echo $this->headMeta()
-            ->appendName('viewport', 'width=device-width, initial-scale=1.0')
-            ->appendHttpEquiv('X-UA-Compatible', 'IE=edge')
-        ?>
+        <?php
+								
+								echo $this->headMeta()
+									->appendName('viewport', 'width=device-width, initial-scale=1.0')
+									->appendHttpEquiv('X-UA-Compatible', 'IE=edge')?>
 
         <!-- Le styles -->
-        <?php echo $this->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/img/favicon.ico'))
-                        ->prependStylesheet($this->basePath('css/style.css'))
-                        ->prependStylesheet($this->basePath('css/bootstrap-theme.min.css'))
-                        ->prependStylesheet($this->basePath('css/bootstrap.min.css')) ?>
+        <?php
+								
+								echo $this->headLink(array (
+										'rel' => 'shortcut icon',
+										'type' => 'image/vnd.microsoft.icon',
+										'href' => $this->basePath() . '/img/favicon.ico' 
+								))
+									->prependStylesheet($this->basePath('css/dark.css'))
+									->prependStylesheet($this->basePath('css/style.css'))
+									->prependStylesheet($this->basePath('css/bootstrap-theme.min.css'))
+									->prependStylesheet($this->basePath('css/bootstrap.min.css'))?>
 
         <!-- Scripts -->
-        <?php echo $this->headScript()
-            ->prependFile($this->basePath('js/app.js'))
-            ->prependFile($this->basePath('js/autosize.min.js'))
-            ->prependFile($this->basePath('js/bootstrap.min.js'))
-            ->prependFile($this->basePath('js/jquery.min.js'))
-            ->prependFile($this->basePath('js/respond.min.js'), 'text/javascript', array('conditional' => 'lt IE 9',))
-            ->prependFile($this->basePath('js/html5shiv.min.js'),   'text/javascript', array('conditional' => 'lt IE 9',))
-            ; ?>
+        <?php
+								
+								echo $this->headScript()
+									->prependFile($this->basePath('js/app.js'))
+									->prependFile($this->basePath('js/js.cookie.js'))
+									->prependFile($this->basePath('js/autosize.min.js'))
+									->prependFile($this->basePath('js/bootstrap.min.js'))
+									->prependFile($this->basePath('js/jquery.min.js'))
+									->prependFile($this->basePath('js/respond.min.js'), 'text/javascript', array (
+										'conditional' => 'lt IE 9' 
+								))
+									->prependFile($this->basePath('js/html5shiv.min.js'), 'text/javascript', array (
+										'conditional' => 'lt IE 9' 
+								))
+									->prependFile($this->basePath('js/modernizr.min.js'));
+								?>
 
     </head>
 <body class="<?php echo $classes; ?>">
-        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-            <div class="container">
-                <div class="navbar-header">
+	<nav class="navbar navbar-inverse" role="navigation">
+		<div class="container-fluid">
+			<div class="navbar-header">
 				<button type="button" class="navbar-toggle" data-toggle="collapse"
 					data-target=".navbar-collapse">
 					<span class="icon-bar"></span> <span class="icon-bar"></span> <span
 						class="icon-bar"></span>
-                    </button>
-				<a class="navbar-brand" href="<?php echo $this->url('home') ?>"><img
+				</button>
+				<a class="navbar-brand" href="<?php echo $this->url('home') ?>"
+					title="<?php echo $this->translate('Target Media Partners') ?>"><img
 					src="<?php echo $this->basePath('img/logo-tmp-sm.png') ?>"
-					alt="Target Media Partners" />&nbsp;<?php echo $this->translate('Target Media Partners') ?></a>
-                </div>
-                <div class="collapse navbar-collapse">
-				<!--<ul class="nav navbar-nav">
-                        <li class="active"><a href="<?php echo $this->url('home') ?>"><?php echo $this->translate('Home') ?></a></li>
-                    </ul>-->
-                    <ul class="nav navbar-nav">
-                        <?php echo $this->losNavigation()->menu('Zend\Navigation\Default')?>
-                    </ul>
-                	<?php
-                    /* echo $this->navigation('navigation')
-                    ->menu()
-                    ->setMinDepth(0)
-                    ->setMaxDepth(0)
-                    ->setUlClass('nav navbar-nav'); */ 
-                    ?>
-                    <ul class="nav navbar-nav navbar-right">
+					alt="Target Media Partners" />&nbsp;<span><?php echo $this->translate('Target Media Partners') ?></span>
+				</a>
+			</div>
+			<ul class="nav navbar-nav navbar-left hidden-xs">
+				<?php if ($this->zfcUserIdentity()) : ?>
+				<!-- display the 'display name' of the user -->
+				<li>
+					<div class="welccome">
+						<div class="wel-wrap">
+							<span class="label">Welcome, </span><a class=""
+								href="<?php echo $this->url('zfcuser'); ?>"><span class="text"><?php echo $this->zfcUserIdentity()->getDisplayname() ?: $this->zfcUserIdentity()->getUsername(); ?></span>
+								<span class="icon"><?php echo $this->gravatar($this->zfcUserIdentity()->getEmail())?></span>
+							</a>
+						</div>
+					</div>
+				</li>
+				<?php endif; ?>
+			</ul>
+			<div class="collapse navbar-collapse">
+				<!-- <ul class="nav navbar-nav"> -->
+				<?php
+				echo $this->navigation('navigation')
+					->menu('Zend\Navigation\Default')
+					->setUlClass('nav navbar-nav')
+					->setPartial('partial/navigation.phtml')?>
+                    <!-- </ul> -->
+				<ul class="nav navbar-nav navbar-right">
 	                    <?php if(!$this->zfcUserIdentity()): ?>
 						    <!-- display the login form -->
 					<li><a href="<?php echo $this->url('zfcuser'); ?>">Login</a></li>
-						<?php else: ?>
-						    <!-- display the 'display name' of the user -->
-					<li><span class="pull-left label">Welcome,</span><a
-						class="pull-left" href="<?php echo $this->url('zfcuser'); ?>"><?php echo $this->zfcUserIdentity()->getDisplayname() ?: $this->zfcUserIdentity()->getUsername(); ?></a></li>
-						<?php endif?>
-                    </ul>
+						<?php endif; ?>
+					</ul>
 			</div>
-			<!--/.nav-collapse -->
-            </div>
-        </nav>
-        <div class="container">
-            <?php echo $this->navigation('Zend\Navigation\Special')
-            ->breadcrumbs()
-            ->setMinDepth(0)
-            ->setPartial('partial/breadcrumb.phtml'); // <-- Add this!! ?>
-    </div>
+			<!-- /.nav-collapse -->
+		</div>
+	</nav>
+	<div class="container-fluid">
+            <?php
+												
+												echo $this->navigation('Zend\Navigation\Special')
+													->breadcrumbs()
+													->setMinDepth(0)
+													->setPartial('partial/breadcrumb.phtml'); // <--
+													                                            // Add
+													                                            // this!! 												?>
+    
+			
+			</div>
 	<?php echo $this->flashMessenger(); ?>
-	<div class="container">
+	<div class="container-fluid main">
             <?php echo $this->content; ?>
             <hr>
-            <footer>
+		<footer>
 			<p>&copy; <?php echo date('Y') ?> by Target Media Partners <?php echo $this->translate('All rights reserved.') ?></p>
-            </footer>
+		</footer>
 	</div>
 	<!-- /container -->
-        <?php echo $this->inlineScript() ?>
-    </body>
+        <?php echo $this->inlineScript()?>
+    
+
+</body>
 </html>
