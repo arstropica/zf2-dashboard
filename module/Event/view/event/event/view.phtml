@@ -48,105 +48,114 @@ $events = $this->events;
 		<?php foreach ($events as $eventType => $event) :?>
 			<?php if ($event) :?>
 				<div class="col-md-12">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<h3 class="panel-title">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
 								<?php echo $this->translate(ucwords($eventType) . ' Details')?>
 							</h3>
-						</div>
-						<div class="panel-body">
-							<table class="table table-hover table-condensed nomargin">
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover table-condensed nomargin">
 								<?php switch ($eventType) : case 'account' : ?>
 										<tr>
-											<th>Account</th>
-											<td><?php echo $event->getAccount()->getName(); ?></td>
-										</tr>
+						<th>Account</th>
+						<td><?php echo $event->getAccount()->getName(); ?></td>
+					</tr>
 										<?php break; ?>
 									<?php case 'lead' : $lead = $event->getLead(); ?>
 										<tr>
-											<th>Created</th>
-											<td><?php echo date_format($lead->getTimecreated(), 'd M, Y h:i A'); ?></td>
-										</tr>
-										<tr>
-											<th>Referrer</th>
-											<td><a target="_blank" title="Referrer"
-												href="<?php echo $lead->getReferrer(); ?>"><?php echo $lead->getReferrer(); ?></a></td>
-										</tr>
-										<tr>
-											<th>I.P. Address</th>
-											<td><?php echo $lead->getIpaddress(); ?></td>
-										</tr>
+						<th>Created</th>
+						<td><?php echo date_format($lead->getTimecreated(), 'd M, Y h:i A'); ?></td>
+					</tr>
+					<tr>
+						<th>Last Submitted</th>
+						<td><?php $lastSubmitted = $lead->getLastsubmitted(); if ($lastSubmitted) echo date_format($lastSubmitted, 'd M, Y h:i A'); ?></td>
+					</tr>
+					<tr>
+						<th>Referrer</th>
+						<td><a target="_blank" title="Referrer"
+							href="<?php echo $lead->getReferrer(); ?>"><?php echo $lead->getReferrer(); ?></a></td>
+					</tr>
+					<tr>
+						<th>I.P. Address</th>
+						<td><?php echo $lead->getIpaddress(); ?></td>
+					</tr>
+					<tr>
+						<th>View Lead</th>
+						<td><a
+							href="<?php echo $this->url('lead/view', ['action' => 'view', 'id' => $lead->getId()]); ?>"><?php echo "Lead #" . $lead->getId(); ?></a></td>
+					</tr>
 										<?php break; ?>
 									<?php case 'api' : ?>
 										<tr>
-											<th>API</th>
-											<td><?php $api = $event->getApi(); echo $api->getId() ? $api->getName() : "N/A"; ?></td>
-										</tr>
+						<th>API</th>
+						<td><?php $api = $event->getApi(); echo $api->getId() ? $api->getName() : "N/A"; ?></td>
+					</tr>
 										<?php break; ?>
 									<?php case 'email' : ?>
 										<tr>
-											<th>Recipient</th>
-											<td><?php echo $event->getAddressTo(); ?></td>
-										</tr>
+						<th>Recipient</th>
+						<td><?php echo $event->getAddressTo(); ?></td>
+					</tr>
 										<?php break; ?>
 									<?php case 'tenstreet' : $tresponse = @unserialize($event->getResponse()); ?>
 										<?php if ($tresponse && isset($tresponse['TenstreetResponse'])) :  $tresponse = $tresponse['TenstreetResponse']; ?>
 											<?php if (isset($tresponse['Status'])) : ?>
 												<tr>
-													<th>Status</th>
-													<td><?php echo $tresponse['Status']; ?></td>
-												</tr>
+						<th>Status</th>
+						<td><?php echo $tresponse['Status']; ?></td>
+					</tr>
 											<?php endif; ?>
 											<?php if (isset($tresponse['DriverId'])) : ?>
 												<tr>
-													<th>Driver ID</th>
-													<td><?php echo $tresponse['DriverId']; ?></td>
-												</tr>
+						<th>Driver ID</th>
+						<td><?php echo $tresponse['DriverId']; ?></td>
+					</tr>
 											<?php endif; ?>
 											<?php if (isset($tresponse['DisplayHTML']['@cdata'])) : ?>
 												<tr>
-													<th>Snapshot</th>
-													<td><?php echo $tresponse['DisplayHTML']['@cdata']; ?></td>
-												</tr>
+						<th>Snapshot</th>
+						<td><?php echo $tresponse['DisplayHTML']['@cdata']; ?></td>
+					</tr>
 											<?php endif; ?>
 										<?php endif; ?>
 										<?php break; ?>
 									<?php case 'error' : $trace = @unserialize($event->getTrace()); ?>
 										<?php if (isset($trace)) : ?>
 										<tr>
-											<td><code><?php echo $trace; ?></code></td>
-										</tr>
+						<td><code><?php echo $trace; ?></code></td>
+					</tr>
 										<?php endif; ?>
 										<?php break; ?>
 								<?php endswitch; ?>
 							</table>
-						</div>
-					</div>
-				</div>
+			</div>
+		</div>
+	</div>
 			<?php endif; ?>
 		<?php endforeach; ?>
 		<?php if (isset($events['lead'])) : $lead = $events['lead']->getLead(); ?>
 			<?php if (($leadEvents = $lead->getEvents()) == true) :?>
 				<div class="col-md-12">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<h3 class="panel-title">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
 								<?php echo $this->translate('Lead History')?>
 							</h3>
-						</div>
-						<div class="panel-body">
-							<table class="table table-hover table-condensed nomargin">
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover table-condensed nomargin">
 								<?php foreach ($leadEvents as $leadEvent) : $event = $leadEvent->getEvent(); ?>
 									<tr>
-										<th><?php echo $event->getEvent(); ?></th>
-										<td><?php echo $event->getMessage(); ?></td>
-										<td><?php echo date_format($event->getOccurred(), 'd M, Y h:i A'); ?></td>
-									</tr>
+						<th><?php echo $event->getEvent(); ?></th>
+						<td><?php echo $event->getMessage(); ?></td>
+						<td><?php echo date_format($event->getOccurred(), 'd M, Y h:i A'); ?></td>
+					</tr>
 								<?php endforeach; ?>
 							</table>
-						</div>
-					</div>
-				</div>
+			</div>
+		</div>
+	</div>
 			<?php endif; ?>
 		<?php endif; ?>
 	<?php endif; ?> 
