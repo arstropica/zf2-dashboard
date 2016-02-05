@@ -7,7 +7,7 @@ $this->headTitle($title);
 <?php echo $this->escapeHtml($title); ?>
 <span class="pull-right"> <a class="btn btn-info"
 		href="<?php echo $this->losUrl()->from('services/tenstreet', ['action'=>'list'], true);?>">Back</a>
-</span>
+	</span>
 </h1>
 <?php
 /**
@@ -32,6 +32,10 @@ $events = $entity->getEvents();
 					<tr>
 						<th>Created</th>
 						<td><?php echo date_format($entity->getTimecreated(), 'd M, Y h:i A'); ?></td>
+					</tr>
+					<tr>
+						<th>Submitted</th>
+						<td><?php $lastSubmitted = $entity->getLastsubmitted(); if ($lastSubmitted) echo date_format($entity->getTimecreated(), 'd M, Y h:i A'); ?></td>
 					</tr>
 					<tr>
 						<th>Referrer</th>
