@@ -1,5 +1,7 @@
 <?php
+
 namespace Lead\Controller;
+
 use Lead\Entity\Lead;
 use Zend\View\Model\JsonModel;
 use Event\Entity\Event;
@@ -13,11 +15,10 @@ use Zend\Mvc\Controller\AbstractRestfulController;
  * @author arstropica
  *        
  */
-class ServicesController extends AbstractRestfulController
-{
+class ServicesController extends AbstractRestfulController {
 	use EntityManagerAwareTrait, ServiceEventTrait;
 
-	public function processAction ()
+	public function processAction()
 	{
 		$id = $this->getEvent()
 			->getRouteMatch()
@@ -26,17 +27,17 @@ class ServicesController extends AbstractRestfulController
 		if ($id) {
 			$result = $this->submit($id);
 			
-			return $this->getJsonErrorResponse('json')->successOperation(
-					$result);
+			return $this->getJsonErrorResponse('json')
+				->successOperation($result);
 		}
 		
-		return $this->getJsonErrorResponse('json')->errorHandler(400, 
-				"Operation Failed. Lead " . ($id ?  : " not ") . " submitted.");
+		return $this->getJsonErrorResponse('json')
+			->errorHandler(400, "Operation Failed. Lead " . ($id ?  : " not ") . " submitted.");
 	}
 
-	protected function submit ($id)
+	protected function submit($id)
 	{
-		$results = [];
+		$results = [ ];
 		$entity = $this->getLead($id);
 		if ($entity && $entity instanceof Lead) {
 			$account = $entity->getAccount();
@@ -44,19 +45,23 @@ class ServicesController extends AbstractRestfulController
 				$apis = $account->getApis(true);
 				if ($apis->count() > 0) {
 					try {
-						foreach ($apis as $api) {
+						foreach ( $apis as $api ) {
 							$result = false;
 							switch ($api->getName()) {
-								case 'Tenstreet':
+								case 'Tenstreet' :
 									$result = $this->getServiceLocator()
-										->get(
-											'TenStreet\Service\PostClientData')
+										->get('TenStreet\Service\PostClientData')
 										->send($id);
 									break;
-								case 'Email':
+								case 'Email' :
 									$result = $this->getServiceLocator()
 										->get('Email\Service\SendMail')
-										->send($id);
+										->send($id, 'Email');
+									break;
+								case 'WebWorks' :
+									$result = $this->getServiceLocator()
+										->get('WebWorks\Service\ImportXML')
+										->send($id, 'WebWorks');
 									break;
 							}
 							if ($result instanceof JsonModel) {
@@ -64,11 +69,11 @@ class ServicesController extends AbstractRestfulController
 							}
 							$results = array_merge_recursive($result, $results);
 						}
-					} catch (\Exception $e) {
-						$result = [];
-						$result['error'][] = [
+					} catch ( \Exception $e ) {
+						$result = [ ];
+						$result ['error'] [] = [ 
 								$e->getMessage(),
-								$e->getTrace()
+								$e->getTrace() 
 						];
 						$results = array_merge_recursive($results, $result);
 					}
@@ -84,13 +89,13 @@ class ServicesController extends AbstractRestfulController
 	 * @param int $id        	
 	 * @return Lead|null
 	 */
-	protected function getLead ($id)
+	protected function getLead($id)
 	{
 		$em = $this->getEntityManager();
 		$leadRepository = $em->getRepository("Lead\\Entity\\Lead");
 		
-		return $leadRepository->findOneBy([
-				'id' => $id
+		return $leadRepository->findOneBy([ 
+				'id' => $id 
 		]);
 	}
 }
