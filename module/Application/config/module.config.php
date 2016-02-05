@@ -7,725 +7,815 @@
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 $env = getenv('APPLICATION_ENV') ?  : 'production';
-return array(
-		'controllers' => array(
-				'invokables' => array(
+return array (
+		'controllers' => array (
+				'invokables' => array (
 						'Application\Controller\Index' => 'Application\Controller\IndexController',
-						'Application\Controller\Navigation' => 'Application\Controller\NavigationController'
-				)
+						'Application\Controller\Navigation' => 'Application\Controller\NavigationController' 
+				) 
 		),
-		'router' => array(
-				'routes' => array(
-						'home' => array(
+		'router' => array (
+				'routes' => array (
+						'home' => array (
 								'type' => 'Zend\Mvc\Router\Http\Literal',
-								'options' => array(
+								'options' => array (
 										'route' => '/',
-										'defaults' => array(
+										'defaults' => array (
 												'controller' => 'Application\Controller\Index',
-												'action' => 'index'
-										)
-								)
+												'action' => 'index' 
+										) 
+								) 
 						),
-						'dashboard' => array(
+						'dashboard' => array (
 								'type' => 'Literal',
-								'options' => array(
+								'options' => array (
 										'route' => '/dashboard',
-										'defaults' => array(
+										'defaults' => array (
 												'controller' => 'Application\Controller\Index',
-												'action' => 'dashboard'
-										)
-								)
+												'action' => 'dashboard' 
+										) 
+								) 
 						),
-						'navigation' => array(
+						'navigation' => array (
 								'type' => 'Literal',
-								'options' => array(
+								'options' => array (
 										'route' => '/navigation',
-										'defaults' => array(
+										'defaults' => array (
 												'controller' => 'Application\Controller\Navigation',
-												'action' => 'index'
-										)
-								)
+												'action' => 'index' 
+										) 
+								) 
 						),
-						'error' => array(
+						'error' => array (
 								'type' => 'Literal',
-								'options' => array(
+								'options' => array (
 										'route' => '/error',
-										'defaults' => array(
+										'defaults' => array (
 												'controller' => 'Application\Controller\Index',
-												'action' => 'error'
-										)
+												'action' => 'error' 
+										) 
 								),
 								'may_terminate' => false,
-								'child_routes' => array(
-										'403' => array(
+								'child_routes' => array (
+										'403' => array (
 												'type' => 'Literal',
-												'options' => array(
+												'options' => array (
 														'route' => '/403',
-														'defaults' => array(
+														'defaults' => array (
 																'controller' => 'Application\Controller\Error',
-																'action' => 'error403'
-														)
-												)
-										)
-								)
-						)
-				)
+																'action' => 'error403' 
+														) 
+												) 
+										) 
+								) 
+						) 
+				) 
 		),
-		'controller_plugins' => array(
-				'factories' => array(
-						'getJsonErrorResponse' => 'Application\Controller\Factory\JsonErrorResponseFactory',
-						'getErrorResponse' => 'Application\Controller\Factory\ErrorResponseFactory'
+		'controller_plugins' => array (
+				'factories' => array (
+						'getJsonErrorResponse' => 'Application\Controller\Plugin\Factory\JsonErrorResponseFactory',
+						'getErrorResponse' => 'Application\Controller\Plugin\Factory\ErrorResponseFactory' 
 				),
-				'invokables' => array()
+				'invokables' => array () 
 		),
-		'service_manager' => array(
-				'invokables' => array(
+		'service_manager' => array (
+				'initializers' => array (
+						'Application\Initializer\ElasticaInitializer',
+						'Application\Initializer\SearchManagerInitializer' 
+				),
+				'invokables' => array (
 						'Application\Form\PagerForm' => 'Application\Form\PagerForm',
 						'Application\Controller\Plugin\JSONErrorResponse' => 'Application\Controller\Plugin\JSONErrorResponse',
-						'Application\Controller\Plugin\ErrorResponse' => 'Application\Controller\Plugin\ErrorResponse',
+						'Application\Controller\Plugin\ErrorResponse' => 'Application\Controller\Plugin\ErrorResponse' 
 				),
-				'abstract_factories' => array(
+				'abstract_factories' => array (
 						'Zend\Navigation\Service\NavigationAbstractServiceFactory',
 						'Zend\Cache\Service\StorageCacheAbstractServiceFactory',
-						'Zend\Log\LoggerAbstractServiceFactory'
+						'Zend\Log\LoggerAbstractServiceFactory' 
 				),
-				'factories' => array(
+				'factories' => array (
 						'translator' => 'Zend\Mvc\Service\TranslatorServiceFactory',
 						'navigation' => 'Zend\Navigation\Service\DefaultNavigationFactory',
 						'Application\Options\ModuleOptions' => 'Application\Options\Factory\ModuleOptionsFactory',
 						'Application\Service\Lead' => 'Application\Service\Factory\LeadServiceFactory',
 						'Application\Service\Account' => 'Application\Service\Factory\AccountServiceFactory',
-						'Application\Service\Event' => 'Application\Service\Factory\EventServiceFactory'
-				)
+						'Application\Service\Event' => 'Application\Service\Factory\EventServiceFactory' 
+				) 
 		),
-		'translator' => array(
+		'translator' => array (
 				'locale' => 'en_US',
-				'translation_file_patterns' => array(
-						array(
+				'translation_file_patterns' => array (
+						array (
 								'type' => 'gettext',
 								'base_dir' => __DIR__ . '/../language',
-								'pattern' => '%s.mo'
-						)
-				)
+								'pattern' => '%s.mo' 
+						) 
+				) 
 		),
-		'view_manager' => array(
+		'view_manager' => array (
 				'display_not_found_reason' => true,
 				'display_exceptions' => ($env == 'production') ? false : true,
 				'doctype' => 'HTML5',
 				'not_found_template' => 'error/404',
 				'exception_template' => 'error/index',
-				'template_map' => array(
-						'paginator-slide' => __DIR__ .
-								 '/../view/layout/paginator.phtml',
-								'layout/layout' => __DIR__ .
-								 '/../view/layout/layout.phtml',
-								'application/index/index' => __DIR__ .
-								 '/../view/application/index/index.phtml',
-								'error/403' => __DIR__ .
-								 '/../view/error/403.phtml',
-								'error/404' => __DIR__ .
-								 '/../view/error/404.phtml',
-								'error/index' => __DIR__ .
-								 '/../view/error/index.phtml'
+				'template_map' => array (
+						'paginator-slide' => __DIR__ . '/../view/layout/paginator.phtml',
+						'layout/layout' => __DIR__ . '/../view/layout/layout.phtml',
+						'application/index/index' => __DIR__ . '/../view/application/index/index.phtml',
+						'error/403' => __DIR__ . '/../view/error/403.phtml',
+						'error/404' => __DIR__ . '/../view/error/404.phtml',
+						'error/index' => __DIR__ . '/../view/error/index.phtml' 
 				),
-				'template_path_stack' => array(
-						__DIR__ . '/../view'
-				)
+				'template_path_stack' => array (
+						__DIR__ . '/../view' 
+				) 
 		),
-		'view_helpers' => array(
-				'invokables' => array(
+		'view_helpers' => array (
+				'invokables' => array (
 						'form' => 'Application\Form\View\Helper\Form',
 						'formRow' => 'Application\Form\View\Helper\FormRow',
 						'formDateRange' => 'Application\Form\View\Helper\FormDateRange',
+						'formSlider' => 'Application\Form\View\Helper\FormSlider',
 						'fieldCollection' => 'Application\Form\View\Helper\FieldCollection',
 						'routeLabel' => 'Application\View\Helper\RouteLabel',
 						'tableCollapse' => 'Application\View\Helper\TableCollapse',
 						'getRepo' => 'Application\View\Helper\EntityRepo',
-						'paginatorPosition' => 'Application\View\Helper\PaginatorPosition'
+						'paginatorPosition' => 'Application\View\Helper\PaginatorPosition' 
 				),
-				'factories' => array(
-						'formElement' => 'Application\Form\View\Helper\Factory\FormElementFactory'
-				)
+				'factories' => array (
+						'formElement' => 'Application\Form\View\Helper\Factory\FormElementFactory' 
+				) 
 		),
-		'view_helper_config' => array(
-				'flashmessenger' => array(
+		'view_helper_config' => array (
+				'flashmessenger' => array (
 						'message_open_format' => '<div%s><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><ul><li>',
 						'message_close_string' => '</li></ul></div>',
-						'message_separator_string' => '</li><li>'
-				)
+						'message_separator_string' => '</li><li>' 
+				) 
 		),
 		// Placeholder for console routes
-		'console' => array(
-				'router' => array(
-						'routes' => array()
-				)
+		'console' => array (
+				'router' => array (
+						'routes' => array () 
+				) 
 		),
-		'form_options' => array(
-				'ignoredViewHelpers' => array(
+		'form_options' => array (
+				'ignoredViewHelpers' => array (
 						'file',
 						'checkbox',
 						'radio',
 						'submit',
 						'multi_checkbox',
 						'button',
-						'reset'
-				)
+						'reset' 
+				) 
 		),
-		'app_options' => array(
+		'app_options' => array (
 				'exceptions_from_errors' => true,
 				'recover_from_fatal' => false,
-				'fatal_errors_callback' => function  ($s_msg, $s_file, $s_line)
-				{
+				'fatal_errors_callback' => function ($s_msg, $s_file, $s_line) {
 					return false;
 				},
 				'redirect_url' => '/error',
 				
-				'php_settings' => array(
+				'php_settings' => array (
 						'error_reporting' => E_ALL,
 						'display_errors' => 'On',
-						'display_startup_errors' => 'Off'
-				)
+						'display_startup_errors' => 'Off' 
+				) 
 		),
-		'log' => array(
-				'file' => 'logs/' . date('Y-m') . '.log'
+		'log' => array (
+				'file' => 'logs/' . date('Y-m') . '.log' 
 		),
-		'navigation' => array(
-				'default' => array(
-						array(
+		'navigation' => array (
+				'default' => array (
+						array (
 								'label' => 'Home',
 								'route' => 'home',
-								'pages' => array(
-										array(
+								'icon' => 'glyphicon glyphicon-dashboard',
+								'pages' => array (
+										array (
 												'label' => 'Dashboard',
 												'route' => 'dashboard',
-												'action' => 'dashboard'
-										)
-								)
+												'action' => 'dashboard' 
+										),
+										array (
+												'label' => 'Event Log',
+												'route' => 'event',
+												'action' => 'list',
+												'resource' => 'navigation',
+												'privilege' => 'display' 
+										) 
+								) 
 						),
-						array(
+						array (
 								'label' => 'Leads',
 								'route' => 'lead',
 								'resource' => 'navigation',
 								'privilege' => 'display',
-								'pages' => array(
-										array(
+								'icon' => 'glyphicon glyphicon-stats',
+								'pages' => array (
+										array (
 												'label' => 'Display Leads',
 												'route' => 'lead',
-												'action' => 'list'
+												'action' => 'list' 
 										),
-										array(
+										array (
 												'label' => 'Import Leads',
 												'route' => 'import',
-												'action' => 'import'
+												'action' => 'import' 
 										),
-										array(
+										array (
 												'label' => 'Add Lead',
 												'route' => 'lead/add',
-												'action' => 'add'
+												'action' => 'add' 
 										),
-										array(
+										array (
 												'label' => 'Display Attributes',
 												'route' => 'attribute',
-												'action' => 'list'
+												'action' => 'list' 
 										),
-										array(
+										array (
 												'label' => 'View Lead',
 												'route' => 'lead/view',
 												'action' => 'view',
-												'visible' => false
+												'visible' => false 
 										),
-										array(
+										array (
 												'label' => 'Assign Lead',
 												'route' => 'lead/edit',
 												'action' => 'edit',
-												'visible' => false
+												'visible' => false 
 										),
-										array(
+										array (
 												'label' => 'Delete Lead',
 												'route' => 'lead/delete',
 												'action' => 'delete',
-												'visible' => false
-										)
-								)
+												'visible' => false 
+										) 
+								) 
 						),
-						array(
+						array (
 								'label' => 'Accounts',
 								'route' => 'account',
 								'resource' => 'navigation',
 								'privilege' => 'display',
-								'pages' => array(
-										array(
+								'icon' => 'glyphicon glyphicon-briefcase',
+								'pages' => array (
+										array (
 												'label' => 'Display Accounts',
 												'route' => 'account',
-												'action' => 'list'
+												'action' => 'list' 
 										),
-										array(
+										array (
 												'label' => 'Add Account',
 												'route' => 'account/add',
-												'action' => 'add'
+												'action' => 'add' 
 										),
-										array(
+										array (
 												'label' => 'View Account',
 												'route' => 'account/view',
 												'action' => 'view',
-												'visible' => false
+												'visible' => false 
 										),
-										array(
+										array (
 												'label' => 'Edit Account',
 												'route' => 'account/edit',
 												'action' => 'edit',
-												'visible' => false
+												'visible' => false 
 										),
-										array(
+										array (
 												'label' => 'Archive Account',
 												'route' => 'account/delete',
 												'action' => 'delete',
-												'visible' => false
-										)
-								)
+												'visible' => false 
+										) 
+								) 
 						),
-						array(
+						array (
 								'label' => 'Services',
 								'route' => 'services',
 								'resource' => 'navigation',
 								'privilege' => 'display',
-								'pages' => array(
-										array(
+								'icon' => 'glyphicon glyphicon-star',
+								'pages' => array (
+										array (
 												'label' => 'TenStreet',
 												'route' => 'services/tenstreet',
-												'action' => 'list'
+												'action' => 'list' 
 										),
-										array(
+										array (
 												'label' => 'TenStreet',
 												'route' => 'services/tenstreet/list',
 												'action' => 'list',
-												'visible' => false
+												'visible' => false 
 										),
-										array(
+										array (
 												'label' => 'Email',
 												'route' => 'services/email',
-												'action' => 'list'
+												'action' => 'list' 
 										),
-										array(
+										array (
 												'label' => 'Email',
 												'route' => 'services/email/list',
 												'action' => 'list',
-												'visible' => false
-										)
-								)
+												'visible' => false 
+										),
+										array (
+												'label' => 'Options',
+												'route' => 'api/list',
+												'action' => 'list' 
+										) 
+								) 
 						),
-						array(
-								'label' => 'Options',
-								'route' => 'api',
+						array (
+								'label' => 'Reports',
+								'route' => 'report',
 								'resource' => 'navigation',
 								'privilege' => 'display',
-								'pages' => array(
-										array(
-												'label' => 'Event Log',
-												'route' => 'event',
-												'action' => 'list'
+								'icon' => 'glyphicon glyphicon-search',
+								'pages' => array (
+										array (
+												'label' => 'Display Reports',
+												'route' => 'report',
+												'action' => 'list' 
 										),
-										array(
-												'label' => 'TenStreet',
-												'route' => 'api/edit',
-												'action' => 'edit',
-												'params' => array(
-														'id' => 1
-												)
+										array (
+												'label' => 'Index Manager',
+												'route' => 'report/index',
+												'action' => 'list' 
 										),
-										array(
-												'label' => 'Email',
-												'route' => 'api/edit',
+										array (
+												'label' => 'Display Reports',
+												'route' => 'report/list',
+												'action' => 'list',
+												'visible' => false 
+										),
+										array (
+												'label' => 'Add Report',
+												'route' => 'report/add',
+												'action' => 'add' 
+										),
+										array (
+												'label' => 'View Report',
+												'route' => 'report/view',
+												'action' => 'view',
+												'visible' => false 
+										),
+										array (
+												'label' => 'Edit Report',
+												'route' => 'report/edit',
 												'action' => 'edit',
-												'params' => array(
-														'id' => 2
-												)
-										)
-								)
+												'visible' => false 
+										),
+										array (
+												'label' => 'Archive Report',
+												'route' => 'report/delete',
+												'action' => 'delete',
+												'visible' => false 
+										) 
+								) 
 						),
-						array(
+						array (
 								'label' => 'Profile',
 								'route' => 'zfcuser',
-								'pages' => array(
-										array(
+								'icon' => 'glyphicon glyphicon-user',
+								'pages' => array (
+										array (
 												'label' => 'Your Profile',
 												'route' => 'zfcuser',
 												'action' => 'index',
 												'resource' => 'navigation',
-												'privilege' => 'display'
+												'privilege' => 'display' 
 										),
-										array(
+										array (
 												'label' => 'Register',
 												'route' => 'zfcuser/register',
 												'action' => 'register',
 												'visible' => false,
 												'resource' => 'navigation',
-												'privilege' => 'display'
+												'privilege' => 'display' 
 										),
-										array(
+										array (
 												'label' => 'Login',
 												'route' => 'zfcuser/login',
 												'action' => 'login',
 												'resource' => 'navigation',
-												'privilege' => 'login'
+												'privilege' => 'login' 
 										),
-										array(
+										array (
 												'label' => 'Change Email',
 												'route' => 'zfcuser/changeemail',
 												'action' => 'changeemail',
 												'resource' => 'navigation',
-												'privilege' => 'display'
+												'privilege' => 'display' 
 										),
-										array(
+										array (
 												'label' => 'Change Password',
 												'route' => 'zfcuser/changepassword',
 												'action' => 'changepassword',
 												'resource' => 'navigation',
-												'privilege' => 'display'
+												'privilege' => 'display' 
 										),
-										array(
+										array (
 												'label' => 'Logout',
 												'route' => 'zfcuser/logout',
 												'action' => 'logout',
 												'resource' => 'navigation',
-												'privilege' => 'logout'
-										)
-								)
-						)
+												'privilege' => 'logout' 
+										) 
+								) 
+						) 
 				),
-				'special' => array(
-						array(
+				'special' => array (
+						array (
 								'label' => 'Home',
 								'route' => 'home',
-								'pages' => array(
-										array(
+								'pages' => array (
+										array (
 												'label' => 'Dashboard',
 												'route' => 'dashboard',
-												'action' => 'dashboard'
-										)
-								)
+												'action' => 'dashboard' 
+										) 
+								) 
 						),
-						array(
+						array (
 								'label' => 'Leads',
 								'route' => 'lead',
-								'pages' => array(
-										array(
+								'pages' => array (
+										array (
 												'label' => 'Display Leads',
 												'route' => 'lead',
-												'action' => 'list'
+												'action' => 'list' 
 										),
-										array(
+										array (
 												'label' => 'Display Leads',
 												'route' => 'lead/list',
-												'action' => 'list'
+												'action' => 'list' 
 										),
-										array(
+										array (
 												'label' => 'Import Leads',
 												'route' => 'import',
-												'action' => 'import'
+												'action' => 'import' 
 										),
-										array(
+										array (
 												'label' => 'Add Lead',
 												'route' => 'lead/add',
-												'action' => 'add'
+												'action' => 'add' 
 										),
-										array(
+										array (
 												'label' => 'View Lead',
 												'route' => 'lead/view',
 												'action' => 'view',
-												'visible' => true
+												'visible' => true 
 										),
-										array(
+										array (
 												'label' => 'Assign Lead',
 												'route' => 'lead/edit',
 												'action' => 'edit',
-												'visible' => true
+												'visible' => true 
 										),
-										array(
+										array (
 												'label' => 'Delete Lead',
 												'route' => 'lead/delete',
 												'action' => 'delete',
-												'visible' => true
+												'visible' => true 
 										),
-										array(
+										array (
 												'label' => 'Attributes',
 												'route' => 'attribute',
-												'pages' => array(
-														array(
+												'pages' => array (
+														array (
 																'label' => 'Display Attributes',
 																'route' => 'attribute/list',
-																'action' => 'list'
+																'action' => 'list' 
 														),
-														array(
+														array (
 																'label' => 'Edit Attribute',
 																'route' => 'attribute/edit',
-																'action' => 'edit'
+																'action' => 'edit' 
 														),
-														array(
+														array (
 																'label' => 'Add Attribute',
 																'route' => 'attribute/add',
-																'action' => 'add'
+																'action' => 'add' 
 														),
-														array(
+														array (
 																'label' => 'Delete Attribute',
 																'route' => 'attribute/delete',
-																'action' => 'delete'
+																'action' => 'delete' 
 														),
-														array(
+														array (
 																'label' => 'Merge Attribute',
 																'route' => 'attribute/merge',
-																'action' => 'merge'
-														)
-												)
-										)
-								)
+																'action' => 'merge' 
+														) 
+												) 
+										) 
+								) 
 						),
-						array(
+						array (
 								'label' => 'Accounts',
 								'route' => 'account',
-								'pages' => array(
-										array(
+								'pages' => array (
+										array (
 												'label' => 'Display Accounts',
 												'route' => 'account',
-												'action' => 'list'
+												'action' => 'list' 
 										),
-										array(
+										array (
 												'label' => 'Display Accounts',
 												'route' => 'account/list',
-												'action' => 'list'
+												'action' => 'list' 
 										),
-										array(
+										array (
 												'label' => 'Add Account',
 												'route' => 'account/add',
-												'action' => 'add'
+												'action' => 'add' 
 										),
-										array(
+										array (
 												'label' => 'View Account',
 												'route' => 'account/view',
 												'action' => 'view',
-												'visible' => true
+												'visible' => true 
 										),
-										array(
+										array (
 												'label' => 'Edit Account',
 												'route' => 'account/edit',
 												'action' => 'edit',
-												'visible' => true
+												'visible' => true 
 										),
-										array(
+										array (
 												'label' => 'Delete Account',
 												'route' => 'account/delete',
 												'action' => 'delete',
-												'visible' => true
+												'visible' => true 
 										),
-										array(
+										array (
 												'label' => 'Confirm Account Deletion',
 												'route' => 'account/confirm',
 												'action' => 'confirm',
-												'visible' => true
+												'visible' => true 
 										),
-										array(
+										array (
 												'label' => 'View Account',
 												'route' => 'account/application',
 												'action' => 'view',
 												'dynamic' => true,
-												'pages' => array(
-														array(
+												'pages' => array (
+														array (
 																'label' => 'View Leads',
 																'route' => 'account/application/lead',
 																'action' => 'list',
-																'visible' => true
+																'visible' => true 
 														),
-														array(
+														array (
 																'label' => 'View Leads',
 																'route' => 'account/application/lead/list',
 																'action' => 'list',
-																'visible' => true
+																'visible' => true 
 														),
-														array(
+														array (
 																'label' => 'API(s)',
 																'route' => 'account/application/api',
 																'action' => 'list',
-																'visible' => true
+																'visible' => true 
 														),
-														array(
+														array (
 																'label' => 'API(s)',
 																'route' => 'account/application/api/list',
 																'action' => 'list',
-																'visible' => true
+																'visible' => true 
 														),
-														array(
+														array (
 																'label' => 'Edit API(s)',
 																'route' => 'account/application/api/edit',
 																'action' => 'edit',
-																'visible' => true
-														)
-												)
-										)
-								)
+																'visible' => true 
+														) 
+												) 
+										) 
+								) 
 						),
-						array(
+						array (
 								'label' => 'Services',
 								'route' => 'services',
-								'pages' => array(
-										array(
+								'pages' => array (
+										array (
 												'label' => 'TenStreet',
 												'route' => 'services/tenstreet',
-												'pages' => array(
-														array(
+												'pages' => array (
+														array (
 																'label' => 'TenStreet Leads',
 																'route' => 'services/tenstreet/list',
-																'action' => 'list'
+																'action' => 'list' 
 														),
-														array(
+														array (
 																'label' => 'View Lead',
 																'route' => 'services/tenstreet/view',
-																'action' => 'view'
+																'action' => 'view' 
 														),
-														array(
+														array (
 																'label' => 'TenStreet',
 																'route' => 'services/tenstreet/submit',
-																'action' => 'submit'
-														)
-												)
+																'action' => 'submit' 
+														) 
+												) 
 										),
-										array(
+										array (
 												'label' => 'Email',
 												'route' => 'services/email',
-												'pages' => array(
-														array(
+												'pages' => array (
+														array (
 																'label' => 'Email',
 																'route' => 'services/email/list',
-																'action' => 'list'
+																'action' => 'list' 
 														),
-														array(
+														array (
 																'label' => 'View Lead',
 																'route' => 'services/email/view',
-																'action' => 'view'
+																'action' => 'view' 
 														),
-														array(
+														array (
 																'label' => 'Submit Email',
 																'route' => 'services/email/submit',
-																'action' => 'submit'
-														)
-												)
-										)
-								)
+																'action' => 'submit' 
+														) 
+												) 
+										) 
+								) 
 						),
-						array(
+						array (
 								'label' => 'Options',
 								'route' => 'api',
-								'pages' => array(
-										array(
+								'pages' => array (
+										array (
 												'label' => 'Display APIs',
 												'route' => 'api/list',
-												'action' => 'list'
+												'action' => 'list' 
 										),
-										array(
+										array (
 												'label' => 'TenStreet',
 												'route' => 'api/edit',
 												'action' => 'edit',
-												'params' => array(
-														'id' => 1
-												)
+												'params' => array (
+														'id' => 1 
+												) 
 										),
-										array(
+										array (
 												'label' => 'Email',
 												'route' => 'api/edit',
 												'action' => 'edit',
-												'params' => array(
-														'id' => 2
-												)
-										)
-								)
+												'params' => array (
+														'id' => 2 
+												) 
+										),
+										array (
+												'label' => 'WebWorks',
+												'route' => 'api/edit',
+												'action' => 'edit',
+												'params' => array (
+														'id' => 3 
+												) 
+										) 
+								) 
 						),
-						array(
+						array (
 								'label' => 'Logs',
 								'route' => 'event',
-								'pages' => array(
-										array(
+								'pages' => array (
+										array (
 												'label' => 'Display Log',
 												'route' => 'event/list',
-												'action' => 'list'
+												'action' => 'list' 
 										),
-										array(
+										array (
 												'label' => 'View Event',
 												'route' => 'event/view',
-												'action' => 'view'
-										)
-								)
+												'action' => 'view' 
+										) 
+								) 
 						),
-						array(
+						array (
+								'label' => 'Reports',
+								'route' => 'report',
+								'pages' => array (
+										array (
+												'label' => 'Index Manager',
+												'route' => 'report/index',
+												'action' => 'list' 
+										),
+										array (
+												'label' => 'Display Reports',
+												'route' => 'report',
+												'action' => 'list' 
+										),
+										array (
+												'label' => 'Display Reports',
+												'route' => 'report/list',
+												'action' => 'list',
+												'pages' => array (
+														array (
+																'label' => 'View Results',
+																'route' => 'report/application/result/list',
+																'action' => 'list' 
+														) 
+												) 
+										),
+										array (
+												'label' => 'Add Report',
+												'route' => 'report/add',
+												'action' => 'add' 
+										),
+										array (
+												'label' => 'View Report',
+												'route' => 'report/view',
+												'action' => 'view' 
+										),
+										array (
+												'label' => 'Edit Report',
+												'route' => 'report/edit',
+												'action' => 'edit' 
+										),
+										array (
+												'label' => 'Archive Report',
+												'route' => 'report/delete',
+												'action' => 'delete' 
+										) 
+								) 
+						),
+						array (
 								'label' => 'Profile',
 								'route' => 'zfcuser',
-								'pages' => array(
-										array(
+								'pages' => array (
+										array (
 												'label' => 'Your Profile',
 												'route' => 'zfcuser',
-												'action' => 'index'
+												'action' => 'index' 
 										),
-										array(
+										array (
 												'label' => 'Your Profile',
 												'route' => 'user',
-												'action' => 'index'
+												'action' => 'index' 
 										),
-										array(
+										array (
 												'label' => 'Register',
 												'route' => 'zfcuser/register',
 												'action' => 'register',
-												'visible' => true
+												'visible' => true 
 										),
-										array(
+										array (
 												'label' => 'Register',
 												'route' => 'user/register',
 												'action' => 'register',
-												'visible' => true
+												'visible' => true 
 										),
-										array(
+										array (
 												'label' => 'Login',
 												'route' => 'zfcuser/login',
-												'action' => 'login'
+												'action' => 'login' 
 										),
-										array(
+										array (
 												'label' => 'Login',
 												'route' => 'user/login',
-												'action' => 'login'
+												'action' => 'login' 
 										),
-										array(
+										array (
 												'label' => 'Change Email',
 												'route' => 'zfcuser/changeemail',
-												'action' => 'changeemail'
+												'action' => 'changeemail' 
 										),
-										array(
+										array (
 												'label' => 'Change Email',
 												'route' => 'user/changeemail',
-												'action' => 'changeemail'
+												'action' => 'changeemail' 
 										),
-										array(
+										array (
 												'label' => 'Change Password',
 												'route' => 'zfcuser/changepassword',
-												'action' => 'changepassword'
+												'action' => 'changepassword' 
 										),
-										array(
+										array (
 												'label' => 'Change Password',
 												'route' => 'user/changepassword',
-												'action' => 'changepassword'
+												'action' => 'changepassword' 
 										),
-										array(
+										array (
 												'label' => 'Logout',
 												'route' => 'zfcuser/logout',
 												'action' => 'logout',
 												'resource' => 'navigation',
-												'privilege' => 'logout'
+												'privilege' => 'logout' 
 										),
-										array(
+										array (
 												'label' => 'Logout',
 												'route' => 'user/logout',
 												'action' => 'logout',
 												'resource' => 'navigation',
-												'privilege' => 'logout'
-										)
-								)
-						)
-				)
-		)
+												'privilege' => 'logout' 
+										) 
+								) 
+						) 
+				) 
+		) 
 );
