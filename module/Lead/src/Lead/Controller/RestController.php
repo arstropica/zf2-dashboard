@@ -1,5 +1,7 @@
 <?php
+
 namespace Lead\Controller;
+
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Lead\Entity\Lead;
 use Zend\EventManager\EventManagerInterface;
@@ -13,43 +15,41 @@ use Event\Entity\Event;
 use Api\Entity\Api;
 use Application\Provider\ServiceEventTrait;
 
-class RestController extends AbstractRestfulController
-{
+class RestController extends AbstractRestfulController {
 	use EntityManagerAwareTrait, ServiceEventTrait;
-
-	protected $collectionMethods = array(
+	
+	protected $collectionMethods = array (
 			'GET',
-			'POST'
+			'POST' 
 	);
-
-	protected $resourceMethods = array(
+	
+	protected $resourceMethods = array (
 			'GET',
 			'PUT',
-			'DELETE'
+			'DELETE' 
 	);
-
+	
 	/**
 	 *
 	 * @var OAuth2Server
 	 */
 	protected $server;
-
+	
 	/**
 	 *
 	 * @var Lead
 	 */
 	protected $lead;
 
-	public function __construct (OAuth2Server $server)
+	public function __construct(OAuth2Server $server)
 	{
 		$this->server = $server;
 	}
 
-	protected function authorize ()
+	protected function authorize()
 	{
 		$authorized = false;
-		if ($this->server->verifyResourceRequest(
-				OAuth2Request::createFromGlobals())) {
+		if ($this->server->verifyResourceRequest(OAuth2Request::createFromGlobals())) {
 			// authorized
 			$authorized = true;
 		} else {
@@ -62,48 +62,53 @@ class RestController extends AbstractRestfulController
 		return $authorized ? true : false;
 	}
 
-	public function indexAction ()
+	public function indexAction()
 	{
-		if (! $this->authorize()) {
-			return $this->getJsonErrorResponse('json')->errorHandler(401, 
-					"Not Authorized.");
+		if (!$this->authorize()) {
+			return $this->getJsonErrorResponse('json')
+				->errorHandler(401, "Not Authorized.");
 		}
 		$results = $this->getList();
-		return $this->getJsonErrorResponse('json')->successOperation($results);
+		return $this->getJsonErrorResponse('json')
+			->successOperation($results);
 	}
 
-	public function addAction ()
+	public function addAction()
 	{
-		if (! $this->authorize()) {
-			return $this->getJsonErrorResponse('json')->errorHandler(401, 
-					"Not Authorized.");
+		if (!$this->authorize()) {
+			return $this->getJsonErrorResponse('json')
+				->errorHandler(401, "Not Authorized.");
 		}
 		
 		$request = $this->getRequest();
-		$result = array(
-				'data' => null
+		$result = array (
+				'data' => null 
 		);
 		if ($request->isPost()) {
-			$data = $request->getPost()->toArray();
+			$data = $request->getPost()
+				->toArray();
 			$result = $this->create($data);
 		}
 		
-		return $this->getJsonErrorResponse('json')->successOperation($result);
+		return $this->getJsonErrorResponse('json')
+			->successOperation($result);
 	}
 
-	public function submitAction ()
+	public function submitAction()
 	{
-		if (! $this->authorize()) {
-			return $this->getJsonErrorResponse('json')->errorHandler(401, 
-					"Not Authorized.");
+		if (!$this->authorize()) {
+			return $this->getJsonErrorResponse('json')
+				->errorHandler(401, "Not Authorized.");
 		}
 		
-		$id = (int) $this->params()->fromRoute('id', 0);
+		$id = (int) $this->params()
+			->fromRoute('id', 0);
 		$request = $this->getRequest();
 		$result = null;
 		if ($request->isPost()) {
 			$data = $request->getPost();
-			$logger = $this->getServiceLocator()->get('Logger');
+			$logger = $this->getServiceLocator()
+				->get('Logger');
 			$logger->info(print_r($data, true));
 			$lead = $this->create($data);
 			if ($lead instanceof Lead) {
@@ -114,21 +119,20 @@ class RestController extends AbstractRestfulController
 			$lead = $this->getLead($id, false);
 			if ($lead instanceof Lead && ($id = $lead->getId()) == true) {
 				$result = $this->submit($id);
-				return $this->getJsonErrorResponse('json')->successOperation(
-						$result);
+				return $this->getJsonErrorResponse('json')
+					->successOperation($result);
 			}
 		}
 		
-		return $this->getJsonErrorResponse('json')->errorHandler(400, 
-				"Operation Failed. Lead " . ($id ?  : " not ") . " created.", 
-				$result);
+		return $this->getJsonErrorResponse('json')
+			->errorHandler(400, "Operation Failed. Lead " . ($id ?  : " not ") . " created.", $result);
 	}
 
-	public function editAction ()
+	public function editAction()
 	{
-		if (! $this->authorize()) {
-			return $this->getJsonErrorResponse('json')->errorHandler(401, 
-					"Not Authorized.");
+		if (!$this->authorize()) {
+			return $this->getJsonErrorResponse('json')
+				->errorHandler(401, "Not Authorized.");
 		}
 		$request = $this->getRequest();
 		$result = null;
@@ -138,53 +142,60 @@ class RestController extends AbstractRestfulController
 			$result = $this->update($id, $data);
 		}
 		
-		return $this->getJsonErrorResponse('json')->successOperation($result);
+		return $this->getJsonErrorResponse('json')
+			->successOperation($result);
 	}
 
-	public function viewAction ()
+	public function viewAction()
 	{
-		if (! $this->authorize()) {
-			return $this->getJsonErrorResponse('json')->errorHandler(401, 
-					"Not Authorized.");
+		if (!$this->authorize()) {
+			return $this->getJsonErrorResponse('json')
+				->errorHandler(401, "Not Authorized.");
 		}
-		$id = (int) $this->params()->fromRoute('id', 0);
-		if (! $id) {
-			return $this->redirect()->toRoute('rest-api', 
-					array(
-							'action' => 'index'
-					), array(), true);
+		$id = (int) $this->params()
+			->fromRoute('id', 0);
+		if (!$id) {
+			return $this->redirect()
+				->toRoute('rest-api', array (
+					'action' => 'index' 
+			), array (), true);
 		}
 		
-		$queryBuilder = $this->getEntityManager()->createQueryBuilder();
-		$queryBuilder->select('t')->from($this->getEntityClass(), 't');
+		$queryBuilder = $this->getEntityManager()
+			->createQueryBuilder();
+		$queryBuilder->select('t')
+			->from($this->getEntityClass(), 't');
 		
-		$result = $queryBuilder->getQuery()->getResult(
-				\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
+		$result = $queryBuilder->getQuery()
+			->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
 		
-		return $this->getJsonErrorResponse('json')->successOperation($result);
+		return $this->getJsonErrorResponse('json')
+			->successOperation($result);
 	}
 
-	public function testAction ()
+	public function testAction()
 	{
-		if (! $this->authorize()) {
-			return $this->getJsonErrorResponse('json')->errorHandler(401, 
-					"Not Authorized.");
+		if (!$this->authorize()) {
+			return $this->getJsonErrorResponse('json')
+				->errorHandler(401, "Not Authorized.");
 		}
-		$result = [
-				'test' => 'success'
+		$result = [ 
+				'test' => 'success' 
 		];
-		return $this->getJsonErrorResponse('json')->successOperation($result);
+		return $this->getJsonErrorResponse('json')
+			->successOperation($result);
 	}
 
-	public function errorAction ()
+	public function errorAction()
 	{
-		return $this->getJsonErrorResponse('json')->errorHandler(400, 
-				"Unspecified Error.");
+		return $this->getJsonErrorResponse('json')
+			->errorHandler(400, "Unspecified Error.");
 	}
 
-	protected function allowMethods ()
+	protected function allowMethods()
 	{
-		if ($this->params()->fromRoute('id', false)) {
+		if ($this->params()
+			->fromRoute('id', false)) {
 			// we have an ID, return specific item
 			return $this->resourceMethods;
 		}
@@ -192,135 +203,126 @@ class RestController extends AbstractRestfulController
 		return $this->collectionMethods;
 	}
 
-	public function setEventManager (EventManagerInterface $events)
+	public function setEventManager(EventManagerInterface $events)
 	{
 		// events property defined in AbstractController
 		$this->events = $events;
 		parent::setEventManager($events);
 		// Register the listener and callback method with a priority of 10
-		$events->attach('dispatch', array(
+		$events->attach('dispatch', array (
 				$this,
-				'checkOptions'
+				'checkOptions' 
 		), 10);
 	}
 
-	public function checkOptions ($e)
+	public function checkOptions($e)
 	{
-		if (in_array($e->getRequest()->getMethod(), $this->allowMethods())) {
+		if (in_array($e->getRequest()
+			->getMethod(), $this->allowMethods())) {
 			// Method Allowed, Nothing to Do
 			return;
 		} else {
 			// Method Not Allowed
-			return $this->getJsonErrorResponse('json')->methodNotAllowed();
+			return $this->getJsonErrorResponse('json')
+				->methodNotAllowed();
 		}
 	}
 
-	protected function submit ($id)
+	protected function submit($id)
 	{
 		$this->createServiceEvent()
 			->setEntityId($id)
 			->setEntityClass($this->getEntityClass());
-		$token = $this->getRequest()->getPost('token');
+		$token = $this->getRequest()
+			->getPost('token');
 		$response = false;
 		try {
-			$response = $this->forward()->dispatch('Lead\Controller\Services', 
-					array(
-							'action' => 'process',
-							'id' => $id
-					), array(), true);
-		} catch (\Exception $e) {
+			$response = $this->forward()
+				->dispatch('Lead\Controller\Services', array (
+					'action' => 'process',
+					'id' => $id 
+			), array (), true);
+		} catch ( \Exception $e ) {
 			$this->logError($e);
-			return $this->getJsonErrorResponse('json')->errorHandler(400, 
-					$e->getMessage(), $e->getTrace());
+			return $this->getJsonErrorResponse('json')
+				->errorHandler(400, $e->getMessage(), $e->getTrace());
 		}
 		
 		return $response;
 	}
 
-	protected function hydrate (Lead $lead, $data = [])
+	protected function hydrate(Lead $lead, $data = [])
 	{
 		$em = $this->getEntityManager();
-		$leadAttributeRepository = $em->getRepository(
-				"Lead\\Entity\\LeadAttribute");
+		$leadAttributeRepository = $em->getRepository("Lead\\Entity\\LeadAttribute");
 		
 		$accountRepository = $em->getRepository("Account\\Entity\\Account");
 		
-		if (isset($data['attributes'], $data['lead'])) {
+		if (isset($data ['attributes'], $data ['lead'])) {
 			$attribute_count = $leadAttributeRepository->getCount();
-			foreach ($data as $section => $values) {
+			foreach ( $data as $section => $values ) {
 				switch ($section) {
-					case 'attributes':
+					case 'attributes' :
 						{
-							foreach ($values as $attributeName => $attributeValue) {
-								$leadAttribute = $leadAttributeRepository->findOneBy(
-										[
-												'attributeName' => $attributeName
-										]);
-								if (! $leadAttribute) {
-									$leadAttribute = $leadAttributeRepository->findOneBy(
-											[
-													'attributeDesc' => $attributeName,
-													'attributeName' => 'Question'
-											]);
+							foreach ( $values as $attributeName => $attributeValue ) {
+								$leadAttribute = $leadAttributeRepository->findOneBy([ 
+										'attributeName' => $attributeName 
+								]);
+								if (!$leadAttribute) {
+									$leadAttribute = $leadAttributeRepository->findOneBy([ 
+											'attributeDesc' => $attributeName,
+											'attributeName' => 'Question' 
+									]);
 								}
-								if (! $leadAttribute) {
+								if (!$leadAttribute) {
 									$leadAttribute = new LeadAttribute();
 									$leadAttribute->setAttributeName('Question');
-									$leadAttribute->setAttributeDesc(
-											$attributeName);
-									$leadAttribute->setAttributeOrder(
-											$attribute_count ++);
+									$leadAttribute->setAttributeDesc($attributeName);
+									$leadAttribute->setAttributeOrder($attribute_count++);
 								}
 								if ($leadAttribute) {
 									$leadAttributeValue = new LeadAttributeValue();
 									
-									$leadAttributeValue->setValue(
-											$attributeValue);
-									$leadAttributeValue->setAttribute(
-											$leadAttribute);
+									$leadAttributeValue->setValue($attributeValue);
+									$leadAttributeValue->setAttribute($leadAttribute);
 									
 									$lead->addAttribute($leadAttributeValue);
 								}
 							}
 							break;
 						}
-					case 'lead':
+					case 'lead' :
 						{
-							foreach ($values as $property => $value) {
+							foreach ( $values as $property => $value ) {
 								switch ($property) {
-									case 'timecreated':
-									case 'referrer':
-									case 'ipaddress':
+									case 'timecreated' :
+									case 'referrer' :
+									case 'ipaddress' :
 										if ($property == 'timecreated') {
-											$isvalid = $this->validateDate(
-													$value);
-											$value = $isvalid ? new \DateTime(
-													$value) : new \DateTime(
-													"now");
+											// $isvalid =
+											// $this->validateDate($value);
+											$value = new \DateTime("now");
 										}
-										if (method_exists($lead, 
-												'set' . ucfirst($property))) {
-											$lead->{'set' . ucfirst($property)}(
-													$value);
+										if (method_exists($lead, 'set' . ucfirst($property))) {
+											$lead->{'set' . ucfirst($property)}($value);
 										}
 										break;
-									case 'company':
-									case 'companyid':
-										if (! $lead->getAccount()) {
+									case 'company' :
+									case 'companyid' :
+										if (!$lead->getAccount()) {
 											switch ($property) {
-												case 'company':
-													$criteria = [
-															'name' => $value
+												case 'company' :
+													$criteria = [ 
+															'name' => $value 
 													];
 													break;
-												case 'companyid':
-													$criteria = [
-															'id' => $value
+												case 'companyid' :
+													$criteria = [ 
+															'id' => $value 
 													];
 													break;
 											}
-											$account = $accountRepository->findOneBy(
-													$criteria);
+											$account = $accountRepository->findOneBy($criteria);
 											if ($account) {
 												$lead->setAccount($account);
 											}
@@ -339,31 +341,31 @@ class RestController extends AbstractRestfulController
 		return false;
 	}
 
-	public function getEntityClass ()
+	public function getEntityClass()
 	{
 		$module = $this->getModuleName();
 		
 		return "$module\Entity\\$module";
 	}
 
-	public function getEntityServiceClass ()
+	public function getEntityServiceClass()
 	{
 		$module = $this->getModuleName();
 		
 		return "$module\Service\\$module";
 	}
 
-	protected function getModuleName ()
+	protected function getModuleName()
 	{
 		$module_array = explode('\\', get_class($this));
 		
-		return $module_array[0];
+		return $module_array [0];
 	}
 
-	private function validateDate ($date)
+	private function validateDate($date)
 	{
 		$stamp = strtotime($date);
-		if (! is_numeric($stamp))
+		if (!is_numeric($stamp))
 			return false;
 		$month = date('m', $stamp);
 		$day = date('d', $stamp);
@@ -373,32 +375,37 @@ class RestController extends AbstractRestfulController
 		return false;
 	}
 
-	protected function logEvent ($event)
+	protected function logEvent($event)
 	{
-		$this->getEventManager()->trigger($event, $this->getServiceEvent());
+		$this->getEventManager()
+			->trigger($event, $this->getServiceEvent());
 	}
 
-	protected function logError (\Exception $e, $result = [])
+	protected function logError(\Exception $e, $result = [])
 	{
-		$this->getServiceEvent()->setIsError(true);
-		$this->getServiceEvent()->setMessage($e->getMessage());
+		$this->getServiceEvent()
+			->setIsError(true);
+		$this->getServiceEvent()
+			->setMessage($e->getMessage());
 		if ($result) {
-			$this->getServiceEvent()->setResult(print_r($result, true));
+			$this->getServiceEvent()
+				->setResult(print_r($result, true));
 		} else {
-			$this->getServiceEvent()->setResult($e->getTraceAsString());
+			$this->getServiceEvent()
+				->setResult($e->getTraceAsString());
 		}
 		$this->logEvent('RuntimeError');
 	}
 
-	protected function getLead ($id, $extract = true)
+	protected function getLead($id, $extract = true)
 	{
 		$em = $this->getEntityManager();
 		
 		$lead = $this->lead;
-		if (! $lead) {
+		if (!$lead) {
 			$leadRepository = $em->getRepository("Lead\\Entity\\Lead");
-			$lead = $leadRepository->findOneBy([
-					'id' => $id
+			$lead = $leadRepository->findOneBy([ 
+					'id' => $id 
 			]);
 			$this->setLead($lead);
 		}
@@ -416,13 +423,13 @@ class RestController extends AbstractRestfulController
 	 *
 	 * @param \Lead\Entity\Lead $lead        	
 	 */
-	public function setLead ($lead)
+	public function setLead($lead)
 	{
 		$this->lead = $lead;
 	}
 	
 	// Class Methods
-	public function create ($data)
+	public function create($data)
 	{
 		$this->createServiceEvent()
 			->setEntityClass($this->getEntityClass())
@@ -437,25 +444,23 @@ class RestController extends AbstractRestfulController
 			try {
 				$em->persist($lead);
 				$em->flush();
-			} catch (\Exception $e) {
+			} catch ( \Exception $e ) {
 				$this->logError($e);
-				return $this->getJsonErrorResponse('json')->errorHandler(400, 
-						"Invalid Submission. " . $e->getMessage(), $data);
+				return $this->getJsonErrorResponse('json')
+					->errorHandler(400, "Invalid Submission. " . $e->getMessage(), $data);
 			}
 		} else {
 			$e = new \Exception('Failed to create lead.', 400);
 			$this->logError($e, $data);
-			return $this->getJsonErrorResponse('json')->errorHandler(400, 
-					"Invalid Submission.", $data);
+			return $this->getJsonErrorResponse('json')
+				->errorHandler(400, "Invalid Submission.", $data);
 		}
 		
 		if ($lead) {
 			$referrer = $lead->getReferrer();
 			$this->getServiceEvent()
 				->setEntityId($lead->getId())
-				->setMessage(
-					"Lead #" . $lead->getId() . " submitted from " . $referrer .
-							 ".");
+				->setMessage("Lead #" . $lead->getId() . " submitted from " . $referrer . ".");
 			$this->logEvent("AddAction.post");
 			$result = $lead;
 		}
@@ -463,16 +468,19 @@ class RestController extends AbstractRestfulController
 		return $result;
 	}
 
-	public function getList ()
+	public function getList()
 	{
 		/* @var $qb \Doctrine\ORM\QueryBuilder */
-		$qb = $this->getEntityManager()->createQueryBuilder();
-		$qb->add('select', 'e')->add('from', $this->getEntityClass() . ' e');
+		$qb = $this->getEntityManager()
+			->createQueryBuilder();
+		$qb->add('select', 'e')
+			->add('from', $this->getEntityClass() . ' e');
 		
-		return $qb->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+		return $qb->getQuery()
+			->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
 	}
 
-	public function update ($id, $data)
+	public function update($id, $data)
 	{
 		$this->createServiceEvent()
 			->setEntityId($id)
@@ -481,8 +489,8 @@ class RestController extends AbstractRestfulController
 		$em = $this->getEntityManager();
 		$leadRepository = $em->getRepository("Lead\\Entity\\Lead");
 		
-		$entity = $leadRepository->findOneBy([
-				'id' => $id
+		$entity = $leadRepository->findOneBy([ 
+				'id' => $id 
 		]);
 		
 		$hydrator = new DoctrineHydrator($em);
@@ -490,10 +498,10 @@ class RestController extends AbstractRestfulController
 			$lead = $hydrator->hydrate($data, $entity);
 			$em->persist($lead);
 			$em->flush();
-		} catch (\Exception $e) {
+		} catch ( \Exception $e ) {
 			$this->logError($e);
-			return $this->getJsonErrorResponse('json')->errorHandler(400, 
-					"Invalid Submission. " . $e->getMessage(), $data);
+			return $this->getJsonErrorResponse('json')
+				->errorHandler(400, "Invalid Submission. " . $e->getMessage(), $data);
 		}
 		
 		if ($lead) {
@@ -505,56 +513,64 @@ class RestController extends AbstractRestfulController
 		return $lead;
 	}
 
-	public function options ()
+	public function options()
 	{
 		$response = $this->getResponse();
 		// If in Options Array, Allow
-		$response->getHeaders()->addHeaderLine('Allow', 
-				implode(',', $this->allowMethods()));
+		$response->getHeaders()
+			->addHeaderLine('Allow', implode(',', $this->allowMethods()));
 		// Return Response
 		return $response;
 	}
 
-	public function get ($id)
+	public function get($id)
 	{
 		/* @var $qb \Doctrine\ORM\QueryBuilder */
-		$qb = $this->getEntityManager()->createQueryBuilder();
+		$qb = $this->getEntityManager()
+			->createQueryBuilder();
 		$qb->add('select', 'e')
 			->add('from', $this->getEntityClass() . ' e')
 			->setMaxResults(1);
 		
-		$result = $qb->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+		$result = $qb->getQuery()
+			->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
 		return $result ? current($result) : false;
 	}
 	
 	// Override default actions as they do not return valid JsonModels
-	public function delete ($id)
+	public function delete($id)
 	{
-		return $this->getJsonErrorResponse('json')->methodNotAllowed();
+		return $this->getJsonErrorResponse('json')
+			->methodNotAllowed();
 	}
 
-	public function deleteList ($data)
+	public function deleteList($data)
 	{
-		return $this->getJsonErrorResponse('json')->methodNotAllowed();
+		return $this->getJsonErrorResponse('json')
+			->methodNotAllowed();
 	}
 
-	public function head ($id = null)
+	public function head($id = null)
 	{
-		return $this->getJsonErrorResponse('json')->methodNotAllowed();
+		return $this->getJsonErrorResponse('json')
+			->methodNotAllowed();
 	}
 
-	public function patch ($id, $data)
+	public function patch($id, $data)
 	{
-		return $this->getJsonErrorResponse('json')->methodNotAllowed();
+		return $this->getJsonErrorResponse('json')
+			->methodNotAllowed();
 	}
 
-	public function replaceList ($data)
+	public function replaceList($data)
 	{
-		return $this->getJsonErrorResponse('json')->methodNotAllowed();
+		return $this->getJsonErrorResponse('json')
+			->methodNotAllowed();
 	}
 
-	public function patchList ($data)
+	public function patchList($data)
 	{
-		return $this->getJsonErrorResponse('json')->methodNotAllowed();
+		return $this->getJsonErrorResponse('json')
+			->methodNotAllowed();
 	}
 }
