@@ -1,10 +1,19 @@
 <?php
+
 namespace Lead\Entity;
+
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Zend\Form\Annotation;
 use Doctrine\Common\Collections\Collection;
 use Zend\Db\Sql\Ddl\Column\Integer;
+use JMS\Serializer\Annotation as JMS;
+use Doctrine\Search\Mapping\Annotations as MAP;
+use Application\Provider\EntityDataTrait;
+use Application\Provider\SearchManagerAwareTrait;
+use Application\Service\ElasticSearch\SearchableEntityInterface;
+use Application\Provider\ServiceLocatorAwareTrait;
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
 
 /**
  * LeadAttribute
@@ -12,19 +21,28 @@ use Zend\Db\Sql\Ddl\Column\Integer;
  * @ORM\Table(name="lead_attributes")
  * @ORM\Entity(repositoryClass="Lead\Entity\Repository\LeadAttributeRepository")
  * @Annotation\Instance("\Lead\Entity\LeadAttribute")
+ * @JMS\ExclusionPolicy("all")
+ * @MAP\ElasticSearchable(
+ * index="reports",
+ * type="attribute",
+ * source=true
+ * )
  */
-class LeadAttribute
-{
-
+class LeadAttribute implements SearchableEntityInterface, ServiceLocatorAwareInterface {
+	use EntityDataTrait, SearchManagerAwareTrait, ServiceLocatorAwareTrait;
+	
 	/**
 	 *
 	 * @var integer @ORM\Column(name="id", type="integer", nullable=false)
 	 *      @ORM\Id
 	 *      @ORM\GeneratedValue(strategy="IDENTITY")
 	 *      @Annotation\Exclude()
+	 *      @MAP\Id
+	 *      @JMS\Type("integer")
+	 *      @JMS\Expose @JMS\Groups({"details", "attributes"})
 	 */
 	private $id;
-
+	
 	/**
 	 *
 	 * @var string @ORM\Column(name="attribute_name", type="string", length=255,
@@ -37,9 +55,15 @@ class LeadAttribute
 	 *      "required":"true",
 	 *      "label":"Name",
 	 *      })
+	 *      @JMS\Type("string")
+	 *      @JMS\Expose @JMS\Groups({"details", "attributes"})
+	 *      @MAP\ElasticField(
+	 *      type="string",
+	 *      includeInAll=true
+	 *      )
 	 */
 	private $attributeName;
-
+	
 	/**
 	 *
 	 * @var string @ORM\Column(name="attribute_desc", type="text", length=65535,
@@ -51,27 +75,71 @@ class LeadAttribute
 	 *      "required":"true",
 	 *      "label":"Description",
 	 *      })
+	 *      @JMS\Type("string")
+	 *      @JMS\Expose @JMS\Groups({"details", "attributes"})
+	 *      @MAP\ElasticField(type="multi_field", fields={
+	 *      @MAP\ElasticField(name="attributeDesc", type="string",
+	 *      includeInAll=true, analyzer="whitespace"),
+	 *      @MAP\ElasticField(name="exact", type="string",
+	 *      includeInAll=false, index="not_analyzed")
+	 *      })
 	 */
 	private $attributeDesc;
-
+	
+	/**
+	 *
+	 * @var string @ORM\Column(name="attribute_type", type="text", length=55,
+	 *      nullable=false)
+	 *      @Annotation\Filter({"name":"StripTags"})
+	 *      @Annotation\Filter({"name":"StringTrim"})
+	 *      @Annotation\Required(true)
+	 *      @Annotation\Type("Zend\Form\Element\Select")
+	 *      @Annotation\Options({
+	 *      "required":"true",
+	 *      "label":"Type",
+	 *      "empty_option": "Select Data Type",
+	 *      "value_options": {
+	 *      "number":"Number",
+	 *      "date":"Date",
+	 *      "string":"String",
+	 *      "text":"Text",
+	 *      "multiple":"Multiple",
+	 *      "boolean":"Boolean",
+	 *      "location":"Location"
+	 *      }
+	 *      })
+	 *      @JMS\Type("string")
+	 *      @JMS\Expose @JMS\Groups({"details", "attributes"})
+	 *      @MAP\ElasticField(
+	 *      type="string",
+	 *      includeInAll=true
+	 *      )
+	 */
+	private $attributeType = 'string';
+	
 	/**
 	 *
 	 * @var integer @ORM\Column(name="attribute_order", type="integer",
 	 *      nullable=true)
 	 *      @Annotation\Exclude()
+	 *      @JMS\Type("integer")
+	 *      @JMS\Expose @JMS\Groups({"details", "attributes"})
+	 *      @MAP\ElasticField(
+	 *      type="string",
+	 *      includeInAll=true
+	 *      )
 	 */
 	private $attributeOrder;
-
+	
 	/**
 	 *
-	 * @var \Doctrine\Common\Collections\Collection
-	 *      @ORM\OneToMany(targetEntity="Lead\Entity\LeadAttributeValue",
+	 * @var \Doctrine\Common\Collections\Collection @ORM\OneToMany(targetEntity="Lead\Entity\LeadAttributeValue",
 	 *      mappedBy="attribute", cascade={"persist", "remove"},
 	 *      fetch="EXTRA_LAZY")
 	 *      @Annotation\Exclude()
 	 */
 	protected $values;
-
+	
 	/**
 	 *
 	 * @var Integer @Annotation\Exclude()
@@ -81,7 +149,7 @@ class LeadAttribute
 	/**
 	 * Initialies the array variables.
 	 */
-	public function __construct ()
+	public function __construct()
 	{
 		$this->values = new ArrayCollection();
 	}
@@ -91,12 +159,12 @@ class LeadAttribute
 	 *
 	 * @return integer
 	 */
-	public function getId ()
+	public function getId()
 	{
 		return $this->id;
 	}
 
-	public function setId ($id)
+	public function setId($id)
 	{
 		$this->id = $id;
 		
@@ -110,7 +178,7 @@ class LeadAttribute
 	 *
 	 * @return LeadAttribute
 	 */
-	public function setAttributeName ($attributeName)
+	public function setAttributeName($attributeName)
 	{
 		$this->attributeName = $attributeName;
 		
@@ -122,7 +190,7 @@ class LeadAttribute
 	 *
 	 * @return string
 	 */
-	public function getAttributeName ()
+	public function getAttributeName()
 	{
 		return $this->attributeName;
 	}
@@ -134,7 +202,7 @@ class LeadAttribute
 	 *
 	 * @return LeadAttribute
 	 */
-	public function setAttributeDesc ($attributeDesc)
+	public function setAttributeDesc($attributeDesc)
 	{
 		$this->attributeDesc = $attributeDesc;
 		
@@ -146,9 +214,33 @@ class LeadAttribute
 	 *
 	 * @return string
 	 */
-	public function getAttributeDesc ()
+	public function getAttributeDesc()
 	{
 		return $this->attributeDesc;
+	}
+
+	/**
+	 * Get Attribute Type
+	 *
+	 * @return string $attributeType
+	 */
+	public function getAttributeType()
+	{
+		return $this->attributeType;
+	}
+
+	/**
+	 * Set Attribute Type
+	 *
+	 * @param string $attributeType        	
+	 *
+	 * @return LeadAttribute
+	 */
+	public function setAttributeType($attributeType)
+	{
+		$this->attributeType = $attributeType;
+		
+		return $this;
 	}
 
 	/**
@@ -156,7 +248,7 @@ class LeadAttribute
 	 *
 	 * @return integer|null
 	 */
-	public function getAttributeOrder ()
+	public function getAttributeOrder()
 	{
 		return $this->attributeOrder;
 	}
@@ -167,7 +259,7 @@ class LeadAttribute
 	 *
 	 * @return LeadAttribute
 	 */
-	public function setAttributeOrder ($attributeOrder)
+	public function setAttributeOrder($attributeOrder)
 	{
 		$this->attributeOrder = $attributeOrder;
 		
@@ -179,7 +271,7 @@ class LeadAttribute
 	 *
 	 * @return array
 	 */
-	public function getValues ($ac = false)
+	public function getValues($ac = false)
 	{
 		return $ac ? $this->values : $this->values->getValues();
 	}
@@ -191,10 +283,10 @@ class LeadAttribute
 	 *
 	 * @return void
 	 */
-	public function addValue ($value)
+	public function addValue($value)
 	{
 		$value->setAttribute($this);
-		$this->values[] = $value;
+		$this->values [] = $value;
 	}
 
 	/**
@@ -204,10 +296,10 @@ class LeadAttribute
 	 *
 	 * @return void
 	 */
-	public function addValues (Collection $values)
+	public function addValues(Collection $values)
 	{
-		foreach ($values as $value) {
-			if (! $this->values->contains($value)) {
+		foreach ( $values as $value ) {
+			if (!$this->values->contains($value)) {
 				$this->values->add($value);
 				$value->setAttribute($this);
 			}
@@ -220,7 +312,7 @@ class LeadAttribute
 	 *
 	 * @return LeadAttribute
 	 */
-	public function setValues ($values)
+	public function setValues($values)
 	{
 		$this->values = $values;
 		
@@ -233,9 +325,9 @@ class LeadAttribute
 	 *
 	 * @return LeadAttribute
 	 */
-	public function removeValues (Collection $values)
+	public function removeValues(Collection $values)
 	{
-		foreach ($values as $value) {
+		foreach ( $values as $value ) {
 			if ($this->values->contains($value)) {
 				$this->values->removeElement($value);
 				$value->setAttribute(null);
@@ -250,9 +342,10 @@ class LeadAttribute
 	 *
 	 * @return integer
 	 */
-	public function getCount ()
+	public function getCount()
 	{
-		return $this->getValues(true)->count();
+		return $this->getValues(true)
+			->count();
 	}
 
 	/**
@@ -260,7 +353,7 @@ class LeadAttribute
 	 *
 	 * @return string
 	 */
-	public function __toString ()
+	public function __toString()
 	{
 		return $this->getAttributeOrder();
 	}

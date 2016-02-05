@@ -1,8 +1,19 @@
 <?php
+
 namespace Account\Entity;
+
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Zend\Form\Annotation;
+use Report\Entity\Report;
+use Doctrine\Common\Collections\Collection;
+use JMS\Serializer\Annotation as JMS;
+use Doctrine\Search\Mapping\Annotations as MAP;
+use Application\Provider\EntityDataTrait;
+use Application\Service\ElasticSearch\SearchableEntityInterface;
+use Application\Provider\SearchManagerAwareTrait;
+use Application\Provider\ServiceLocatorAwareTrait;
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
 
 /**
  * Account
@@ -10,19 +21,24 @@ use Zend\Form\Annotation;
  * @ORM\Table(name="account")
  * @ORM\Entity(repositoryClass="Account\Entity\Repository\AccountRepository")
  * @Annotation\Instance("\Account\Entity\Account")
+ * @JMS\ExclusionPolicy("all")
+ * @MAP\ElasticSearchable(index="reports", type="account", source=true)
  */
-class Account
-{
-
+class Account implements SearchableEntityInterface, ServiceLocatorAwareInterface {
+	use EntityDataTrait, SearchManagerAwareTrait, ServiceLocatorAwareTrait;
+	
 	/**
 	 *
 	 * @var integer @ORM\Column(name="id", type="integer", nullable=false)
 	 *      @ORM\Id
 	 *      @ORM\GeneratedValue(strategy="IDENTITY")
 	 *      @Annotation\Type("Zend\Form\Element\Hidden")
+	 *      @MAP\Id
+	 *      @JMS\Type("integer")
+	 *      @JMS\Expose @JMS\Groups({"list", "details"})
 	 */
 	private $id;
-
+	
 	/**
 	 *
 	 * @var string @ORM\Column(name="guid", type="string", length=255,
@@ -30,7 +46,7 @@ class Account
 	 *      @Annotation\Type("Zend\Form\Element\Hidden")
 	 */
 	private $guid;
-
+	
 	/**
 	 *
 	 * @var string @ORM\Column(name="name", type="string", length=255,
@@ -39,9 +55,17 @@ class Account
 	 *      @Annotation\Required({"required":"true"})
 	 *      @Annotation\Filter({"name":"StripTags"})
 	 *      @Annotation\Options({"label":"Account Name"})
+	 *      @JMS\Type("string")
+	 *      @JMS\Expose @JMS\Groups({"list", "details"})
+	 *      @MAP\ElasticField(type="multi_field", fields={
+	 *      @MAP\ElasticField(name="name", type="string", includeInAll=true,
+	 *      analyzer="whitespace"),
+	 *      @MAP\ElasticField(name="exact", type="string",
+	 *      includeInAll=false, index="not_analyzed")
+	 *      })
 	 */
 	private $name;
-
+	
 	/**
 	 *
 	 * @var string @ORM\Column(name="description", type="text", length=65535,
@@ -52,7 +76,7 @@ class Account
 	 *      @Annotation\Options({"label":"Description"})
 	 */
 	private $description;
-
+	
 	/**
 	 *
 	 * @var boolean @ORM\Column(name="active", type="boolean", nullable=false)
@@ -63,7 +87,7 @@ class Account
 	 *      })
 	 */
 	private $active = '1';
-
+	
 	/**
 	 *
 	 * @var \Doctrine\Common\Collections\Collection @ORM\ManyToMany(
@@ -91,7 +115,7 @@ class Account
 	 *      @Annotation\Exclude()
 	 */
 	private $apis;
-
+	
 	/**
 	 *
 	 * @var \Doctrine\Common\Collections\Collection @ORM\OneToMany(
@@ -122,11 +146,42 @@ class Account
 	 *      )
 	 *      }
 	 *      )
-	 *      @ORM\OrderBy({"id"="DESC"})
+	 *      @ORM\OrderBy({"lastsubmitted"="DESC"})
 	 *      @Annotation\Exclude()
 	 */
 	private $leads;
-
+	
+	/**
+	 *
+	 * @var Collection @ORM\OneToMany(
+	 *      targetEntity="Report\Entity\Report",
+	 *      mappedBy="account",
+	 *      fetch="EXTRA_LAZY",
+	 *      indexBy="id",
+	 *      cascade={"remove"},
+	 *      )
+	 *      @ORM\JoinTable(
+	 *      name="report",
+	 *      joinColumns={
+	 *      @ORM\JoinColumn(
+	 *      name="account_id",
+	 *      referencedColumnName="id",
+	 *      nullable=true,
+	 *      )
+	 *      },
+	 *      inverseJoinColumns={
+	 *      @ORM\JoinColumn(
+	 *      name="id",
+	 *      referencedColumnName="id",
+	 *      unique=true,
+	 *      ),
+	 *      }
+	 *      )
+	 *      @ORM\OrderBy({"id"="DESC"})
+	 *      @Annotation\Exclude()
+	 */
+	private $reports;
+	
 	/**
 	 *
 	 * @var \Doctrine\Common\Collections\Collection @ORM\OneToMany(
@@ -141,7 +196,7 @@ class Account
 	 *     
 	 */
 	private $events;
-
+	
 	/**
 	 *
 	 * @var \Doctrine\Common\Collections\Collection @ORM\OneToMany(
@@ -160,11 +215,12 @@ class Account
 	/**
 	 * Initialies the collection variables.
 	 */
-	public function __construct ()
+	public function __construct()
 	{
 		$this->apis = new ArrayCollection();
 		$this->apiSettings = new ArrayCollection();
 		$this->leads = new ArrayCollection();
+		$this->reports = new ArrayCollection();
 		$this->events = new ArrayCollection();
 	}
 
@@ -175,7 +231,7 @@ class Account
 	 *
 	 * @return Account
 	 */
-	public function setId ($id)
+	public function setId($id)
 	{
 		$this->id = $id;
 		
@@ -187,7 +243,7 @@ class Account
 	 *
 	 * @return integer
 	 */
-	public function getId ()
+	public function getId()
 	{
 		return $this->id;
 	}
@@ -199,7 +255,7 @@ class Account
 	 *
 	 * @return Account
 	 */
-	public function setGuid ($guid)
+	public function setGuid($guid)
 	{
 		$this->guid = $guid;
 		
@@ -211,7 +267,7 @@ class Account
 	 *
 	 * @return string
 	 */
-	public function getGuid ()
+	public function getGuid()
 	{
 		return $this->guid;
 	}
@@ -223,7 +279,7 @@ class Account
 	 *
 	 * @return Account
 	 */
-	public function setName ($name)
+	public function setName($name)
 	{
 		$this->name = $name;
 		
@@ -235,7 +291,7 @@ class Account
 	 *
 	 * @return string
 	 */
-	public function getName ()
+	public function getName()
 	{
 		return $this->name;
 	}
@@ -247,7 +303,7 @@ class Account
 	 *
 	 * @return Account
 	 */
-	public function setDescription ($description)
+	public function setDescription($description)
 	{
 		$this->description = $description;
 		
@@ -259,7 +315,7 @@ class Account
 	 *
 	 * @return string
 	 */
-	public function getDescription ()
+	public function getDescription()
 	{
 		return $this->description;
 	}
@@ -271,7 +327,7 @@ class Account
 	 *
 	 * @return Account
 	 */
-	public function setActive ($active)
+	public function setActive($active)
 	{
 		$this->active = $active;
 		
@@ -283,7 +339,7 @@ class Account
 	 *
 	 * @return boolean
 	 */
-	public function getActive ()
+	public function getActive()
 	{
 		return $this->active;
 	}
@@ -294,7 +350,7 @@ class Account
 	 *
 	 * @return \Api\Entity\Api|boolean
 	 */
-	public function findApi ($apiName)
+	public function findApi($apiName)
 	{
 		$api = false;
 		$apis = $this->findApis($apiName);
@@ -310,13 +366,12 @@ class Account
 	 *
 	 * @return ArrayCollection
 	 */
-	public function findApis ($apiName)
+	public function findApis($apiName)
 	{
-		return $this->getApis(true)->filter(
-				function  ($api) use( $apiName)
-				{
-					return $api->getName() == $apiName;
-				});
+		return $this->getApis(true)
+			->filter(function ($api) use($apiName) {
+			return $api->getName() == $apiName;
+		});
 	}
 
 	/**
@@ -324,7 +379,7 @@ class Account
 	 *
 	 * @return array
 	 */
-	public function getApis ($ac = false)
+	public function getApis($ac = false)
 	{
 		return $ac ? $this->apis : $this->apis->getValues();
 	}
@@ -336,10 +391,10 @@ class Account
 	 *
 	 * @return void
 	 */
-	public function addApis ($apis)
+	public function addApis($apis)
 	{
-		foreach ($apis as $api) {
-			if (! $this->apis->contains($api)) {
+		foreach ( $apis as $api ) {
+			if (!$this->apis->contains($api)) {
 				$this->apis->add($api);
 			}
 		}
@@ -352,9 +407,9 @@ class Account
 	 *
 	 * @return Account
 	 */
-	public function removeApis (ArrayCollection $apis)
+	public function removeApis(ArrayCollection $apis)
 	{
-		foreach ($apis as $api) {
+		foreach ( $apis as $api ) {
 			if ($this->apis->contains($api)) {
 				$this->apis->removeElement($api);
 			}
@@ -368,7 +423,7 @@ class Account
 	 *
 	 * @return array
 	 */
-	public function getLeads ($ac = false)
+	public function getLeads($ac = false)
 	{
 		return $ac ? $this->leads : $this->leads->getValues();
 	}
@@ -380,9 +435,9 @@ class Account
 	 *
 	 * @return void
 	 */
-	public function addLead ($lead)
+	public function addLead($lead)
 	{
-		if (! $this->leads->contains($lead)) {
+		if (!$this->leads->contains($lead)) {
 			$this->leads->add($lead);
 		}
 		$lead->setAccount($this);
@@ -395,9 +450,9 @@ class Account
 	 *
 	 * @return Account
 	 */
-	public function removeLeads ($leads)
+	public function removeLeads($leads)
 	{
-		foreach ($leads as $lead) {
+		foreach ( $leads as $lead ) {
 			if ($this->leads->contains($lead)) {
 				$this->leads->removeElement($lead);
 				$lead->setAccount(null);
@@ -412,7 +467,7 @@ class Account
 	 *
 	 * @return array
 	 */
-	public function getEvents ()
+	public function getEvents()
 	{
 		return $this->events->getValues();
 	}
@@ -424,10 +479,10 @@ class Account
 	 *
 	 * @return void
 	 */
-	public function addEvents (ArrayCollection $events)
+	public function addEvents(ArrayCollection $events)
 	{
-		foreach ($events as $event) {
-			if (! $this->events->contains($event)) {
+		foreach ( $events as $event ) {
+			if (!$this->events->contains($event)) {
 				$this->events->add($event);
 				$event->setAccount($this);
 			}
@@ -441,9 +496,9 @@ class Account
 	 *
 	 * @return Account
 	 */
-	public function removeEvents (ArrayCollection $events)
+	public function removeEvents(ArrayCollection $events)
 	{
-		foreach ($events as $event) {
+		foreach ( $events as $event ) {
 			if ($this->events->contains($event)) {
 				$this->events->removeElement($event);
 				$event->setAccount(null);
@@ -458,7 +513,7 @@ class Account
 	 *
 	 * @return array
 	 */
-	public function getApiSettings ()
+	public function getApiSettings()
 	{
 		return $this->apiSettings->getValues();
 	}
@@ -470,10 +525,10 @@ class Account
 	 *
 	 * @return Account
 	 */
-	public function setApiSettings (ArrayCollection $apiSettings)
+	public function setApiSettings(ArrayCollection $apiSettings)
 	{
-		foreach ($apiSettings as $apiSetting) {
-			if (! $this->apiSettings->contains($apiSetting)) {
+		foreach ( $apiSettings as $apiSetting ) {
+			if (!$this->apiSettings->contains($apiSetting)) {
 				$this->apiSettings->add($apiSetting);
 				$apiSetting->setAccount($this);
 			}
@@ -488,10 +543,10 @@ class Account
 	 *
 	 * @return void
 	 */
-	public function addApiSettings (ArrayCollection $apiSettings)
+	public function addApiSettings(ArrayCollection $apiSettings)
 	{
-		foreach ($apiSettings as $apiSetting) {
-			if (! $this->apiSettings->contains($apiSetting)) {
+		foreach ( $apiSettings as $apiSetting ) {
+			if (!$this->apiSettings->contains($apiSetting)) {
 				$this->apiSettings->add($apiSetting);
 				$apiSetting->setAccount($this);
 			}
@@ -504,9 +559,9 @@ class Account
 	 *
 	 * @return Account
 	 */
-	public function removeApiSettings (ArrayCollection $apiSettings)
+	public function removeApiSettings(ArrayCollection $apiSettings)
 	{
-		foreach ($apiSettings as $apiSetting) {
+		foreach ( $apiSettings as $apiSetting ) {
 			if ($this->apiSettings->contains($apiSetting)) {
 				$this->apiSettings->removeElement($apiSetting);
 				$apiSetting->setAccount(null);
@@ -516,7 +571,65 @@ class Account
 		return $this;
 	}
 
-	public function __toString ()
+	/**
+	 *
+	 * @param bool $ac        	
+	 *
+	 * @return Collection $reports
+	 */
+	public function getReports($ac = false)
+	{
+		return $ac ? $this->reports : $this->reports->getValues();
+	}
+
+	/**
+	 *
+	 * @param Collection $reports        	
+	 *
+	 * @return Account
+	 */
+	public function setReports($reports)
+	{
+		$this->reports = $reports;
+		return $this;
+	}
+
+	/**
+	 * Add reports to the account.
+	 *
+	 * @param Collection $reports        	
+	 *
+	 * @return void
+	 */
+	public function addReports(Collection $reports)
+	{
+		foreach ( $reports as $report ) {
+			if (!$this->reports->contains($report)) {
+				$this->reports->add($report);
+				$report->setAccount($this);
+			}
+		}
+	}
+
+	/**
+	 *
+	 * @param Collection $reports        	
+	 *
+	 * @return Account
+	 */
+	public function removeReports(Collection $reports)
+	{
+		foreach ( $reports as $report ) {
+			if ($this->reports->contains($report)) {
+				$this->reports->removeElement($report);
+				$report->setAccount(null);
+			}
+		}
+		
+		return $this;
+	}
+
+	public function __toString()
 	{
 		return $this->getName();
 	}
