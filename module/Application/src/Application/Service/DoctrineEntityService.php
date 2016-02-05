@@ -1,5 +1,7 @@
 <?php
+
 namespace Application\Service;
+
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
@@ -12,16 +14,14 @@ use Doctrine\ORM\EntityRepository;
  * @author arstropica
  *        
  */
-class DoctrineEntityService implements ServiceManagerAwareInterface, 
-		EventManagerAwareInterface
-{
-
+class DoctrineEntityService implements ServiceManagerAwareInterface, EventManagerAwareInterface {
+	
 	protected $serviceManager;
-
+	
 	protected $eventManager;
-
+	
 	protected $entityManager;
-
+	
 	protected $entityRepository;
 
 	/**
@@ -29,33 +29,36 @@ class DoctrineEntityService implements ServiceManagerAwareInterface,
 	 *
 	 * @return EntityRepository
 	 */
-	public function findAll ()
+	public function findAll()
 	{
-		$entities = [];
-		$this->getEventManager()->trigger(__FUNCTION__ . '.pre', $this, 
-				array(
-						'entities' => $entities
-				));
-		$entities = $this->getEntityRepository()->findAll();
-		$this->getEventManager()->trigger(__FUNCTION__ . '.post', $this, 
-				array(
-						'entities' => $entities
-				));
+		$entities = [ ];
+		$this->getEventManager()
+			->trigger(__FUNCTION__ . '.pre', $this, array (
+				'entities' => $entities 
+		));
+		$entities = $this->getEntityRepository()
+			->findAll();
+		$this->getEventManager()
+			->trigger(__FUNCTION__ . '.post', $this, array (
+				'entities' => $entities 
+		));
 		return $entities;
 	}
 
-	public function find ($id)
+	public function find($id)
 	{
-		return $this->getEntityRepository()->find($id);
+		return $this->getEntityRepository()
+			->find($id);
 	}
 
-	public function findByQuery (\Closure $query)
+	public function findByQuery(\Closure $query)
 	{
-		$queryBuilder = $this->getEntityRepository()->createQueryBuilder(
-				'entity');
+		$queryBuilder = $this->getEntityRepository()
+			->createQueryBuilder('entity');
 		$currentQuery = call_user_func($query, $queryBuilder);
 		// \Zend\Debug\Debug::dump($currentQuery->getQuery());
-		return $currentQuery->getQuery()->getResult();
+		return $currentQuery->getQuery()
+			->getResult();
 	}
 
 	/**
@@ -64,18 +67,20 @@ class DoctrineEntityService implements ServiceManagerAwareInterface,
 	 * @param Entity $entity        	
 	 * @return Entity
 	 */
-	public function persist ($entity)
+	public function persist($entity)
 	{
-		$this->getEventManager()->trigger(__FUNCTION__ . '.pre', $this, 
-				array(
-						'entity' => $entity
-				));
-		$this->getEntityManager()->persist($entity);
-		$this->getEntityManager()->flush();
-		$this->getEventManager()->trigger(__FUNCTION__ . '.post', $this, 
-				array(
-						'entity' => $entity
-				));
+		$this->getEventManager()
+			->trigger(__FUNCTION__ . '.pre', $this, array (
+				'entity' => $entity 
+		));
+		$this->getEntityManager()
+			->persist($entity);
+		$this->getEntityManager()
+			->flush();
+		$this->getEventManager()
+			->trigger(__FUNCTION__ . '.post', $this, array (
+				'entity' => $entity 
+		));
 		
 		return $entity;
 	}
@@ -85,7 +90,7 @@ class DoctrineEntityService implements ServiceManagerAwareInterface,
 	 * @param \Doctrine\ORM\EntityRepository $entityRepository        	
 	 * @return \Haushaltportal\Service\DoctrineEntityService
 	 */
-	public function setEntityRepository (EntityRepository $entityRepository)
+	public function setEntityRepository(EntityRepository $entityRepository)
 	{
 		$this->entityRepository = $entityRepository;
 		return $this;
@@ -96,7 +101,7 @@ class DoctrineEntityService implements ServiceManagerAwareInterface,
 	 * @param EntityManager $entityManager        	
 	 * @return \Haushaltportal\Service\DoctrineEntityService
 	 */
-	public function setEntityManager (EntityManager $entityManager)
+	public function setEntityManager(EntityManager $entityManager)
 	{
 		$this->entityManager = $entityManager;
 		return $this;
@@ -106,7 +111,7 @@ class DoctrineEntityService implements ServiceManagerAwareInterface,
 	 *
 	 * @return EntityManager
 	 */
-	public function getEntityManager ()
+	public function getEntityManager()
 	{
 		return $this->entityManager;
 	}
@@ -117,7 +122,7 @@ class DoctrineEntityService implements ServiceManagerAwareInterface,
 	 * @param EventManagerInterface $eventManager        	
 	 * @return \Haushaltportal\Service\DoctrineEntityService
 	 */
-	public function setEventManager (EventManagerInterface $eventManager)
+	public function setEventManager(EventManagerInterface $eventManager)
 	{
 		$this->eventManager = $eventManager;
 		return $this;
@@ -129,7 +134,7 @@ class DoctrineEntityService implements ServiceManagerAwareInterface,
 	 *
 	 * @return EventManagerInterface
 	 */
-	public function getEventManager ()
+	public function getEventManager()
 	{
 		return $this->eventManager;
 	}
@@ -140,7 +145,7 @@ class DoctrineEntityService implements ServiceManagerAwareInterface,
 	 * @param ServiceManager $serviceManager        	
 	 * @return \Haushaltportal\Service\DoctrineEntityService
 	 */
-	public function setServiceManager (ServiceManager $serviceManager)
+	public function setServiceManager(ServiceManager $serviceManager)
 	{
 		$this->serviceManager = $serviceManager;
 		return $this;
@@ -151,7 +156,7 @@ class DoctrineEntityService implements ServiceManagerAwareInterface,
 	 *
 	 * @return ServiceManager
 	 */
-	public function getServiceManager ()
+	public function getServiceManager()
 	{
 		return $this->serviceManager;
 	}
