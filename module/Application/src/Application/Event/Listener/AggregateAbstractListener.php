@@ -1,5 +1,7 @@
 <?php
+
 namespace Application\Event\Listener;
+
 use Zend\EventManager\ListenerAggregateInterface;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\SharedEventManager;
@@ -14,30 +16,30 @@ use Event\Entity\ErrorEvent;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
 use Application\Hydrator\Strategy\MaybeSerializableStrategy;
+use Lead\Entity\Lead;
 
 /**
  *
  * @author arstropica
  *        
  */
-abstract class AggregateAbstractListener implements ListenerAggregateInterface
-{
+abstract class AggregateAbstractListener implements ListenerAggregateInterface {
 	
 	use EntityManagerAwareTrait, ServiceLocatorAwareTrait;
-
+	
 	/**
 	 *
 	 * @var \Zend\Stdlib\CallbackHandler[]
 	 */
-	protected $listeners = array();
-
+	protected $listeners = array ();
+	
 	/**
 	 *
 	 * @var \Event\Entity\Event
 	 */
 	protected $event;
 
-	public function __construct (ServiceLocatorInterface $serviceLocator)
+	public function __construct(ServiceLocatorInterface $serviceLocator)
 	{
 		$this->setServiceLocator($serviceLocator);
 	}
@@ -47,11 +49,11 @@ abstract class AggregateAbstractListener implements ListenerAggregateInterface
 	 *
 	 * @see \Zend\EventManager\ListenerAggregateInterface::detach()
 	 */
-	public function detach (EventManagerInterface $events)
+	public function detach(EventManagerInterface $events)
 	{
-		foreach ($this->listeners as $index => $listener) {
+		foreach ( $this->listeners as $index => $listener ) {
 			if ($events->detach($listener)) {
-				unset($this->listeners[$index]);
+				unset($this->listeners [$index]);
 			}
 		}
 	}
@@ -62,82 +64,116 @@ abstract class AggregateAbstractListener implements ListenerAggregateInterface
 	 * @see \Zend\EventManager\ListenerAggregateInterface::attach()
 	 *
 	 */
-	public function attach (EventManagerInterface $events)
+	public function attach(EventManagerInterface $events)
 	{}
 
-	public function _attachStateful (SharedEventManager $sm, $target, $method)
+	public function _attachStateful(SharedEventManager $sm, $target, $method)
 	{
 		$i = 100;
-		foreach ([
+		foreach ( [ 
 				'pre' => 'pre',
 				'' => 'on',
-				'post' => 'post'
-		] as $prefix => $state) {
+				'post' => 'post' 
+		] as $prefix => $state ) {
 			try {
 				if (method_exists($this, $prefix . $method)) {
 					
-					$this->listeners[] = $sm->attach($target, 
-							"{$method}.{$state}", 
-							array(
-									$this,
-									$prefix . $method
-							), $i);
+					$this->listeners [] = $sm->attach($target, "{$method}.{$state}", array (
+							$this,
+							$prefix . $method 
+					), $i);
 				}
-			} catch (\Exception $e) {}
+			} catch ( \Exception $e ) {
+			}
 			$i -= 100;
 		}
 	}
 
-	protected function dispatch ($entity, $event, $data = [])
+	protected function dispatch($entity, $event, $data = [], $updateEntity = false)
 	{
 		$valid = false;
-		$base = $this->getEvent($data['action'], $data['message']);
+		$base = $this->getEvent($data ['action'], $data ['message']);
 		$eventName = basename(str_replace('\\', '/', get_class($event)));
-		$entityName = is_object($entity) ? basename(
-				str_replace('\\', '/', get_class($entity))) : false;
+		$entityName = is_object($entity) ? basename(str_replace('\\', '/', get_class($entity))) : false;
 		
 		if ($base && $event) {
 			$event->setEvent($base);
 			
 			switch ($entityName) {
-				case 'Account':
+				case 'Account' :
 					switch ($eventName) {
-						case 'AccountEvent':
+						case 'AccountEvent' :
 							$event->setAccount($entity);
 							$valid = true;
 							break;
-						case 'ErrorEvent':
+						case 'ErrorEvent' :
 							$valid = true;
 							break;
 					}
 					break;
-				case 'Api':
+				case 'Api' :
 					switch ($eventName) {
-						case 'ApiEvent':
+						case 'ApiEvent' :
 							$event->setApi($entity);
 							$valid = true;
 							break;
-						case 'ErrorEvent':
+						case 'ErrorEvent' :
 							$valid = true;
 							break;
 					}
 					break;
-				case 'Lead':
-				default:
+				case 'Report' :
 					switch ($eventName) {
-						case 'TenStreetApiEvent':
-						case 'EmailApiEvent':
+						case 'ReportEvent' :
+							$event->setReport($entity);
+							$valid = true;
+							break;
+						case 'AccountEvent' :
 							$account = $entity->getAccount();
 							if ($account) {
-								$name = $eventName == 'EmailApiEvent' ? 'Email' : 'Tenstreet';
+								$event->setAccount($account);
+								$valid = true;
+							}
+							break;
+					}
+					break;
+				case 'Agent' :
+					switch ($eventName) {
+						case 'AgentEvent' :
+							$event->setAgent($entity);
+							$valid = true;
+							break;
+					}
+					break;
+				case 'Lead' :
+				default :
+					switch ($eventName) {
+						case 'TenStreetApiEvent' :
+						case 'WebWorksApiEvent' :
+						case 'EmailApiEvent' :
+							if ($updateEntity && $entity instanceof Lead) {
+								$entity->setLastsubmitted($base->getOccurred());
+							}
+							$account = $entity->getAccount();
+							if ($account) {
+								switch ($eventName) {
+									case 'EmailApiEvent' :
+										$name = 'Email';
+										break;
+									case 'WebWorksApiEvent' :
+										$name = 'WebWorks';
+										break;
+									case 'TenStreetApiEvent' :
+										$name = 'Tenstreet';
+										break;
+								}
 								$api = $account->findApi($name);
 								if ($api) {
 									$accountApiEvent = new AccountApiEvent();
 									$accountApiEvent->setEvent($base)
 										->setApi($api)
 										->setAccount($account);
-									$this->dispatch($entity, $accountApiEvent, 
-											$data);
+									$this->dispatch($entity, $accountApiEvent, $data);
 									// $apiEvent = new ApiEvent();
 									// $apiEvent->setEvent($base)->setApi($api);
 									// $this->dispatch($entity, $apiEvent,
@@ -147,22 +183,22 @@ abstract class AggregateAbstractListener implements ListenerAggregateInterface
 								$event->setAccount($account);
 							}
 							break;
-						case 'ErrorEvent':
+						case 'ErrorEvent' :
 							$valid = true;
 							break;
-						case 'LeadEvent':
+						case 'LeadEvent' :
 							$event->setLead($entity);
 							$account = $entity->getAccount();
 							if ($account) {
 								$accountEvent = new AccountEvent();
-								$accountEvent->setEvent($base)->setAccount(
-										$account);
+								$accountEvent->setEvent($base)
+									->setAccount($account);
 								$this->dispatch($entity, $accountEvent, $data);
 								$valid = true;
 							}
 							$valid = true;
 							break;
-						case 'AccountEvent':
+						case 'AccountEvent' :
 							$account = $entity->getAccount();
 							if ($account) {
 								$event->setAccount($account);
@@ -174,17 +210,14 @@ abstract class AggregateAbstractListener implements ListenerAggregateInterface
 			}
 			if ($valid) {
 				try {
-					$hydrator = new DoctrineHydrator($this->getEntityManager(), 
-							get_class($event));
+					$hydrator = new DoctrineHydrator($this->getEntityManager(), get_class($event));
 					
-					foreach ([
+					foreach ( [ 
 							'response',
-							'trace'
-					] as $serializable) {
-						if (method_exists($event, 
-								'get' . ucwords($serializable))) {
-							$hydrator->addStrategy($serializable, 
-									new MaybeSerializableStrategy());
+							'trace' 
+					] as $serializable ) {
+						if (method_exists($event, 'get' . ucwords($serializable))) {
+							$hydrator->addStrategy($serializable, new MaybeSerializableStrategy());
 						}
 					}
 					
@@ -192,7 +225,11 @@ abstract class AggregateAbstractListener implements ListenerAggregateInterface
 					$em = $this->getEntityManager();
 					$em->persist($event);
 					$em->flush();
-				} catch (\Exception $e) {
+					if ($updateEntity) {
+						$em->persist($entity);
+					}
+					$em->flush();
+				} catch ( \Exception $e ) {
 					// fail silently
 					return false;
 				}
@@ -210,12 +247,12 @@ abstract class AggregateAbstractListener implements ListenerAggregateInterface
 	 *
 	 * @return boolean
 	 */
-	public function OnError (ServiceEvent $e)
+	public function OnError(ServiceEvent $e)
 	{
-		$data = [];
-		$data['action'] = $e->getDescription();
-		$data['message'] = $e->getMessage();
-		$data['trace'] = $e->getResult();
+		$data = [ ];
+		$data ['action'] = $e->getDescription();
+		$data ['message'] = $e->getMessage();
+		$data ['trace'] = $e->getResult();
 		
 		return $this->dispatch(null, new ErrorEvent(), $data);
 	}
@@ -225,7 +262,7 @@ abstract class AggregateAbstractListener implements ListenerAggregateInterface
 	 * @param Event $event        	
 	 * @return AggregateAbstractListener
 	 */
-	protected function setEvent (Event $event)
+	protected function setEvent(Event $event)
 	{
 		$this->event = $event;
 		
@@ -236,7 +273,7 @@ abstract class AggregateAbstractListener implements ListenerAggregateInterface
 	 *
 	 * @return AggregateAbstractListener
 	 */
-	protected function clearEvent ()
+	protected function clearEvent()
 	{
 		$this->event = null;
 		
@@ -249,32 +286,31 @@ abstract class AggregateAbstractListener implements ListenerAggregateInterface
 	 * @param string $message        	
 	 * @return \Event\Entity\Event
 	 */
-	protected function getEvent ($action = null, $message = null)
+	protected function getEvent($action = null, $message = null)
 	{
-		if (! $this->event) {
-			if (! $action) {
+		if (!$this->event) {
+			if (!$action) {
 				$action = 'Unknown ' . get_called_class() . ' Event';
 			}
 			
-			if (! $message) {
+			if (!$message) {
 				$message = 'Unknown ' . get_called_class() . ' Event';
 			}
 			
-			$data = [
+			$data = [ 
 					'event' => $action,
 					'occurred' => new \DateTime('now'),
-					'message' => $message
+					'message' => $message 
 			];
 			try {
 				$event = new Event();
-				$hydrator = new DoctrineHydrator($this->getEntityManager(), 
-						get_class($event));
+				$hydrator = new DoctrineHydrator($this->getEntityManager(), get_class($event));
 				$event = $hydrator->hydrate($data, $event);
 				$entityManager = $this->getEntityManager();
 				$entityManager->persist($event);
 				$entityManager->flush();
 				$this->event = $event;
-			} catch (\Exception $e) {
+			} catch ( \Exception $e ) {
 				// fail silently
 				return false;
 			}
