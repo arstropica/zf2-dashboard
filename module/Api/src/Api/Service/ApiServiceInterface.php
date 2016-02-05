@@ -1,5 +1,7 @@
 <?php
+
 namespace Api\Service;
+
 use Zend\View\Model\JsonModel;
 
 /**
@@ -7,18 +9,19 @@ use Zend\View\Model\JsonModel;
  * @author arstropica
  *        
  */
-interface ApiServiceInterface
-{
+interface ApiServiceInterface {
 
 	/**
 	 * Send data to API using entity identifier.
 	 *
 	 * @param int $id
 	 *        	Entity Identifier
+	 * @param $service Name
+	 *        	of Active API
 	 *        	
 	 * @return JsonModel|array|boolean
 	 */
-	public function send ($id);
+	public function send($id, $service);
 
 	/**
 	 * Log Entity action Event
@@ -27,16 +30,17 @@ interface ApiServiceInterface
 	 *
 	 * @return void
 	 */
-	public function logEvent ($event);
+	public function logEvent($event);
 
 	/**
 	 * Get API Options for Entity
 	 *
 	 * @param int $id        	
+	 * @param string $service        	
 	 *
 	 * @return array
 	 */
-	public function getOptions ($id);
+	public function getOptions($id, $service);
 
 	/**
 	 * Get data to send.
@@ -45,14 +49,14 @@ interface ApiServiceInterface
 	 *
 	 * @return mixed $data
 	 */
-	public function getData ($id);
+	public function getData($id);
 
 	/**
 	 * Return response
 	 *
 	 * @param array $data        	
 	 */
-	public function respond ($data = null);
+	public function respond($data = null);
 
 	/**
 	 * Return Error Response
@@ -61,7 +65,7 @@ interface ApiServiceInterface
 	 *
 	 * @return array|JsonModel
 	 */
-	public function respondError (\Exception $e);
+	public function respondError(\Exception $e);
 
 	/**
 	 *
@@ -69,5 +73,5 @@ interface ApiServiceInterface
 	 *
 	 * @return array|JsonModel
 	 */
-	public function respondSuccess ($result);
+	public function respondSuccess($result);
 }

@@ -1,5 +1,7 @@
 <?php
+
 namespace Email\Service;
+
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Api\Service\ApiServiceInterface;
 use Zend\EventManager\EventManagerAwareInterface;
@@ -19,25 +21,23 @@ use Application\Provider\ServiceEventTrait;
  * @author arstropica
  *        
  */
-abstract class AbstractEmailService implements ServiceLocatorAwareInterface, 
-		ApiServiceInterface, EventManagerAwareInterface
-{
+abstract class AbstractEmailService implements ServiceLocatorAwareInterface, ApiServiceInterface, EventManagerAwareInterface {
 	
 	use EventManagerAwareTrait, ServiceLocatorAwareTrait, AuthorizationAwareTrait, EntityManagerAwareTrait, ServiceEventTrait;
-
+	
 	/**
 	 *
 	 * @var JSONErrorResponse
 	 */
 	protected $errorResponse;
-
+	
 	/**
 	 *
 	 * @var Lead
 	 */
 	protected $lead;
 
-	public function __construct (ServiceLocatorInterface $servicelocator)
+	public function __construct(ServiceLocatorInterface $servicelocator)
 	{
 		$this->setServiceLocator($servicelocator);
 		$this->errorResponse = $this->getServiceLocator()
@@ -53,7 +53,7 @@ abstract class AbstractEmailService implements ServiceLocatorAwareInterface,
 	 * @see \Api\Service\ApiServiceInterface::respondError()
 	 *
 	 */
-	public function respondError (\Exception $e)
+	public function respondError(\Exception $e)
 	{}
 
 	/**
@@ -62,7 +62,7 @@ abstract class AbstractEmailService implements ServiceLocatorAwareInterface,
 	 * @see \Api\Service\ApiServiceInterface::getOptions()
 	 *
 	 */
-	public function getOptions ($id)
+	public function getOptions($id, $service = 'Email')
 	{}
 
 	/**
@@ -71,7 +71,7 @@ abstract class AbstractEmailService implements ServiceLocatorAwareInterface,
 	 * @see \Api\Service\ApiServiceInterface::respond()
 	 *
 	 */
-	public function respond ($data = null)
+	public function respond($data = null)
 	{}
 
 	/**
@@ -80,7 +80,7 @@ abstract class AbstractEmailService implements ServiceLocatorAwareInterface,
 	 * @see \Api\Service\ApiServiceInterface::send()
 	 *
 	 */
-	public function send ($id)
+	public function send($id, $service = 'Email')
 	{}
 
 	/**
@@ -89,7 +89,7 @@ abstract class AbstractEmailService implements ServiceLocatorAwareInterface,
 	 * @see \Api\Service\ApiServiceInterface::respondSuccess()
 	 *
 	 */
-	public function respondSuccess ($result)
+	public function respondSuccess($result)
 	{}
 
 	/**
@@ -98,7 +98,7 @@ abstract class AbstractEmailService implements ServiceLocatorAwareInterface,
 	 * @see \Api\Service\ApiServiceInterface::getData()
 	 *
 	 */
-	public function getData ($id)
+	public function getData($id)
 	{}
 
 	/**
@@ -107,14 +107,14 @@ abstract class AbstractEmailService implements ServiceLocatorAwareInterface,
 	 * @see \Api\Service\ApiServiceInterface::logEvent()
 	 *
 	 */
-	public function logEvent ($event)
+	public function logEvent($event)
 	{}
 
 	/**
 	 *
 	 * @return \Application\Controller\Plugin\JSONErrorResponse
 	 */
-	public function getErrorResponse ()
+	public function getErrorResponse()
 	{
 		return $this->errorResponse;
 	}
@@ -123,7 +123,7 @@ abstract class AbstractEmailService implements ServiceLocatorAwareInterface,
 	 *
 	 * @param \Application\Controller\Plugin\JSONErrorResponse $errorResponse        	
 	 */
-	public function setErrorResponse ($errorResponse)
+	public function setErrorResponse($errorResponse)
 	{
 		$this->errorResponse = $errorResponse;
 	}
@@ -133,23 +133,23 @@ abstract class AbstractEmailService implements ServiceLocatorAwareInterface,
 	 *
 	 * @return boolean
 	 */
-	public function checkAuth ()
+	public function checkAuth()
 	{
-		if (! $this->authorize() && ! $this->isUserAuthorized()) {
+		if (!$this->authorize() && !$this->isUserAuthorized()) {
 			return false;
 		}
 		return true;
 	}
 
-	protected function getLead ($id, $extract = true)
+	protected function getLead($id, $extract = true)
 	{
 		$em = $this->getEntityManager();
 		
 		$lead = $this->lead;
-		if (! $lead) {
+		if (!$lead) {
 			$leadRepository = $em->getRepository("Lead\\Entity\\Lead");
-			$lead = $leadRepository->findOneBy([
-					'id' => $id
+			$lead = $leadRepository->findOneBy([ 
+					'id' => $id 
 			]);
 			$this->setLead($lead);
 		}
@@ -167,36 +167,36 @@ abstract class AbstractEmailService implements ServiceLocatorAwareInterface,
 	 *
 	 * @param \Lead\Entity\Lead $lead        	
 	 */
-	public function setLead ($lead)
+	public function setLead($lead)
 	{
 		$this->lead = $lead;
 	}
 
-	protected function getBody ($leadData, $html = true)
+	protected function getBody($leadData, $html = true)
 	{
-		$data = [];
+		$data = [ ];
 		$content = "";
 		
-		foreach ($leadData as $property => $asset) {
+		foreach ( $leadData as $property => $asset ) {
 			if ($asset) {
 				switch ($property) {
-					case 'id':
-					case 'referrer':
-						$data['summary'][$property] = $asset;
+					case 'id' :
+					case 'referrer' :
+						$data ['summary'] [$property] = $asset;
 						break;
-					case 'ipaddress':
-						$data['summary']["IP Address"] = $asset;
+					case 'ipaddress' :
+						$data ['summary'] ["IP Address"] = $asset;
 						break;
-					case 'timecreated':
-						$data['summary']["Time Created"] = date_format($asset, 
-								'Y-m-d H:i:s');
+					case 'timecreated' :
+						$data ['summary'] ["Time Created"] = date_format($asset, 'Y-m-d H:i:s');
 						break;
-					case 'account':
-						$data['summary'][$property] = $asset->getName();
+					case 'account' :
+						$data ['summary'] [$property] = $asset->getName();
 						break;
-					case 'attributes':
-						foreach ($asset as $attributeValue) {
-							$data['details'][$attributeValue->getAttribute()->getAttributeDesc()] = $attributeValue->getValue();
+					case 'attributes' :
+						foreach ( $asset as $attributeValue ) {
+							$data ['details'] [$attributeValue->getAttribute()
+								->getAttributeDesc()] = $attributeValue->getValue();
 						}
 						break;
 				}
@@ -233,9 +233,9 @@ TEXT;
 				$TR = "%1\$s : %2\$s\r\n";
 			}
 			$outline = "";
-			foreach ($data as $section => $values) {
+			foreach ( $data as $section => $values ) {
 				$inline = "";
-				foreach ($values as $property => $value) {
+				foreach ( $values as $property => $value ) {
 					$inline .= sprintf($TR, ucwords($property), $value);
 				}
 				$outline .= sprintf($table, ucwords($section), $inline);

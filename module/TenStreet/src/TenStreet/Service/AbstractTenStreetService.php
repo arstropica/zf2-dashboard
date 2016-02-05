@@ -1,5 +1,7 @@
 <?php
+
 namespace TenStreet\Service;
+
 use User\Provider\AuthorizationAwareTrait;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Api\Service\ApiServiceInterface;
@@ -20,285 +22,267 @@ use Application\Provider\ServiceEventTrait;
  * @author arstropica
  *        
  */
-abstract class AbstractTenStreetService implements ServiceLocatorAwareInterface, 
-		ApiServiceInterface, EventManagerAwareInterface
-{
+abstract class AbstractTenStreetService implements ServiceLocatorAwareInterface, ApiServiceInterface, EventManagerAwareInterface {
 	
 	use EventManagerAwareTrait, ServiceLocatorAwareTrait, AuthorizationAwareTrait, easyXMLTrait, ServiceEventTrait;
-
+	
 	/**
 	 *
 	 * @var JSONErrorResponse
 	 */
 	protected $errorResponse;
-
+	
 	/**
 	 *
 	 * @var array
 	 */
 	protected $wsdl;
-
+	
 	/**
 	 *
 	 * @var string
 	 */
 	protected $env;
-
+	
 	/**
 	 *
 	 * @var Client
 	 */
 	protected $client;
-
+	
 	/**
 	 *
 	 * @var string
 	 */
 	protected $rootNode;
-
+	
 	/**
 	 *
 	 * @var TenStreetData
 	 */
 	protected $tenStreetData;
 	
-	public function __construct (ServiceLocatorInterface $servicelocator)
-	{
-		$this->setServiceLocator($servicelocator);
-		$this->errorResponse = $this->getServiceLocator()->get('ControllerPluginManager')->get(
-				'getJsonErrorResponse');
-		$this->errorResponse->setMode('array');
-		$this->setServiceEvent(new ServiceEvent('TenStreet', $this));
+	public function __construct(ServiceLocatorInterface $servicelocator) {
+		$this->setServiceLocator( $servicelocator );
+		$this->errorResponse = $this->getServiceLocator()
+			->get( 'ControllerPluginManager' )
+			->get( 'getJsonErrorResponse' );
+		$this->errorResponse->setMode( 'array' );
+		$this->setServiceEvent( new ServiceEvent( 'TenStreet', $this ) );
 	}
-
+	
 	/**
 	 *
 	 * @return the $errorResponse
 	 */
-	public function getErrorResponse ()
-	{
+	public function getErrorResponse() {
 		return $this->errorResponse;
 	}
-
+	
 	/**
 	 *
 	 * @param \Application\Controller\Plugin\JSONErrorResponse $errorResponse        	
 	 */
-	public function setErrorResponse ($errorResponse)
-	{
+	public function setErrorResponse($errorResponse) {
 		$this->errorResponse = $errorResponse;
 	}
-
+	
 	/**
 	 * (non-PHPdoc)
 	 *
 	 * @see \Api\Service\ApiServiceInterface::send()
 	 */
-	public function send ($id)
-	{}
-
+	public function send($id, $service) {
+	}
+	
 	/**
 	 * (non-PHPdoc)
 	 *
 	 * @see \Api\Service\ApiServiceInterface::logEvent()
 	 */
-	public function logEvent ($event)
-	{}
-
+	public function logEvent($event) {
+	}
+	
 	/**
 	 * (non-PHPdoc)
 	 *
 	 * @see \Api\Service\ApiServiceInterface::getOptions()
 	 */
-	public function getOptions ($id)
-	{}
-
+	public function getOptions($id, $service) {
+	}
+	
 	/**
 	 * (non-PHPdoc)
 	 *
 	 * @see \Api\Service\ApiServiceInterface::getData()
 	 */
-	public function getData ($id)
-	{}
-
+	public function getData($id) {
+	}
+	
 	/**
 	 * (non-PHPdoc)
 	 *
 	 * @see \Api\Service\ApiServiceInterface::respond()
 	 */
-	public function respond ($data = null)
-	{}
-
+	public function respond($data = null) {
+	}
+	
 	/**
 	 * (non-PHPdoc)
 	 *
 	 * @see \Api\Service\ApiServiceInterface::respondError()
 	 */
-	public function respondError (\Exception $e)
-	{}
-
+	public function respondError(\Exception $e) {
+	}
+	
 	/**
 	 * (non-PHPdoc)
 	 *
 	 * @see \Api\Service\ApiServiceInterface::respondSuccess()
 	 */
-	public function respondSuccess ($result)
-	{}
-
+	public function respondSuccess($result) {
+	}
+	
 	/**
 	 *
 	 * @param string $env        	
 	 *
 	 * @return string $wsdl
 	 */
-	public function getWsdl ()
-	{
+	public function getWsdl() {
 		if (! $this->wsdl) {
-			$config = $this->getServiceLocator()->get('Config');
-			$this->setWsdl(
-					$config['TenStreet']['Controller']['SoapClient']['wsdl']);
+			$config = $this->getServiceLocator()
+				->get( 'Config' );
+			$this->setWsdl( $config ['TenStreet'] ['Controller'] ['SoapClient'] ['wsdl'] );
 		}
-		return $this->wsdl[$this->getEnv()];
+		return $this->wsdl [$this->getEnv()];
 	}
-
+	
 	/**
 	 *
 	 * @param string $wsdl        	
 	 */
-	public function setWsdl ($wsdl)
-	{
+	public function setWsdl($wsdl) {
 		$this->wsdl = $wsdl;
 	}
-
+	
 	/**
 	 *
 	 * @return the $env
 	 */
-	public function getEnv ()
-	{
+	public function getEnv() {
 		if (! $this->env) {
-			$this->setEnv(getenv('APPLICATION_ENV') ?  : 'development');
+			$this->setEnv( getenv( 'APPLICATION_ENV' ) ?  : 'development' );
 		}
 		return $this->env;
 	}
-
+	
 	/**
 	 *
 	 * @param string $env        	
 	 */
-	public function setEnv ($env)
-	{
+	public function setEnv($env) {
 		$this->env = $env;
 	}
-
+	
 	/**
 	 *
 	 * @return the $client
 	 */
-	public function getClient ()
-	{
+	public function getClient() {
 		if (! $this->client) {
-			$clientOptions = array(
+			$clientOptions = array (
 					'compression' => SOAP_COMPRESSION_ACCEPT,
 					'soap_version' => SOAP_1_1,
-					'connection_timeout' => 5
+					'connection_timeout' => 5 
 			);
 			
-			$client = new Client($this->getWsdl($this->getEnv()), $clientOptions);
-			$this->setClient($client);
+			$client = new Client( $this->getWsdl( $this->getEnv() ), $clientOptions );
+			$this->setClient( $client );
 		}
 		
 		return $this->client;
 	}
-
+	
 	/**
 	 *
 	 * @param \Zend\Soap\Client $client        	
 	 */
-	public function setClient ($client)
-	{
+	public function setClient($client) {
 		$this->client = $client;
 	}
-
+	
 	/**
 	 *
 	 * @return the $rootNode
 	 */
-	public function getRootNode ()
-	{
+	public function getRootNode() {
 		if (! $this->rootNode) {
-			$config = $this->getServiceLocator()->get('Config');
-			$this->setRootNode(
-					$config['TenStreet']['Controller']['SoapClient']['rootNode']);
+			$config = $this->getServiceLocator()
+				->get( 'Config' );
+			$this->setRootNode( $config ['TenStreet'] ['Controller'] ['SoapClient'] ['rootNode'] );
 		}
 		return $this->rootNode;
 	}
-
+	
 	/**
 	 *
 	 * @param string $rootNode        	
 	 */
-	public function setRootNode ($rootNode)
-	{
+	public function setRootNode($rootNode) {
 		$this->rootNode = $rootNode;
 	}
-
+	
 	/**
 	 *
 	 * @return the $tenStreetData
 	 */
-	public function getTenStreetData ()
-	{
+	public function getTenStreetData() {
 		return $this->tenStreetData;
 	}
-
+	
 	/**
 	 *
 	 * @param \TenStreet\Entity\TenStreetData $tenStreetData        	
 	 */
-	public function setTenStreetData ($tenStreetData)
-	{
+	public function setTenStreetData($tenStreetData) {
 		$this->tenStreetData = $tenStreetData;
 	}
-
+	
 	/**
 	 * Check Authorization
 	 *
 	 * @return boolean
 	 */
-	public function checkAuth ()
-	{
+	public function checkAuth() {
 		if (! $this->authorize() && ! $this->isUserAuthorized()) {
 			return false;
 		}
 		return true;
 	}
-
+	
 	/**
 	 *
 	 * @return TenStreetDataMapper
 	 */
-	protected function getTenStreetDataMapper ()
-	{
+	protected function getTenStreetDataMapper() {
 		$sm = $this->getServiceLocator();
-		return $sm->get('TenStreetDataMapper');
+		return $sm->get( 'TenStreetDataMapper' );
 	}
-
-	protected function parse ($response)
-	{
-		$result = array(
-				'submitted' => 0
+	
+	protected function parse($response) {
+		$result = array (
+				'submitted' => 0 
 		);
 		
-		if (isset($response['TenstreetResponse'])) {
-			$r = $response['TenstreetResponse'];
-			$result['lastresponse'] = $r['Description'];
-			if (isset($r['Status'])) {
-				$result['submitted'] = $r['Status'] == 'Accepted' ? 1 : 0;
-				if ($result['submitted']) {
-					$result['timesubmitted'] = date('Y-m-d H:i:s', 
-							strtotime($r['DateTime']));
-					$result['driverid'] = $r['DriverId'];
+		if (isset( $response ['TenstreetResponse'] )) {
+			$r = $response ['TenstreetResponse'];
+			$result ['lastresponse'] = $r ['Description'];
+			if (isset( $r ['Status'] )) {
+				$result ['submitted'] = $r ['Status'] == 'Accepted' ? 1 : 0;
+				if ($result ['submitted']) {
+					$result ['timesubmitted'] = date( 'Y-m-d H:i:s', strtotime( $r ['DateTime'] ) );
+					$result ['driverid'] = $r ['DriverId'];
 				}
 			}
 		}
