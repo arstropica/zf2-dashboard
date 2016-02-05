@@ -1,4 +1,5 @@
 <?php
+
 namespace Account\Entity\Repository;
 
 /**
@@ -8,10 +9,11 @@ namespace Account\Entity\Repository;
  */
 use Doctrine\ORM\EntityRepository;
 
-class AccountRepository extends EntityRepository
-{
+class AccountRepository extends EntityRepository {
+	
+	CONST CACHE_PREFIX = 'account-';
 
-	public function getDescriptions ($number = 0)
+	public function getDescriptions($number = 0)
 	{
 		$dql = <<<DQL
 		SELECT 
@@ -21,28 +23,29 @@ class AccountRepository extends EntityRepository
 		ORDER BY a.description ASC
 DQL;
 		
-		$query = $this->getEntityManager()->createQuery($dql);
+		$query = $this->getEntityManager()
+			->createQuery($dql);
 		if ($number) {
 			$query->setMaxResults($number);
 		}
 		
 		$query->useQueryCache(true);
-		$query->useResultCache(true, 3600, md5($dql));
+		$query->useResultCache(true, 3600, self::CACHE_PREFIX . md5($dql));
 		
 		$results = $query->getResult();
 		$no_account = new \Account\Entity\Account();
 		$no_account->setDescription('Unassigned');
 		$no_account->setId('none');
-		$accounts = [
-				'none' => $no_account
+		$accounts = [ 
+				'none' => $no_account 
 		];
-		foreach ($results as $result) {
-			$accounts[$result->getDescription()] = $result;
+		foreach ( $results as $result ) {
+			$accounts [$result->getDescription()] = $result;
 		}
 		return $accounts;
 	}
 
-	public function getNames ($number = 0)
+	public function getNames($number = 0)
 	{
 		$dql = <<<DQL
 		SELECT 
@@ -52,28 +55,29 @@ DQL;
 		ORDER BY a.name ASC
 DQL;
 		
-		$query = $this->getEntityManager()->createQuery($dql);
+		$query = $this->getEntityManager()
+			->createQuery($dql);
 		if ($number) {
 			$query->setMaxResults($number);
 		}
 		
 		$query->useQueryCache(true);
-		$query->useResultCache(true, 3600, md5($dql));
+		$query->useResultCache(true, 3600, self::CACHE_PREFIX . md5($dql));
 		
 		$results = $query->getResult();
 		$no_account = new \Account\Entity\Account();
 		$no_account->setName('Unassigned');
 		$no_account->setId('none');
-		$accounts = [
-				'none' => $no_account
+		$accounts = [ 
+				'none' => $no_account 
 		];
-		foreach ($results as $result) {
-			$accounts[$result->getName()] = $result;
+		foreach ( $results as $result ) {
+			$accounts [$result->getName()] = $result;
 		}
 		return $accounts;
 	}
 
-	public function getAccounts ()
+	public function getAccounts()
 	{
 		$dql = <<<DQL
 		SELECT
@@ -83,30 +87,29 @@ DQL;
 		ORDER BY a.name ASC
 DQL;
 		
-		$query = $this->getEntityManager()->createQuery($dql);
+		$query = $this->getEntityManager()
+			->createQuery($dql);
 		
 		$query->useQueryCache(true);
-		$query->useResultCache(true, 3600, md5($dql));
+		$query->useResultCache(true, 3600, self::CACHE_PREFIX . md5($dql));
 		
 		$results = $query->getResult();
-		$accounts = [];
-		foreach ($results as $result) {
-			$accounts[$result->getId()] = $result;
+		$accounts = [ ];
+		foreach ( $results as $result ) {
+			$accounts [$result->getId()] = $result;
 		}
 		return $accounts;
 	}
 
-	public function getArrayAccounts ($property = 'name')
+	public function getArrayAccounts($property = 'name')
 	{
 		$accounts = $this->getAccounts();
-		return array_map(
-				function  ($account) use( $property)
-				{
-					return $account->{'get' . ucfirst($property)}();
-				}, array_values($accounts));
+		return array_map(function ($account) use($property) {
+			return $account->{'get' . ucfirst($property)}();
+		}, array_values($accounts));
 	}
 
-	public function getAvailableLeads ($number = 0)
+	public function getAvailableLeads($number = 0)
 	{
 		$dql = <<<DQL
 		SELECT
@@ -117,15 +120,16 @@ DQL;
 			l.account IS NULL
 DQL;
 		
-		$query = $this->getEntityManager()->createQuery($dql);
+		$query = $this->getEntityManager()
+			->createQuery($dql);
 		
 		$query->useQueryCache(true);
-		$query->useResultCache(true, 3600, md5($dql));
+		$query->useResultCache(true, 3600, self::CACHE_PREFIX . md5($dql));
 		
 		$results = $query->getResult();
-		$leads = [];
-		foreach ($results as $result) {
-			$leads[$result->getId()] = $result;
+		$leads = [ ];
+		foreach ( $results as $result ) {
+			$leads [$result->getId()] = $result;
 		}
 		return $leads;
 	}
