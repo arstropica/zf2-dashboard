@@ -1,5 +1,7 @@
 <?php
+
 namespace Event\Entity;
+
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -8,9 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  * @ORM\Table(name="events")
  */
-class Event
-{
-
+class Event {
+	
 	/**
 	 *
 	 * @var integer @ORM\Column(name="id", type="integer", nullable=false)
@@ -18,21 +19,21 @@ class Event
 	 *      @ORM\GeneratedValue(strategy="IDENTITY")
 	 */
 	protected $id;
-
+	
 	/**
 	 *
 	 * @var string @ORM\Column(name="event", type="string", length=45,
 	 *      nullable=false)
 	 */
 	protected $event;
-
+	
 	/**
 	 *
 	 * @var \DateTime @ORM\Column(name="occurred", type="datetime",
 	 *      nullable=false)
 	 */
 	protected $occurred;
-
+	
 	/**
 	 *
 	 * @var string @ORM\Column(name="message", type="text", length=65535,
@@ -45,7 +46,7 @@ class Event
 	 *
 	 * @return integer
 	 */
-	public function getId ()
+	public function getId()
 	{
 		return $this->id;
 	}
@@ -57,7 +58,7 @@ class Event
 	 *
 	 * @return Event
 	 */
-	public function setId ($id)
+	public function setId($id)
 	{
 		$this->id = $id;
 		
@@ -69,7 +70,7 @@ class Event
 	 *
 	 * @return string
 	 */
-	public function getEvent ()
+	public function getEvent()
 	{
 		return $this->event;
 	}
@@ -81,7 +82,7 @@ class Event
 	 *
 	 * @return Event
 	 */
-	public function setEvent ($event)
+	public function setEvent($event)
 	{
 		$this->event = $event;
 		
@@ -95,7 +96,7 @@ class Event
 	 *
 	 * @return Event
 	 */
-	public function setOccurred ($occurred)
+	public function setOccurred($occurred)
 	{
 		$this->occurred = $occurred;
 		
@@ -107,7 +108,7 @@ class Event
 	 *
 	 * @return \DateTime
 	 */
-	public function getOccurred ()
+	public function getOccurred()
 	{
 		return $this->occurred;
 	}
@@ -119,7 +120,7 @@ class Event
 	 *
 	 * @return Event
 	 */
-	public function setMessage ($message)
+	public function setMessage($message)
 	{
 		$this->message = $message;
 		
@@ -131,10 +132,8 @@ class Event
 	 *
 	 * @return string
 	 */
-	public function getMessage ()
+	public function getMessage()
 	{
 		return $this->message;
-		
-		return $this;
 	}
 }
