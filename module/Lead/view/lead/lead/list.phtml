@@ -17,109 +17,183 @@ $this->headTitle($title);
 </h1>
 <hr class="small">
 <br />
-<div class="row">
+<div class="row formtable-header">
 	<div class="col-xs-12">
-		<div class="view-header row">
-			<div class="col-xs-12">
-				<div class="formtable-header pull-right">
+		<div class="row pager-control">
+			<div class="col-xs-6">
+				<div class="pager-header pull-left">
+							<?php echo $this->form($this->pager, FormHelper::LAYOUT_HORIZONTAL); ?>
+						</div>
+			</div>
+			<div class="col-xs-6">
+				<div class="total-item-count pull-right">
+							<?php echo $this->paginatorPosition($this->paginator); ?>
+						</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-xs-12 visible-xs">
+		<div class="form-control-group row">
+			<div class="col-sm-12 col-md-2">
+				<label class="inline">Filters: </label>
+			</div>
+			<div class="col-sm-12 col-md-10">
+				<div class="form-filter">
 					<?php
 					if (isset($this->filters)) {
 						$filters = $this->filters;
 						
-						$filters->setAttribute('class', 'pull-right leadform');
+						$filters->setAttribute('class', 'leadform');
 						
 						$filters->setAttribute('id', 'leadFilterForm');
 						
-						echo $this->form(null, 
-								\Application\Form\View\Helper\Form::LAYOUT_INLINE)->openTag(
-								$filters);
+						echo $this->form(null, \Application\Form\View\Helper\Form::LAYOUT_INLINE)
+							->openTag($filters);
 						
-						foreach ($filters as $filter) {
+						foreach ( $filters as $filter ) {
 							echo $this->formRow($filter);
 						}
 						
-						echo $this->form()->closeTag($filter);
+						echo $this->form()
+							->closeTag($filter);
 					}
 					?>
 				</div>
-				<div class="pager-header pull-left">
-					<?php echo $this->form($this->pager, FormHelper::LAYOUT_HORIZONTAL); ?>
+			</div>
+		</div>
+	</div>
+	<div class="col-xs-12 hidden">
+		<?php
+		if (isset($this->hiddenFilters)) {
+			$hiddenFilters = $this->hiddenFilters;
+			
+			echo $this->form(null, \Application\Form\View\Helper\Form::LAYOUT_INLINE)
+				->openTag($hiddenFilters);
+			
+			foreach ( $hiddenFilters as $filter ) {
+				echo $this->formElement($filter);
+			}
+			
+			echo $this->form()
+				->closeTag($hiddenFilters);
+		}
+		?>
+	</div>
+</div>
+<div class="row">
+	<?php
+	$form = $this->form;
+	$form->setAttribute('class', 'leadform');
+	$form->setAttribute('id', 'leadForm');
+	$form->prepare();
+	echo $this->form(null, \Application\Form\View\Helper\Form::LAYOUT_INLINE)
+		->openTag($form);
+	?>
+	<div class="batchleadsForm clearfix col-xs-12">
+		<div class="form-control-group row">
+			<div class="col-sm-12 col-md-2">
+				<label class="inline">Bulk Actions: </label>
+			</div>
+			<div class="col-sm-12 col-md-10">
+				<div class="bulk-actions">
+					<?php echo $this->formRow($form->get('account')); ?>
+					<?php echo $this->formRow($form->get('bulk_action')); ?>
+					<?php echo $this->formRow($form->get('submit')); ?>
 				</div>
 			</div>
 		</div>
-		<div class="batchleadsForm clearfix">
-			<?php
-			$form = $this->form;
-			$form->setAttribute('class', 'leadform');
-			$form->setAttribute('id', 'leadForm');
-			$form->prepare();
-			echo $this->form(null, 
-					\Application\Form\View\Helper\Form::LAYOUT_INLINE)->openTag(
-					$form);
-			?>
-			<hr class="small">
-			<div class="batch-assign-header clearfix">
-				<?php echo $this->formRow($form->get('account')); ?>
-				<?php echo $this->formRow($form->get('bulk_action')); ?>
-				<?php echo $this->formRow($form->get('submit')); ?>
-				<div class="total-item-count pull-right">
-					<?php echo $this->paginatorPosition($this->paginator); ?>
-				</div>
-			</div>
-			<table class="table table-hover table-striped sel" id="leadstable">
-				<thead>
-					<tr>
-						<th class="lead.id col-xs-1"><input type="checkbox" class="selall"></th>
+	</div>
+	<div class="col-xs-12">
+		<table class="table table-hover table-striped sel" id="leadstable">
+			<thead>
+				<tr>
 				<?php
-				foreach ($this->ui['table'] as $field => $ui) :
+				foreach ( $this->ui ['table'] as $field => $ui ) :
 					$selected = $this->sort == $field;
 					$rorder = $this->order == 'asc' ? 'desc' : 'asc';
 					?>
 				<th class="col-xs-<?php echo $ui['col']; ?> <?php echo $field; ?>">
+				<?php if ($field == 'description') : ?>
+					<input type="checkbox" class="selall">&nbsp;&nbsp;
+				<?php endif; ?>
 				<?php if ($ui['sort']) : ?>
 				<a class="sort <?php if ($selected) : echo "selected"; endif; ?>"
-							title="Sort by <?php echo $ui['label']; ?>"
-							href="<?php echo $this->url('lead', array('action' => 'list'), array('query' => array_merge($this->query, array('page' => $this->page, 'sort' => $field, 'order' => ($selected ? $rorder : $this->order)))), true); ?>">
-								<span>
+						title="Sort by <?php echo $ui['label']; ?>"
+						href="<?php echo $this->url('lead', array('action' => 'list'), array('query' => array_merge($this->query, array('page' => $this->page, 'sort' => $field, 'order' => ($selected ? $rorder : $this->order)))), true); ?>">
+							<span>
 				<?php echo $ui['label']; ?> <span
-									class="glyphicon <?php echo $this->order; ?>"
-									aria-hidden="true"></span>
-							</span>
-						</a>
+								class="glyphicon <?php echo $this->order; ?>" aria-hidden="true"></span>
+						</span>
+					</a>
 				<?php else: echo $ui['label']; endif; ?>
 				</th>
 				<?php endforeach; ?>
-				<th class="action col-xs-1 text-right">Action</th>
-					</tr>
-				</thead>
-				<tbody>
+				<th class="action col-xs-2 text-right">Action</th>
+				</tr>
+				<?php $filterFieldset = $form->get('filters'); ?>
+				<tr class="column-filters hidden-xs">
+					<?php foreach ( $this->ui ['table'] as $field => $ui ) : ?>
+						<?php if ($filterFieldset->has($field)) : ?>
+							<th class="col-xs-<?php echo $ui['col']; ?>"><?php echo $this->formElement($filterFieldset->get($field)); ?></th>
+						<?php else: ?>
+							<th class="col-xs-<?php echo $ui['col']; ?>"></th>
+						<?php endif; ?>
+					<?php endforeach; ?>
+					<th class="action col-xs-2 text-right"><?php echo $this->formElement($filterFieldset->get('reset')); ?> <?php echo $this->formElement($filterFieldset->get('filter')); ?></th>
+				</tr>
+			</thead>
+			<tbody>
 	    		<?php foreach ($this->paginator as $entity):?>
-	        		<tr class="leaditem">
-						<td class="lead.id col-xs-1"><div class="checkbox"><?php echo $this->formElement($form->get("sel[" . $entity->getId() . "]")); ?></div></td>
-						<td class="col-xs-3 description"><a
-							href="<?php echo $this->losUrl()->from('lead/view',['id'=>$entity->getId()], true)?>"><?php echo $entity->getFullName(); ?></a></td>
-						<td class="col-xs-2 account"><?php $account = $entity->getAccount(); echo $account ? '<a href="' . $this->url('account/view', ['action'=>'view', 'id' => $account->getId()]) . '">' . $account->getName() . '</a>' : 'None'; ?></td>
-						<td class="col-xs-3 source"><a
-							href="<?php echo $entity->getReferrer(); ?>"><?php echo $entity->getReferrer(); ?></a></td>
-						<td class="col-xs-2 date"><?php echo date_format($entity->getTimecreated(), 'd M, Y h:i A') ?></td>
-						<td class="action col-xs-1 text-right"><a
-							href="<?php echo $this->losUrl()->from('lead/view',['id'=>$entity->getId()], true)?>"
-							title="View Lead" class="btn btn-xs btn-info"><?php echo $this->losIcon('glyphicon-eye-open') ?></a>
-							<a
-							href="<?php echo $this->losUrl()->from('lead/edit',['id'=>$entity->getId()], true)?>"
-							title="Edit Lead" class="btn btn-xs btn-warning"><?php echo $this->losIcon('glyphicon-edit') ?></a>
-						</td>
-					</tr>
+	        	<tr class="leaditem">
+					<td class="col-xs-2 description">
+						<div class="checkbox"><?php echo $this->formElement($form->get("sel[" . $entity->getId() . "]")); ?></div>&nbsp;&nbsp;
+						<a
+						href="<?php echo $this->losUrl()->from('lead/view',['id'=>$entity->getId()], true)?>"><?php echo $entity->getFullName(); ?></a>
+					</td>
+					<td class="col-xs-2 account"><?php $account = $entity->getAccount(); echo $account ? '<a href="' . $this->url('account/view', ['action'=>'view', 'id' => $account->getId()]) . '">' . $account->getName() . '</a>' : 'None'; ?></td>
+					<td class="col-xs-2 source"><a
+						href="<?php echo $entity->getReferrer(); ?>"><?php echo $entity->getReferrer(); ?></a></td>
+					<td class="col-xs-2 updated"><?php $lastSubmitted = $entity->getLastsubmitted(); if ($lastSubmitted) echo date_format($lastSubmitted, 'd M, Y h:i A') ?></td>
+					<td class="col-xs-2 date"><?php echo date_format($entity->getTimecreated(), 'd M, Y h:i A') ?></td>
+					<td class="action col-xs-2 text-right"><a
+						href="<?php echo $this->losUrl()->from('lead/view',['id'=>$entity->getId()], true)?>"
+						title="View Lead" class="btn btn-xs btn-info"><?php echo $this->losIcon('glyphicon-eye-open') ?></a>
+						<a
+						href="<?php echo $this->losUrl()->from('lead/edit',['id'=>$entity->getId()], true)?>"
+						title="Edit Lead" class="btn btn-xs btn-warning"><?php echo $this->losIcon('glyphicon-edit') ?></a>
+					</td>
+				</tr>
 				<?php endforeach;?>
 				</tbody>
-			</table>
-			<hr>
-			<?php echo $this->form()->closeTag(); ?>
-		</div>
+		</table>
 	</div>
+	<?php echo $this->form()->closeTag(); ?>
 </div>
 <?php if ($this->paginator->count() > 1):?>
 <div class="row">
 	<div class="col-xs-12 text-center"><?php echo $this->losPaginationControl($this->paginator,'Sliding',null,['query'=>$this->query]); ?></div>
 </div>
 <?php endif?>
+<?php echo $this->losHeadLink()->setBasePath('/js')->appendChosen()?>
+<?php echo $this->losHeadScript()->setBasePath('/js')->appendChosen()?>
+<?php echo $this->headScript()->appendFile('/js/typeahead.bundle.js')?>
+
+<script type="text/javascript">
+<?php echo "var query = " . json_encode($this->query) . ";"; ?>
+$(function(){
+	$('SELECT.leadFilter:visible, #accountfilter, #referrerfilter').initChosen({
+		max: 1,
+		resize: true
+	});
+	$(window).load(function(){
+		$('.column-filters .form-group-daterange .form-control').each(function(){
+			var id = $(this).prop('id').replace(/Filter/, '');
+			if (query[id] === undefined || ! query[id]) {
+				$(this).initDaterange({
+					autoUpdateInput: false
+				});
+			}
+		});
+	});
+});
+</script>
