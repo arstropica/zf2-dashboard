@@ -2,30 +2,21 @@
 /**
  * Zend Framework (http://framework.zend.com/)
  *
- * @link      http://github.com/zendframework/Account for the canonical source repository
+ * @link      http://github.com/zendframework/Agent for the canonical source repository
  * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
+
 $additionalNamespaces = $additionalModulePaths = $moduleDependencies = null;
 
 $rootPath = realpath(dirname(__DIR__));
 $testsPath = "$rootPath/tests";
+
 if (is_readable($testsPath . '/TestConfiguration.php')) {
 	require_once $testsPath . '/TestConfiguration.php';
 } else {
 	require_once $testsPath . '/TestConfiguration.php.dist';
 }
-
-$modules_path = realpath(dirname(dirname(__DIR__)));
-
-$additionalModulePaths = array (
-		$modules_path . '/Application' 
-);
-
-$additionalNamespaces = array (
-		'Application\Controller' => $modules_path . '/Application/src/Application/Controller',
-		'Application\Provider' => $modules_path . '/Application/src/Application/Provider' 
-);
 
 $path = array (
 		ZF2_PATH,
