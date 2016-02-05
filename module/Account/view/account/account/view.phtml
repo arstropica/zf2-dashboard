@@ -1,9 +1,7 @@
 <?php
 // module/Account/view/account/account/view.phtml:
-/**
- *
- * @var /Account/Entity/Account
- */
+
+/* @var $entity \Account\Entity\Account */
 $entity = $this->entity;
 $title = $entity->getName();
 $this->headTitle($title);
@@ -20,10 +18,18 @@ $this->headTitle($title);
 <span class="pull-right" style="margin-left: 15px;"> <a
 		class="btn btn-info"
 		href="<?php echo $this->url('account', array('action'=>'list'));?>">Back</a>
-	</span> <span class="pull-right"> <a
-		href="<?php echo $this->url('account/application/api/edit', 
-				['action' => 'edit', 'id' => $entity->getId()]); ?>" 
+	</span> <span class="pull-right" style="margin-left: 15px;"> <a
+		href="<?php
+		
+		echo $this->url('account/application/api/edit', [ 
+				'action' => 'edit',
+				'id' => $entity->getId() 
+		]);
+		?>"
 		class="btn btn-success" title="API Settings">API Settings</a>
+	</span> <span class="pull-right"> <a class="btn btn-primary"
+		href="<?php echo $this->url('report/add', array('action'=>'add'), array('query' => array('account' => $entity->getId())));?>">Add
+			Report</a>
 	</span>
 </h1>
 <hr class="small">
@@ -33,6 +39,7 @@ $leads = $entity->getLeads();
 $leads = array_slice($leads, 0, 10);
 $events = $entity->getEvents();
 $events = array_slice($events, 0, 10);
+$reports = $entity->getReports();
 ?>
 <div class="row content-row">
 	<div class="col-xs-12">
@@ -84,9 +91,9 @@ $events = array_slice($events, 0, 10);
 						<tr>
 						<th><?php echo ucwords($api->getName()); ?></th>
 						<td><?php echo $api->getDescription(); ?></td>
-						<td><a
+						<!-- <td><a
 							href="<?php echo $this->url('api/edit', ['id' => $api->getId()]); ?>"
-							title="API Options">Edit</a></td>
+							title="API Options">Edit</a></td> -->
 					</tr>
 					<?php endforeach; ?>
 				</table>
@@ -108,16 +115,19 @@ $events = array_slice($events, 0, 10);
 					class="table table-hover inline-table table-condensed nomargin">
 					<thead>
 						<tr>
+							<th class="col-xs-8 lead.referrer">Name</th>
 							<th class="col-xs-8 lead.referrer">Referrer</th>
-							<th class="col-xs-4 lead.date">Date</th>
+							<th class="col-xs-4 lead.date">Submitted</th>
 						</tr>
 					</thead>
 					<tbody>
 					<?php foreach ($leads as $lead) : ?>
 						<tr>
-							<td class="col-xs-8 lead.referrer"><a target="_blank"
+							<td class="col-xs-3 lead.name"><a
+								href="<?php echo $this->url('lead/view', array('action'=>'view', 'id' => $lead->getId()),[], true); ?>"><?php echo $lead->getFullName(); ?></a></td>
+							<td class="col-xs-5 lead.referrer"><a target="_blank"
 								href="<?php echo $lead->getReferrer(); ?>"><?php echo $lead->getReferrer(); ?></a></td>
-							<td class="col-xs-4 lead.date"><?php echo date_format($lead->getTimecreated(), 'd M, Y h:i A'); ?></td>
+							<td class="col-xs-4 lead.activity"><?php $lastSubmitted = $lead->getLastsubmitted();  if ($lastSubmitted) echo date_format($lead->getLastsubmitted(), 'd M, Y h:i A'); ?></td>
 						</tr>
 					<?php endforeach; ?>
 					</tbody>
@@ -130,6 +140,52 @@ $events = array_slice($events, 0, 10);
 			</div>
 		</div>
 	</div>
+	<?php foreach ($reports as $report) : $results = $report->getResults(false, 10); if ($results) : ?>
+	<div class="col-md-12">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+						<?php echo $this->translate('Lead Intelligence Report: "<a title="Edit Report" href="' . $this->url('report/edit', array('action' => 'edit', 'id' => $report->getId())) . '">' . $report->getName() . '</a>"')?>
+					</h3>
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover table-condensed nomargin">
+					<tr>
+						<th>Score</th>
+						<th>Name</th>
+						<th>Account</th>
+					</tr>
+						<?php
+			
+			/* @var $result \Report\Entity\Result */
+			foreach ( $results as $result ) :
+				if ($result) :
+					$lead = $result->getLead();
+					if ($lead && $lead instanceof \Lead\Entity\Lead) :
+						$_account = $lead->getAccount();
+						?>
+						<tr>
+						<td><?php echo $result->getScore(); ?></td>
+						<td><a
+							href="<?php echo $this->losUrl()->from('lead/view', ['id' => $lead->getId(), 'action' => 'view']); ?>"><?php echo $lead->getFullName(); ?></a></td>
+						<td><?php if ($_account) : ?><a
+							href="<?php echo $this->losUrl()->from('account/view', ['id' => $_account->getId(), 'action' => 'view']); ?>"><?php echo $_account->getName(); ?></a><?php else: ?>None<?php endif; ?></td>
+					</tr>
+						<?php endif; endif; endforeach; ?>
+					</table>
+			</div>
+			<?php if (count($results) >= 10) : ?>
+			<div class="panel-footer">
+				<p>
+					<a
+						href="<?php echo $this->url('report/application/result/list', array('action' => 'list', 'id' => $report->getId())); ?>">View
+						More</a>
+				</p>
+			</div>
+			<?php endif; ?>
+		</div>
+	</div>
+	<?php endif; endforeach; ?>
 	<div class="col-md-12">
 		<div class="panel panel-default">
 			<div class="panel-heading">
