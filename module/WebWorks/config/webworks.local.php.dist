@@ -1,0 +1,14 @@
+<?php
+return array(
+		'WebWorks' => array(
+				'Controller' => array(
+						'Client' => array(
+								'rootNode' => 'WebWorksData',
+								'endpoint' => array(
+										'development' => 'DEV wsdl',
+										'production' => 'PROD wsdl'
+								)
+						)
+				),
+		)
+);
