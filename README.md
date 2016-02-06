@@ -11,7 +11,7 @@ Import the SQL file in the /data directory to create the Database Schema. Copy/r
 
 Details
 ------------
-The application uses [ZF-OAuth2](https://github.com/zfcampus/zf-oauth2) for API access control and authorization, and [ZFCUSer](https://github.com/ZF-Commons/ZfcUser) and [BjYAuthorize](https://github.com/bjyoungblood/BjyAuthorize) for front-end access control and [Doctrine2](https://github.com/doctrine/doctrine2) for ORM mapping. 
+The application uses [ZF-OAuth2](https://github.com/zfcampus/zf-oauth2) for API access control and authorization, and [ZFCUSer](https://github.com/ZF-Commons/ZfcUser) and [BjYAuthorize](https://github.com/bjyoungblood/BjyAuthorize) for front-end access control, [Doctrine2](https://github.com/doctrine/doctrine2) for ORM mapping and [Elastica](https://github.com/ruflin/Elastica) for variable field searching. 
 
 Web server setup
 ----------------
