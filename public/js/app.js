@@ -775,7 +775,7 @@ $.fn.collapseMenu = function(options) {
 			if (this.id) {
 				var key = this.id + "_collapse_folded";
 				var folded = Cookies.get(key);
-				if (folded) {
+				if (folded === 'true' || folded === true) {
 					$(this).closest('BODY').addClass('folded');
 				} else {
 					$(this).closest('BODY').removeClass('folded');
