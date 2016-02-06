@@ -18,7 +18,14 @@
     "doctrine/doctrine-orm-module" : "0.9.2",
     "doctrine/orm" : "v2.5.1",
     "zendframework/zftool" : "dev-master",
-    "phpunit/phpunit" : "4.8.18"
+    "phpunit/phpunit" : "4.8.18",
+    "doctrine/search" : "dev-master",
+    "elasticsearch/elasticsearch" : "v2.0.3",
+    "jms/serializer" : "1.1.0",
+    "ruflin/elastica" : "dev-master",
+    "igorw/event-source" : "1.0.*",
+    "ghunti/highcharts-php" : "v3.0.2",
+    "wiredmedia/doctrine-extensions" : "v0.1"
   },
   "require-dev" : {
     "zendframework/zend-developer-tools" : "dev-master",
