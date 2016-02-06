@@ -1,37 +1,24 @@
 <?php
 $http = 'http';
-if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
+if (isset($_SERVER ['HTTPS']) && $_SERVER ['HTTPS'] == 'on') {
 	$http = 'https';
 }
 
 if ($this->code) {
-    printf("<h2>The authentication code is %s</h2>", $this->code);
-    printf("<p>Use this code to request an access token.</p>");
-    printf("For instance, using <a href=\"https://github.com/jkbr/httpie\">HTTPie</a>:</p> ");
-    printf(
-        "<p>http POST %s grant_type=authorization_code code=%s redirect_uri=%s client_id=testclient client_secret=testpass</p>",
-        $this->serverUrl('/oauth'),
-        $this->code,
-        '/oauth/receivecode'
-    );
-    printf("<p>or using <a href=\"http://curl.haxx.se/docs/manpage.html\">CURL</a>:</p>");
-    printf(
-        "<p>curl -u testclient:testpass %s -d 'grant_type=authorization_code&code=%s&redirect_uri=%s'</p>",
-        $this->serverUrl('/oauth'),
-        $this->code,
-        '/oauth/receivecode'
-    );
-    printf("<p>or</p>");
-    printf(
-        '<p>curl -H "Content-Type: application/json" -X POST -d \'{"redirect_uri":"%s","client_id":"testclient","client_secret":"testpass","code":"%s","grant_type":"authorization_code"}\' %s</p>',
-        '/oauth/receivecode',
-        $this->code,
-        $this->serverUrl('/oauth')
-    );
- } else {
- 	printf("<h2>You have been authorized.</h2><p><a href='javascript:window.close();'>Close Window</a></p>");
-    // printf("<h2>The access token is <a onclick=\"showAccessToken();\" id=\"access_token\">(Click here to read the token from URL fragment)</a></h2>");
-?>
+	printf("<h2>The authentication code is %s</h2>", $this->code);
+	printf("<p>Use this code to request an access token.</p>");
+	printf("For instance, using <a href=\"https://github.com/jkbr/httpie\">HTTPie</a>:</p> ");
+	printf("<p>http POST %s grant_type=authorization_code code=%s redirect_uri=%s client_id=testclient client_secret=testpass</p>", $this->serverUrl('/oauth'), $this->code, '/oauth/receivecode');
+	printf("<p>or using <a href=\"http://curl.haxx.se/docs/manpage.html\">CURL</a>:</p>");
+	printf("<p>curl -u testclient:testpass %s -d 'grant_type=authorization_code&code=%s&redirect_uri=%s'</p>", $this->serverUrl('/oauth'), $this->code, '/oauth/receivecode');
+	printf("<p>or</p>");
+	printf('<p>curl -H "Content-Type: application/json" -X POST -d \'{"redirect_uri":"%s","client_id":"testclient","client_secret":"testpass","code":"%s","grant_type":"authorization_code"}\' %s</p>', '/oauth/receivecode', $this->code, $this->serverUrl('/oauth'));
+} else {
+	printf("<h2>You have been authorized.</h2><p><a href='javascript:window.close();'>Close Window</a></p>");
+	// printf("<h2>The access token is <a onclick=\"showAccessToken();\"
+	// id=\"access_token\">(Click here to read the token from URL
+	// fragment)</a></h2>");
+	?>
 <script type="text/javascript">
     // function to parse fragment parameters
     var parseQueryString = function( queryString ) {
