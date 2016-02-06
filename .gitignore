@@ -14,3 +14,4 @@ composer.phar
 /deployment.properties
 /deployment.xml
 /bower_components/
+/composer.lock
