@@ -14,23 +14,25 @@ updateChart = function(data) {
 		if (info) {
 			var status = info.status !== undefined ? info.status : false;
 			if (status == 'running') {
-				var layer = info.layer !== undefined ? info.layer : false;
-				switch (layer) {
-					case 'elastica':
-						if (typeof info.count !== undefined) {
-							chart.series[0].update({
-								data : [ info.count ]
-							});
-						}
-						break;
-					case 'doctrine':
-						if (typeof info.count !== undefined) {
-							chart.yAxis.update({
-								max : info.count
-							});
-						}
-						break;
-				}
+				try {
+					var layer = info.layer !== undefined ? info.layer : false;
+					switch (layer) {
+						case 'elastica':
+							if (typeof info.count !== undefined) {
+								chart.series[0].update({
+									data : [ info.count ]
+								});
+							}
+							break;
+						case 'doctrine':
+							if (typeof info.count !== undefined) {
+								chart.yAxis.update({
+									max : info.count
+								});
+							}
+							break;
+					}
+				} catch (e) {}
 			}
 		}
 	}
