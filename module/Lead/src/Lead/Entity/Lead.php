@@ -77,12 +77,18 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	 * @var string @ORM\Column(name="ipaddress", type="string", length=15,
 	 *      nullable=false)
 	 *      @Annotation\Exclude()
-	 *      @JMS\Type("string")
+	 */
+	private $ipaddress;
+	
+	/**
+	 *
+	 * @var string @JMS\Type("string")
 	 *      @JMS\Expose @JMS\Groups({"list", "details"})
 	 *      @MAP\ElasticField(type="ip", includeInAll=true, index="no",
 	 *      store=true, nullValue=null)
+	 *     
 	 */
-	private $ipaddress;
+	private $ipv4address;
 	
 	/**
 	 *
@@ -310,6 +316,30 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	public function getIpaddress()
 	{
 		return $this->ipaddress;
+	}
+
+	/**
+	 * Set ipv4address
+	 *
+	 * @param string $ipv4address        	
+	 *
+	 * @return Lead
+	 */
+	public function setIpv4address($ipv4address)
+	{
+		$this->ipv4address = $ipv4address;
+		
+		return $this;
+	}
+
+	/**
+	 * Get ipv4address
+	 *
+	 * @return string
+	 */
+	public function getIpv4address()
+	{
+		return $this->ipv4address;
 	}
 
 	/**
