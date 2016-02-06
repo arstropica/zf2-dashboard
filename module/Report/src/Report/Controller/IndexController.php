@@ -129,7 +129,7 @@ class IndexController extends AbstractCrudController implements CacheAwareInterf
 				'data' => 'Init Build.' 
 		]);
 		
-		ob_end_clean();
+		if (ob_get_contents()) ob_end_clean();
 		ignore_user_abort(true);
 		header("Connection: Keep-Alive");
 		$size = ob_get_length();
