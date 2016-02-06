@@ -231,6 +231,24 @@ class Helper {
 		}
 		return $text;
 	}
+
+	/**
+	 *
+	 * Validate IPv4 Address
+	 *
+	 * @param string $ip        	
+	 * @param bool $return        	
+	 *
+	 * @return bool|string
+	 */
+	public static function validate_ipv4($ip, $return = true)
+	{
+		if ($return) {
+			return filter_var($ip, FILTER_VALIDATE_IP);
+		} else {
+			return (!filter_var($ip, FILTER_VALIDATE_IP) === false);
+		}
+	}
 }
 
 ?>
