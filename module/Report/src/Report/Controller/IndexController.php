@@ -123,7 +123,7 @@ class IndexController extends AbstractCrudController implements CacheAwareInterf
 	public function buildAction()
 	{
 		set_time_limit(0);
-		ini_set('max_input_time', '3600');
+		ini_set('max_input_time', '36000');
 		session_write_close();
 		echo json_encode([ 
 				'data' => 'Init Build.' 
