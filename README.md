@@ -37,6 +37,9 @@ CRUD operations and submit lead information to API/Email.
 ### Account - Account
 CRUD operations for Client Accounts
 
+### Agent - ElasticSearch
+Implementation of ElasticSearch Query and Filter functionality for data search.
+
 ### API - Api
 CRUD Operations for APIs
 
@@ -51,6 +54,12 @@ SOAP Client for data submission to TenStreet API.
 
 ### Email - SendMail
 SendMail Service for email functionality.
+
+### Reports - Search
+Provides UI && business logic for Search Agent
+
+### WebWorks - CURL
+CURL client for data submission to WebWorks API.
 
 ### User - User
 ORM Entities and configuration for user access and role capability.
