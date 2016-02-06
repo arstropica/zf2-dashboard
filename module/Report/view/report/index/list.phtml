@@ -1,0 +1,125 @@
+<?php
+$title = 'Index Manager';
+$this->headTitle($title);
+$elastica = $this->elastica;
+/* @var $chart \Ghunti\HighchartsPHP\Highchart */
+$chart = $this->chart;
+$this->headScript()
+	->appendFile("https://code.highcharts.com/highcharts.js")
+	->appendFile('https://code.highcharts.com/highcharts-more.js')
+	->appendFile("https://code.highcharts.com/modules/solid-gauge.js")
+	->appendFile('/js/report.js');
+
+$this->headlink()
+	->appendStylesheet("http://netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css");
+?>
+<h1>Index Manager</h1>
+<hr>
+
+<div class="row flex-container">
+	<div class="col-xs-12 eventsource es-wrap elastica-index flex-item">
+		<div class="panel with-nav-tabs panel-info">
+			<div class="panel-heading">
+				<ul class="nav nav-tabs">
+					<?php foreach ($elastica['indices'] as $index => $types) : ?>
+					<li class="<?php echo ($index == 'reports') ? 'active' : ''; ?>"><a
+						href="#<?php echo $index; ?>-tab" data-toggle="tab"><?php echo ucwords($index); ?> Index</a></li>
+					<?php endforeach; ?>
+					<li><a href="#attributes-tab" data-toggle="tab">Attributes</a></li>
+				</ul>
+			</div>
+			<div class="panel-body">
+				<div class="tab-content">
+					<?php foreach ($elastica['indices'] as $index => $types) : ?>
+					<div
+						class="tab-pane fade <?php echo ($index == 'reports') ? ' in active' : ''; ?>"
+						id="<?php echo $index; ?>-tab">
+						<div class="row flex-container">
+								<?php foreach ($types as $type) : ?>
+									<div
+								class="eventsource es-wrap elastica-type col-xs-12 col-md-6 flex-item">
+								<div class="panel panel-default es-wrap">
+									<div class="panel-body">
+										<div id="<?php echo "{$index}_{$type}"; ?>" class="highchart"
+											style="height: 300px"></div>
+									</div>
+									<div class="panel-footer">
+										<input class="index" type="hidden"
+											value="<?php echo $index; ?>" /> <input class="type"
+											type="hidden" value="<?php echo $type; ?>" />
+										<button class="btn btn-success rebuild pull-right has-spinner"
+											data-index="<?php echo $index; ?>"
+											data-type="<?php echo $type; ?>">
+											<span class="spinner"><i class="icon-spin icon-refresh"></i></span>
+											Rebuild
+										</button>
+										<button class="btn btn-default cancel pull-left hidden">Cancel</button>
+										<div class="clearfix"></div>
+									</div>
+								</div>
+								<!-- .panel -->
+							</div>
+							<!-- .col -->
+							<script type="text/javascript">
+										$(function(){
+											buildChart('<?php echo $index; ?>', '<?php echo $type; ?>');
+										});
+									</script>
+								<?php endforeach; ?>
+								</div>
+						<!-- .row -->
+						<hr>
+						<input class="index" type="hidden" value="<?php echo $index; ?>" />
+						<button class="btn btn-primary rebuildall has-spinner"
+							data-index="<?php echo $index; ?>">
+							<span class="spinner"><i class="icon-spin icon-refresh"></i></span>
+							Reindex All
+						</button>
+						<div class="clearfix"></div>
+					</div>
+					<!-- .tab-pane -->
+					<?php endforeach; ?>
+					<div class="tab-pane fade" id="attributes-tab">
+						<table class="table table-hover table-striped table-condensed"
+							id="questionstable">
+							<thead>
+								<tr>
+									<th class="col-xs-10">Attribute</th>
+									<th class="col-xs-2 text-right">Type</th>
+								</tr>
+							</thead>
+							<tbody>
+							<?php $attributeTypes = array_map('current', $this->doctrine['attributes']['types']); ?>
+				    		<?php foreach ($this->doctrine['attributes']['entities'] as $entity): ?>
+				        		<tr class="attributeitem"
+									id="<?php echo $entity->getId(); ?>">
+									<td class="col-xs-10 attributeDesc"><?php echo $entity->getAttributeDesc(); ?></td>
+									<td class="col-xs-2 attributeType text-right">
+										<?php $selected = ' selected="selected"'; $attributeType = $entity->getAttributeType(); ?>
+										<select data-id="<?php echo $entity->getId(); ?>">
+											<?php foreach ($attributeTypes as $type): ?>
+											<option value="<?php echo $type; ?>"
+												<?php echo $attributeType == $type ? $selected : ''; ?>><?php echo ucwords($type); ?></option>
+											<?php endforeach; ?>
+										</select>
+									</td>
+								</tr>
+							<?php endforeach;?>
+							</tbody>
+						</table>
+					</div>
+					<!-- .tab-pane -->
+				</div>
+				<!-- .tab-content -->
+			</div>
+			<!--  .panel-body -->
+		</div>
+		<!-- .panel -->
+	</div>
+	<!-- .col -->
+</div>
+<!-- .row -->
+<hr>
+<script type="application/json" id="gaugeOptions">
+	<?php echo $chart->renderOptions(); ?>
+</script>

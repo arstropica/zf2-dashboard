@@ -1,0 +1,21 @@
+<form method="post" name="formDelete"
+	action="<?php echo $this->losurl()->from('report/delete',[],true) ?>">
+	<input type="hidden" name="confirm" value="1">
+
+	<div class="row">
+		<div class="col-xs-12">
+			<p class="alert alert-danger">
+				Please, confirm the deletion of "<strong><?php echo $this->escapeHtml($this->entity->getName()) ?></strong>"?
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-xs-12">
+			<button type="submit" class="btn btn-danger">Confirm</button>
+			<a href="<?php echo $this->losurl()->from('report/list',[],true) ?>"
+				class="btn btn-default">Cancel</a>
+		</div>
+	</div>
+
+</form>

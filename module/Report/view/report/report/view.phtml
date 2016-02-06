@@ -1,0 +1,163 @@
+<?php
+// module/Report/view/report/lead/view.phtml:
+
+/* @var $entity \Report\Entity\Report */
+$entity = $this->entity;
+$title = 'View Report';
+$this->headTitle($title);
+?>
+<h1>
+<?php echo $this->escapeHtml($title); ?>
+	<span class="pull-right"> <a class="btn btn-info"
+		style="margin-left: 15px;"
+		href="<?php echo $this->losUrl()->from('report', ['action'=>'list'], true);?>">Back</a>
+	</span> <span class="pull-right"> <a class="btn btn-danger"
+		style="margin-left: 15px;"
+		href="<?php echo $this->url('report/delete', array('action'=>'delete', 'id' => $entity->getId()));?>">Delete
+			Report</a>
+	</span> <span class="pull-right"> <a class="btn btn-success"
+		href="<?php echo $this->url('report/edit', array('action'=>'edit', 'id' => $entity->getId()));?>">Edit
+			Report</a>
+	</span>
+</h1>
+<?php
+$agent = $entity->getAgent();
+$criteria = $agent ? $agent->getCriteria(false) : [ ];
+$account = $entity->getAccount();
+$events = $entity->getEvents();
+$results = $entity->getResults(false, 10);
+?>
+<div class="row content-row">
+	<div class="col-md-12">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<?php echo $this->translate('Report Summary')?>
+				</h3>
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover table-condensed nomargin">
+					<tr>
+						<th>Name</th>
+						<td><?php echo $entity->getName(); ?></td>
+					</tr>
+					<tr>
+						<th>Updated</th>
+						<td><?php echo date_format($entity->getUpdated(), 'd M, Y h:i A'); ?></td>
+					</tr>
+					<tr>
+						<th>Account</th>
+						<td><?php echo $account ? $account->getName() : 'None'; ?></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-12">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<?php echo $this->translate('Report Criteria')?>
+				</h3>
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover table-condensed nomargin">
+					<tr>
+						<th>Criterion</th>
+						<th>Condition</th>
+						<th>Weight</th>
+						<th>Required</th>
+					</tr>
+					<?php
+					
+					/* @var $criterion \Agent\Entity\AgentCriterion */
+					foreach ( $criteria as $criterion ) :
+						if ($criterion) :
+							$value = $criterion->getValue();
+							$relationship = $criterion->getRelationship();
+							if ($value && $relationship) :
+								?>
+					<tr>
+						<td><?php echo $value->__toString(); ?></td>
+						<td><?php echo $relationship->getDescription() . '(' . $relationship->getSymbol() . ')'; ?></td>
+						<td><?php echo $criterion->getWeight(); ?></td>
+						<td><?php echo $criterion->getRequired() ? 'Yes' : 'No'; ?></td>
+					</tr>
+					<?php endif; endif; endforeach; ?>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-12">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<?php echo $this->translate('Report Results')?>
+				</h3>
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover table-condensed nomargin">
+					<tr>
+						<th>Score</th>
+						<th>Name</th>
+						<th>Account</th>
+					</tr>
+					<?php
+					
+					/* @var $result \Report\Entity\Result */
+					foreach ( $results as $result ) :
+						if ($result) :
+							$lead = $result->getLead();
+							if ($lead && $lead instanceof \Lead\Entity\Lead) :
+								$_account = $lead->getAccount();
+								?>
+					<tr>
+						<td><?php echo $result->getScore(); ?></td>
+						<td><a
+							href="<?php echo $this->losUrl()->from('lead/view', ['id' => $lead->getId(), 'action' => 'view']); ?>"><?php echo $lead->getFullName(); ?></a></td>
+						<td><?php if ($_account) : ?><a
+							href="<?php echo $this->losUrl()->from('account/view', ['id' => $_account->getId(), 'action' => 'view']); ?>"><?php echo $_account->getName(); ?></a><?php else: ?>None<?php endif; ?></td>
+					</tr>
+					<?php endif; endif; endforeach; ?>
+				</table>
+			</div>
+			<?php if (count($results) > 10) : ?>
+				<div class="panel-footer">
+				<p>
+					<a
+						href="<?php echo $this->url('report/application/result/list', array('action' => 'list', 'id' => $entity->getId())); ?>">View
+						More</a>
+				</p>
+			</div>
+			<?php endif; ?>
+		</div>
+	</div>
+	<div class="col-md-12">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<?php echo $this->translate('Report History')?>
+				</h3>
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover table-condensed nomargin">
+					<thead>
+						<tr>
+							<th>Event</th>
+							<th>Message</th>
+							<th>Date</th>
+						</tr>
+					</thead>
+					<?php foreach ($events as $ev) : $event = $ev->getEvent(); ?>
+						<tr>
+						<th><?php echo $event->getEvent(); ?></th>
+						<td><?php echo $event->getMessage(); ?></td>
+						<td><?php echo date_format($event->getOccurred(), 'd M, Y h:i A'); ?></td>
+					</tr>
+					<?php endforeach; ?>
+				</table>
+			</div>
+		</div>
+	</div>
+
+</div>
