@@ -1,123 +1,123 @@
 <?php
 $env = getenv('APPLICATION_ENV') ?  : 'development';
-return array(
-		'controllers' => array(
-				'invokables' => array(
-						'User\Controller\User' => 'User\Controller\UserController',
-				)
+return array (
+		'controllers' => array (
+				'invokables' => array (
+						'User\Controller\User' => 'User\Controller\UserController' 
+				) 
 		),
-		'router' => array(
-				'routes' => array(
-						'gapi' => array(
+		'router' => array (
+				'routes' => array (
+						'gapi' => array (
 								'type' => 'Literal',
-								'options' => array(
+								'options' => array (
 										'route' => '/gapi',
-										'defaults' => array(
+										'defaults' => array (
 												'controller' => 'User\Controller\User',
-												'action' => 'index'
-										)
+												'action' => 'index' 
+										) 
 								),
 								'may_terminate' => true,
-								'child_routes' => array(
-										'auth' => array(
+								'child_routes' => array (
+										'auth' => array (
 												'type' => 'Literal',
-												'options' => array(
+												'options' => array (
 														'route' => '/auth',
-														'defaults' => array(
+														'defaults' => array (
 																'controller' => 'User\Controller\User',
-																'action' => 'auth'
-														)
-												)
+																'action' => 'auth' 
+														) 
+												) 
 										),
-										'token' => array(
+										'token' => array (
 												'type' => 'Literal',
-												'options' => array(
+												'options' => array (
 														'route' => '/token',
-														'defaults' => array(
+														'defaults' => array (
 																'controller' => 'User\Controller\User',
-																'action' => 'token'
-														)
+																'action' => 'token' 
+														) 
 												),
 												'may_terminate' => true,
-												'child_routes' => array(
-														'exchange' => array(
+												'child_routes' => array (
+														'exchange' => array (
 																'type' => 'Literal',
-																'options' => array(
+																'options' => array (
 																		'route' => '/exchange',
-																		'defaults' => array(
+																		'defaults' => array (
 																				'controller' => 'User\Controller\User',
-																				'action' => 'exchange'
-																		)
-																)
+																				'action' => 'exchange' 
+																		) 
+																) 
 														),
-														'refresh' => array(
+														'refresh' => array (
 																'type' => 'Literal',
-																'options' => array(
+																'options' => array (
 																		'route' => '/refresh',
-																		'defaults' => array(
+																		'defaults' => array (
 																				'controller' => 'User\Controller\User',
-																				'action' => 'refresh'
-																		)
-																)
+																				'action' => 'refresh' 
+																		) 
+																) 
 														),
-														'valid' => array(
+														'valid' => array (
 																'type' => 'Literal',
-																'options' => array(
+																'options' => array (
 																		'route' => '/valid',
-																		'defaults' => array(
+																		'defaults' => array (
 																				'controller' => 'User\Controller\User',
-																				'action' => 'valid'
-																		)
-																)
+																				'action' => 'valid' 
+																		) 
+																) 
 														),
-														'revoke' => array(
+														'revoke' => array (
 																'type' => 'Literal',
-																'options' => array(
+																'options' => array (
 																		'route' => '/revoke',
-																		'defaults' => array(
+																		'defaults' => array (
 																				'controller' => 'User\Controller\User',
-																				'action' => 'revoke'
-																		)
-																)
-														),
-												),
-										),
-								),
-						),
-				),
+																				'action' => 'revoke' 
+																		) 
+																) 
+														) 
+												) 
+										) 
+								) 
+						) 
+				) 
 		),
-		'view_manager' => array(
-				'display_exceptions' => true, // ($env == 'production') ? false : true,
-				'template_map' => array(
+		'view_manager' => array (
+				'display_exceptions' => true, // ($env == 'production') ? false :
+				                              // true,
+				'template_map' => array (
 						'error/403' => __DIR__ . '/../view/error/403.phtml',
-						'oauth/receive-code' => __DIR__ .
-								 '/../view/zf/auth/receive-code.phtml'
+						'oauth/receive-code' => __DIR__ . '/../view/zf/auth/receive-code.phtml' 
 				),
-				'template_path_stack' => array(
+				'template_path_stack' => array (
 						'zfcuser' => __DIR__ . '/../view',
-						'User' => __DIR__ . '/../view'
+						'User' => __DIR__ . '/../view' 
 				),
-				'strategies' => array(
-					'ViewJsonStrategy',
-				),
+				'strategies' => array (
+						'ViewJsonStrategy' 
+				) 
 		),
-		'doctrine' => array(
-				'driver' => array(
-						'User_driver' => array(
+		'doctrine' => array (
+				'driver' => array (
+						'User_driver' => array (
 								'class' => 'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
 								'cache' => 'array',
-								'paths' => array(
-										__DIR__ . '/../src/User/Entity/'
-								)
+								'paths' => array (
+										__DIR__ . '/../src/User/Entity/' 
+								) 
 						),
-						'orm_default' => array(
-								'drivers' => array(
-										'User\Entity' => 'User_driver'
-								)
-						)
-				)
+						'orm_default' => array (
+								'drivers' => array (
+										'User\Entity' => 'User_driver' 
+								) 
+						) 
+				) 
 		),
-		'zfcuser' => array(
+		'zfcuser' => array (
 				'table_name' => 'user',
 				'new_user_default_role' => 'user',
 				// telling ZfcUser to use our own class
@@ -126,16 +126,16 @@ return array(
 				'enable_default_entities' => false,
 				'enable_registration' => false,
 				'enable_username' => true,
-				'auth_adapters' => array(
-						100 => 'ZfcUser\Authentication\Adapter\Db'
+				'auth_adapters' => array (
+						100 => 'ZfcUser\Authentication\Adapter\Db' 
 				),
 				'use_redirect_parameter_if_present' => true,
-				'auth_identity_fields' => array(
-						'email'
-				)
+				'auth_identity_fields' => array (
+						'email' 
+				) 
 		),
 		
-		'bjyauthorize' => array(
+		'bjyauthorize' => array (
 				'default_role' => 'guest',
 				// Using the authentication identity provider, which basically
 				// reads the roles from the auth service's identity
@@ -143,279 +143,325 @@ return array(
 				
 				'authenticated_role' => 'user',
 				
-				'role_providers' => array(
+				'role_providers' => array (
 						// using an object repository (entity repository) to
 						// load all roles into our ACL
-						'BjyAuthorize\Provider\Role\ObjectRepositoryProvider' => array(
+						'BjyAuthorize\Provider\Role\ObjectRepositoryProvider' => array (
 								'object_manager' => 'doctrine.entitymanager.orm_default',
-								'role_entity_class' => 'User\Entity\Role'
-						)
+								'role_entity_class' => 'User\Entity\Role' 
+						) 
 				),
 				
-				'resource_providers' => array(
-						'BjyAuthorize\Provider\Resource\Config' => array(
-								'navigation' => [],
-								'resource' => []
-						)
+				'resource_providers' => array (
+						'BjyAuthorize\Provider\Resource\Config' => array (
+								'navigation' => [ ],
+								'resource' => [ ] 
+						) 
 				),
 				
-				'rule_providers' => array(
-						'BjyAuthorize\Provider\Rule\Config' => array(
-								'allow' => array(
-										array(
-												[
+				'rule_providers' => array (
+						'BjyAuthorize\Provider\Rule\Config' => array (
+								'allow' => array (
+										array (
+												[ 
 														'user',
 														'moderator',
-														'administrator'
+														'administrator' 
 												],
 												'navigation',
-												'logout'
+												'logout' 
 										),
-										array(
-												[
+										array (
+												[ 
 														'user',
 														'moderator',
-														'administrator'
+														'administrator' 
 												],
 												'navigation',
-												'display'
+												'display' 
 										),
-										array(
-												[
-														'administrator'
+										array (
+												[ 
+														'administrator' 
 												],
 												'resource',
-												'delete'
-										)
+												'delete' 
+										) 
 								),
-								'deny' => array(
-										array(
-												[
+								'deny' => array (
+										array (
+												[ 
 														'user',
 														'moderator',
-														'administrator'
+														'administrator' 
 												],
 												'navigation',
-												'login'
-										),
-								)
-						)
+												'login' 
+										) 
+								) 
+						) 
 				),
 				
 				'unauthorized_strategy' => 'User\View\UnauthorizedStrategy',
 				
-				'guards' => array(
-						'BjyAuthorize\Guard\Controller' => array(
-								array(
+				'guards' => array (
+						'BjyAuthorize\Guard\Controller' => array (
+								array (
 										'controller' => 'zfcuser',
-										'action' => array(
-												'index'
+										'action' => array (
+												'index' 
 										),
-										'roles' => array(
+										'roles' => array (
 												'guest',
 												'user',
 												'moderator',
-												'administrator'
-										)
+												'administrator' 
+										) 
 								),
-								array(
+								array (
 										'controller' => 'zfcuser',
-										'action' => array(
+										'action' => array (
 												'login',
-												'authenticate'
+												'authenticate' 
 										),
-										'roles' => array(
+										'roles' => array (
 												'guest',
 												'user',
 												'moderator',
-												'administrator'
-										)
+												'administrator' 
+										) 
 								),
-								array(
+								array (
 										'controller' => 'zfcuser',
-										'action' => array(
-												'register'
+										'action' => array (
+												'register' 
 										),
-										'roles' => array()
+										'roles' => array () 
 								),
 								// 'guest'
 								
-								array(
+								array (
 										'controller' => 'zfcuser',
-										'action' => array(
+										'action' => array (
 												'logout',
 												'changeemail',
-												'changepassword'
+												'changepassword' 
 										),
-										'roles' => array(
+										'roles' => array (
 												'user',
 												'moderator',
-												'administrator'
-										)
+												'administrator' 
+										) 
 								),
 								
-								array(
+								array (
 										'controller' => 'Application\Controller\Index',
-										'roles' => array(
+										'roles' => array (
 												'user',
 												'moderator',
-												'administrator'
-										)
+												'administrator' 
+										) 
 								),
 								
-								array(
+								array (
+										'controller' => 'Lead\Controller\Ajax',
+										'roles' => array (
+												'user',
+												'moderator',
+												'administrator' 
+										) 
+								),
+								
+								array (
 										'controller' => 'User\Controller\User',
-										'roles' => array(
-												'guest'
-										)
+										'roles' => array (
+												'guest' 
+										) 
 								),
 								
-								array(
+								array (
 										'controller' => 'Lead\Controller\Lead',
-										'roles' => array(
+										'roles' => array (
 												'user',
 												'moderator',
-												'administrator'
-										)
+												'administrator' 
+										) 
 								),
 								
-								array(
+								array (
 										'controller' => 'Lead\Controller\Import',
-										'roles' => array(
+										'roles' => array (
 												'user',
 												'moderator',
-												'administrator'
-										)
+												'administrator' 
+										) 
 								),
 								
-								array(
+								array (
 										'controller' => 'Lead\Controller\Rest',
-										'roles' => array(
-												'guest'
-										)
+										'roles' => array (
+												'guest' 
+										) 
 								),
 								
-								array(
+								array (
 										'controller' => 'Lead\Controller\TenStreet',
-										'roles' => array(
+										'roles' => array (
 												'user',
 												'moderator',
-												'administrator'
-										)
+												'administrator' 
+										) 
 								),
 								
-								array(
+								array (
 										'controller' => 'Lead\Controller\Email',
-										'roles' => array(
+										'roles' => array (
 												'user',
 												'moderator',
-												'administrator'
-										)
+												'administrator' 
+										) 
 								),
 								
-								array(
+								array (
 										'controller' => 'Lead\Controller\Services',
-										'roles' => array(
+										'roles' => array (
 												'user',
 												'moderator',
-												'administrator'
-										)
+												'administrator' 
+										) 
 								),
 								
-								array(
+								array (
 										'controller' => 'Lead\Controller\Attribute',
-										'roles' => array(
+										'roles' => array (
 												'user',
 												'moderator',
-												'administrator'
-										)
+												'administrator' 
+										) 
 								),
 								
-								array(
+								array (
 										'controller' => 'Account\Controller\Account',
-										'roles' => array(
+										'roles' => array (
 												'user',
 												'moderator',
-												'administrator'
-										)
+												'administrator' 
+										) 
 								),
 								
-								array(
+								array (
 										'controller' => 'Account\Controller\Lead',
-										'roles' => array(
+										'roles' => array (
 												'user',
 												'moderator',
-												'administrator'
-										)
+												'administrator' 
+										) 
 								),
 								
-								array(
+								array (
 										'controller' => 'Account\Controller\Api',
-										'roles' => array(
+										'roles' => array (
 												'user',
 												'moderator',
-												'administrator'
-										)
+												'administrator' 
+										) 
 								),
 								
-								array(
+								array (
 										'controller' => 'Api\Controller\Api',
-										'roles' => array(
+										'roles' => array (
 												'user',
 												'moderator',
-												'administrator'
-										)
+												'administrator' 
+										) 
 								),
 								
-								array(
+								array (
 										'controller' => 'Application\Controller\Navigation',
-										'roles' => array(
+										'roles' => array (
 												'user',
 												'moderator',
-												'administrator'
-										)
+												'administrator' 
+										) 
 								),
 								
-								array(
+								array (
 										'controller' => 'Rest\Controller\Index',
-										'roles' => array(
-												'guest'
-										)
+										'roles' => array (
+												'guest' 
+										) 
 								),
 								
-								array(
+								array (
 										'controller' => 'TenStreet\Controller\SoapClient',
-										'roles' => array(
-												'guest'
-										)
+										'roles' => array (
+												'guest' 
+										) 
 								),
 								
-								array(
+								array (
 										'controller' => 'Event\Controller\Event',
-										'roles' => array(
+										'roles' => array (
 												'user',
 												'moderator',
-												'administrator'
-										)
+												'administrator' 
+										) 
 								),
 								
-								array(
+								array (
 										'controller' => 'ZF\OAuth2\Controller\Auth',
-										'roles' => array(
-												'guest'
-										)
-								)
-						)
+										'roles' => array (
+												'guest' 
+										) 
+								),
+								
+								array (
+										'controller' => 'Report\Controller\Report',
+										'roles' => array (
+												'user',
+												'moderator',
+												'administrator' 
+										) 
+								),
+								
+								array (
+										'controller' => 'Report\Controller\Result',
+										'roles' => array (
+												'user',
+												'moderator',
+												'administrator' 
+										) 
+								),
+								
+								array (
+										'controller' => 'Report\Controller\Index',
+										'roles' => array (
+												'user',
+												'moderator',
+												'administrator' 
+										) 
+								),
+								
+								array (
+										'controller' => 'Agent\Controller\Agent',
+										'roles' => array (
+												'user',
+												'moderator',
+												'administrator' 
+										) 
+								) 
+						) 
 				),
-				'service_manager' => array(
-						'invokables' => array(
-								'User\View\UnauthorizedStrategy' => 'User\View\UnauthorizedStrategy'
+				'service_manager' => array (
+						'invokables' => array (
+								'User\View\UnauthorizedStrategy' => 'User\View\UnauthorizedStrategy' 
 						),
-						'factories' => array(
+						'factories' => array (
+								'zfcuser_redirect_callback' => 'User\Service\Factory\RedirectCallbackFactory',
 								'User\Entity\Role' => 'User\Entity\Role',
 								'User\Entity\User' => 'User\Entity\User',
-								'User\Authentication\Adapter\OAuth2Adapter' => 'User\Authentication\Adapter\Factory\OAuth2AdapterFactory'
-						)
-				)
-		)
+								'User\Authentication\Adapter\OAuth2Adapter' => 'User\Authentication\Adapter\Factory\OAuth2AdapterFactory' 
+						) 
+				) 
+		) 
 );
