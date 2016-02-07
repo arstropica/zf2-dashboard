@@ -1,5 +1,6 @@
 <?php
 use Application\Form\View\Helper\Form as FormHelper;
+use Report\Entity\Result;
 
 $title = 'Display Results';
 $this->headTitle($title);
@@ -22,7 +23,7 @@ $report = $this->entity;
 <h2 class="subtitle">
 	Report: "<a
 		href="<?php echo $this->url('report/view', array('action' => 'view', 'id' => $report->getId())); ?>"
-		title="View Report"><?php echo $entity->getName(); ?></a>"
+		title="View Report"><?php echo $report->getName(); ?></a>"
 </h2>
 <hr class="small">
 <br />
@@ -86,26 +87,31 @@ $report = $this->entity;
 				</tr>
 			</thead>
 			<tbody>
-	    		<?php foreach ($this->paginator as $result): $entity = $result->getLead(); ?>
-	        	<tr class="leaditem">
-					<td><div class="checkbox"><?php echo $this->formElement($form->get("sel[" . $entity->getId() . "]")); ?></div></td>
+	    		<?php
+							foreach ( $this->paginator as $result ) :
+								if ($result instanceof Result) :
+									$lead = $result->getLead();
+									?>
+		        	<tr class="leaditem">
+					<td><div class="checkbox"><?php echo $this->formElement($form->get("sel[" . $lead->getId() . "]")); ?></div></td>
 					<td class="col-xs-1 score">
-						<?php echo $result->getScore(); ?>
-					</td>
+							<?php echo $result->getScore(); ?>
+						</td>
 					<td class="col-xs-3 name"><a
-						href="<?php echo $this->losUrl()->from('lead/view',['id'=>$entity->getId()], true)?>"><?php echo $entity->getFullName(); ?></a>
+						href="<?php echo $this->losUrl()->from('report/application/result/view',['id' => $report->getId(), 'lead' => $lead->getId()], ['query' => ['report' => $report->getId()]], true)?>"><?php echo $lead->getFullName(); ?></a>
 					</td>
-					<td class="col-xs-2 account"><?php $account = $entity->getAccount(); echo $account ? '<a href="' . $this->url('account/view', ['action'=>'view', 'id' => $account->getId()]) . '">' . $account->getName() . '</a>' : 'None'; ?></td>
-					<td class="col-xs-2 updated"><?php $lastSubmitted = $entity->getLastsubmitted(); if ($lastSubmitted) echo date_format($lastSubmitted, 'd M, Y h:i A') ?></td>
-					<td class="col-xs-2 timecreated"><?php echo date_format($entity->getTimecreated(), 'd M, Y h:i A') ?></td>
+					<td class="col-xs-2 account"><?php $account = $lead->getAccount(); echo $account ? '<a href="' . $this->url('account/view', ['action'=>'view', 'id' => $account->getId()]) . '">' . $account->getName() . '</a>' : 'None'; ?></td>
+					<td class="col-xs-2 updated"><?php $lastSubmitted = $lead->getLastsubmitted(); if ($lastSubmitted) echo date_format($lastSubmitted, 'd M, Y h:i A') ?></td>
+					<td class="col-xs-2 timecreated"><?php echo date_format($lead->getTimecreated(), 'd M, Y h:i A') ?></td>
 					<td class="action col-xs-1 text-right"><a
-						href="<?php echo $this->losUrl()->from('lead/view',['id'=>$entity->getId()], true)?>"
+						href="<?php echo $this->losUrl()->from('report/application/result/view',['id'=>$report->getId(), 'action' => 'view', 'lead' => $lead->getId()], ['query' => ['report' => $report->getId()]], true)?>"
 						title="View Lead" class="btn btn-xs btn-info"><?php echo $this->losIcon('glyphicon-eye-open') ?></a>
 						<a
-						href="<?php echo $this->losUrl()->from('lead/edit',['id'=>$entity->getId()], true)?>"
+						href="<?php echo $this->losUrl()->from('lead/edit',['id'=>$lead->getId()], true)?>"
 						title="Edit Lead" class="btn btn-xs btn-warning"><?php echo $this->losIcon('glyphicon-edit') ?></a>
 					</td>
 				</tr>
+					<?php endif;?>
 				<?php endforeach;?>
 				</tbody>
 		</table>

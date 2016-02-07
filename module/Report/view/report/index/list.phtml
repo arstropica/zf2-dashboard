@@ -89,7 +89,7 @@ $this->headlink()
 								</tr>
 							</thead>
 							<tbody>
-							<?php $attributeTypes = array_map('current', $this->doctrine['attributes']['types']); ?>
+							<?php $attributeTypes = $this->doctrine['attributes']['types']; ?>
 				    		<?php foreach ($this->doctrine['attributes']['entities'] as $entity): ?>
 				        		<tr class="attributeitem"
 									id="<?php echo $entity->getId(); ?>">

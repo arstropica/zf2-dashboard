@@ -115,7 +115,8 @@ $this->headTitle($title);
 	        		<tr class="leaditem">
 						<td class="report.id col-xs-1"><div class="checkbox"><?php echo $this->formElement($form->get("sel[" . $entity->getId() . "]")); ?></div></td>
 						<td class="col-xs-4 name"><a
-							href="<?php echo $this->losUrl()->from('report/edit',['id'=>$entity->getId()], true)?>"
+							href="<?php echo ($numleads) ? $this->losUrl()->from('report/application/result/list',['id'=>$entity->getId(), 'action' => 'list'], true) : $this->losUrl()->from('report/edit',['id'=>$entity->getId()], true); ?>"
+							title="<?php echo ($numleads) ? 'View Results' : 'Edit Report'; ?>"
 							title="Edit Report"><?php echo $entity->getName(); ?></a></td>
 						<td class="col-xs-2 account"><?php $account = $entity->getAccount(); echo $account ? '<a href="' . $this->url('account/view', ['action'=>'view', 'id' => $account->getId()]) . '">' . $account->getName() . '</a>' : 'None'; ?></td>
 						<td class="col-xs-2 count"><?php if ($numleads) : ?><a

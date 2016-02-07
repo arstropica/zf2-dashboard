@@ -1,0 +1,142 @@
+<?php
+// module/Lead/view/lead/lead/view.phtml:
+
+/* @var $result \Report\Entity\Result */
+$result = $this->entity;
+
+/* @var $entity \Lead\Entity\Lead */
+$entity = $result->getLead();
+
+/* @var $report \Report\Entity\Report */
+$report = $this->report;
+
+$title = 'View Search Result';
+$this->headTitle($title);
+?>
+<h1>
+<?php echo $this->escapeHtml($title); ?>
+	<span class="pull-right"> <a class="btn btn-info"
+		style="margin-left: 15px;"
+		href="<?php echo $report ? $this->url('report/application/result/list', ['action'=>'list', 'id' => $report->getId()], true) : $this->url('lead/list', ['action'=>'list'], true);?>">Back</a>
+	</span> <span class="pull-right"> <a class="btn btn-danger"
+		style="margin-left: 15px;"
+		href="<?php echo $this->url('lead/delete', array('action'=>'delete', 'id' => $entity->getId()));?>">Delete
+			Lead</a>
+	</span> <span class="pull-right"> <a class="btn btn-success"
+		href="<?php echo $this->url('lead/edit', array('action'=>'edit', 'id' => $entity->getId()));?>">Edit
+			Lead</a>
+	</span>
+</h1>
+<?php
+$detail = $entity->getAttributes(false);
+$account = $entity->getAccount();
+$events = $entity->getEvents();
+?>
+<div class="row content-row">
+	<div class="col-md-12">
+		<div class="panel panel-info">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<?php echo $this->translate('Report Summary')?>
+				</h3>
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover table-condensed nomargin">
+					<tr>
+						<th>Report</th>
+						<td><a
+							href="<?php echo $this->url('report/application/result/list', ['action'=>'list', 'id' => $report->getId()], true); ?>"
+							title="View Report"><?php echo $report->getName(); ?></a></td>
+					</tr>
+					<tr>
+						<th>Result Score</th>
+						<td><?php echo $result->getScore(); ?></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-12">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<?php echo $this->translate('Lead Summary')?>
+				</h3>
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover table-condensed nomargin">
+					<tr>
+						<th>Created</th>
+						<td><?php echo date_format($entity->getTimecreated(), 'd M, Y h:i A'); ?></td>
+					</tr>
+					<tr>
+						<th>Referrer</th>
+						<td><a target="_blank" title="Referrer"
+							href="<?php echo $entity->getReferrer(); ?>"><?php echo $entity->getReferrer(); ?></a></td>
+					</tr>
+					<tr>
+						<th>I.P. Address</th>
+						<td><?php echo $entity->getIpaddress(); ?></td>
+					</tr>
+					<tr>
+						<th>Account</th>
+						<td><?php echo $account ? $account->getName() : 'None'; ?></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-12">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<?php echo $this->translate('Lead Details')?>
+				</h3>
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover table-condensed nomargin">
+					<?php
+					
+					foreach ( $detail as $attributeValue ) :
+						if ($attributeValue) :
+							$attribute = $attributeValue->getAttribute();
+							if ($attribute) :
+								?>
+					<tr>
+						<th><?php echo $attribute->getAttributeDesc(); ?></th>
+						<td><?php echo $attributeValue->getValue(); ?></td>
+					</tr>
+					<?php endif; endif; endforeach; ?>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-12">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<?php echo $this->translate('Lead History')?>
+				</h3>
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover table-condensed nomargin">
+					<thead>
+						<tr>
+							<th>Event</th>
+							<th>Message</th>
+							<th>Date</th>
+						</tr>
+					</thead>
+					<?php foreach ($events as $ev) : $event = $ev->getEvent(); ?>
+						<tr>
+						<th><?php echo $event->getEvent(); ?></th>
+						<td><?php echo $event->getMessage(); ?></td>
+						<td><?php echo date_format($event->getOccurred(), 'd M, Y h:i A'); ?></td>
+					</tr>
+					<?php endforeach; ?>
+				</table>
+			</div>
+		</div>
+	</div>
+
+</div>
