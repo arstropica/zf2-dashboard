@@ -255,6 +255,33 @@ class ResultController extends AbstractCrudController {
 		], true);
 	}
 
+	public function viewAction()
+	{
+		$id = $this->getEvent()
+			->getRouteMatch()
+			->getParam('id', 0);
+		
+		$lead = $this->getEvent()
+			->getRouteMatch()
+			->getParam('lead', 0);
+		
+		$report = $this->params()
+			->fromQuery('report');
+		
+		$em = $this->getEntityManager();
+		$objRepository = $em->getRepository($this->getEntityClass());
+		
+		/* @var $report \Report\Entity\Report */
+		$report = $objRepository->find($id);
+		
+		$entity = $report->findResult($lead);
+		
+		return [ 
+				'entity' => $entity,
+				'report' => $report 
+		];
+	}
+
 	public function exportAction()
 	{
 		$results = array ();
@@ -339,9 +366,11 @@ class ResultController extends AbstractCrudController {
 			// Batch Form
 			
 			foreach ( $paginator as $result ) {
-				$entity = $result->getLead();
-				$cbx = new \Zend\Form\Element\Checkbox("sel[" . $entity->getId() . "]");
-				$form->add($cbx);
+				if ($result instanceof Result) {
+					$entity = $result->getLead();
+					$cbx = new \Zend\Form\Element\Checkbox("sel[" . $entity->getId() . "]");
+					$form->add($cbx);
+				}
 			}
 		}
 		
@@ -568,20 +597,6 @@ class ResultController extends AbstractCrudController {
 			}
 		}
 		return $output;
-	}
-
-	public function getEntityClass()
-	{
-		$module = $this->getModuleName();
-		
-		return "{$module}\\Entity\\Result";
-	}
-
-	public function getEntityServiceClass()
-	{
-		$module = $this->getModuleName();
-		
-		return "$module\\Service\\$module";
 	}
 
 	public function getActionRoute($action = null)

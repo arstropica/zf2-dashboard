@@ -314,6 +314,28 @@ class Report implements ServiceLocatorAwareInterface, ObjectManagerAwareInterfac
 
 	/**
 	 *
+	 * @param integer $id        	
+	 *
+	 * @return null|Result
+	 */
+	public function findResult($id)
+	{
+		$results = $this->getResults(true);
+		$result = null;
+		if ($results && $results instanceof Collection) {
+			$result = $results->filter(function ($r) use($id) {
+				return $r->getLead()
+					->getId() == $id;
+			});
+			if ($result && $result->count() > 0) {
+				$result = $result->first();
+			}
+		}
+		return $result;
+	}
+
+	/**
+	 *
 	 * @param bool $ac        	
 	 *
 	 * @return Collection $events

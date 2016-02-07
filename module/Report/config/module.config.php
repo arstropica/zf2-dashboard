@@ -245,6 +245,20 @@ return array (
 																								'action' => 'export' 
 																						) 
 																				) 
+																		),
+																		'view' => array (
+																				'type' => 'Segment',
+																				'options' => array (
+																						'route' => '/view[/:lead]',
+																						'constraints' => array (
+																								'lead' => '[0-9]+' 
+																						),
+																						'defaults' => array (
+																								'controller' => 'Report\Controller\Result',
+																								'action' => 'view',
+																								'lead' => 0 
+																						) 
+																				) 
 																		) 
 																) 
 														) 
