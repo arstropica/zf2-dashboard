@@ -96,15 +96,7 @@ class IndexController extends AbstractCrudController implements CacheAwareInterf
 			$results ['doctrine'] ['attributes'] ['entities'] = $qb->getQuery()
 				->getResult();
 			
-			/* @var $qb \Doctrine\ORM\QueryBuilder */
-			$qb = $this->getEntityManager()
-				->createQueryBuilder();
-			$qb->add('select', 'e.attributeType')
-				->add('from', $entityClass . ' e')
-				->distinct(true);
-			
-			$results ['doctrine'] ['attributes'] ['types'] = $qb->getQuery()
-				->getArrayResult();
+			$results ['doctrine'] ['attributes'] ['types'] = $this->getRelationshipTypes();
 			
 			return $results;
 		} catch ( \Exception $e ) {
@@ -129,7 +121,8 @@ class IndexController extends AbstractCrudController implements CacheAwareInterf
 				'data' => 'Init Build.' 
 		]);
 		
-		if (ob_get_contents()) ob_end_clean();
+		if (ob_get_contents())
+			ob_end_clean();
 		ignore_user_abort(true);
 		header("Connection: Keep-Alive");
 		$size = ob_get_length();
@@ -718,6 +711,40 @@ class IndexController extends AbstractCrudController implements CacheAwareInterf
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * Get Relationship Types
+	 *
+	 * @return array $results
+	 */
+	protected function getRelationshipTypes()
+	{
+		$types = $result = $results = [ ];
+		
+		/* @var $qb \Doctrine\ORM\QueryBuilder */
+		$qb = $this->getEntityManager()
+			->createQueryBuilder();
+		$qb->add('select', 'r.allowed')
+			->add('from', 'Agent\Entity\Relationship r')
+			->distinct(true);
+		
+		$allowed = $qb->getQuery()
+			->getArrayResult();
+		
+		if ($allowed) {
+			foreach ( $allowed as $_allowed ) {
+				if (isset($_allowed ['allowed']) && is_array($_allowed ['allowed'])) {
+					$types = $_allowed ['allowed'];
+					foreach ( $types as $type ) {
+						$result [$type] = $type;
+					}
+				}
+			}
+			$results = array_unique(array_values($result));
+		}
+		
+		return $results;
 	}
 
 	/**
