@@ -44,6 +44,9 @@ class EntityCacheAwareListener implements ServiceLocatorAwareInterface {
 			$entityName = is_object($oEntity) ? basename(str_replace('\\', '/', get_class($oEntity))) : false;
 			
 			switch ($entityName) {
+				case 'Event' :
+				case 'Agent' :
+				case 'Report' :
 				case 'Lead' :
 				case 'LeadAttribute' :
 				case 'LeadAttributeValue' :
