@@ -723,6 +723,19 @@ return array (
 												) 
 										),
 										array (
+												'label' => 'View Report',
+												'route' => 'report/application',
+												'action' => 'view',
+												'dynamic' => true,
+												'pages' => array (
+														array (
+																'label' => 'View Result',
+																'route' => 'report/application/result/view',
+																'action' => 'view' 
+														) 
+												) 
+										),
+										array (
 												'label' => 'Add Report',
 												'route' => 'report/add',
 												'action' => 'add' 

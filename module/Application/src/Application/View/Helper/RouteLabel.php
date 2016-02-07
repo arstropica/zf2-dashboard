@@ -34,6 +34,10 @@ class RouteLabel extends AbstractHelper implements ServiceLocatorAwareInterface
 						$page->params = ['id' => $id];
 						$page->setLabel($entity->getName());
 						break;
+					case 'report/application':
+						$page->params = ['id' => $id];
+						$page->setLabel($entity->getName());
+						break;
 				}
 			}
 		}
