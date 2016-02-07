@@ -839,6 +839,11 @@ $(function() {
 				return $.getJSON('/lead/ajax/name', {
 					query : query
 				}, function(data) {
+					if ($.isPlainObject(data)) {
+						data = $.map(data, function(el) {
+							return el
+						});
+					}
 					return process(data);
 				});
 			}
@@ -899,4 +904,12 @@ $(function() {
 
 	// TEXTAREA AUTORESIZE
 	autosize($('textarea.autoresize'));
+
+	// RESET LEAD COLUMN FILTER
+	$('.column-filters #filterreset').on('click', function(e) {
+		$(this).closest('.column-filters').find(':input[type=text]').each(function() {
+			$(this).attr('value', '').trigger('change');
+		});
+		$(this).closest('.column-filters').find(':input[multiple]').val([]).trigger('change');
+	});
 });
