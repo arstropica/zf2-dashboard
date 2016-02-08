@@ -65,7 +65,7 @@ class LocalityQuery implements ServiceLocatorAwareInterface {
 		foreach ( $location as $field => $value ) {
 			switch ($field) {
 				case 'city' :
-					$query->{$method}(new Elastica\Query\Match($field, $value));
+					$query->addShould(new Elastica\Query\Match($field, $value));
 					break;
 				case 'state' :
 					$fields = [ 
