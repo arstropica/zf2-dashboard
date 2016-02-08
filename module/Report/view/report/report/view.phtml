@@ -114,7 +114,7 @@ $results = $entity->getResults(false, 10);
 					<tr>
 						<td><?php echo $result->getScore(); ?></td>
 						<td><a
-							href="<?php echo $this->losUrl()->from('report/application/result/view', ['id' => $report->getId(), 'lead' => $lead->getId(), 'action' => 'view'], ['query' => ['report' => $entity->getId()]], true); ?>"><?php echo $lead->getFullName(); ?></a></td>
+							href="<?php echo $this->losUrl()->from('report/application/result/view', ['id' => $entity->getId(), 'lead' => $lead->getId(), 'action' => 'view'], ['query' => ['report' => $entity->getId()]], true); ?>"><?php echo $lead->getFullName(); ?></a></td>
 						<td><?php if ($_account) : ?><a
 							href="<?php echo $this->losUrl()->from('account/view', ['id' => $_account->getId(), 'action' => 'view']); ?>"><?php echo $_account->getName(); ?></a><?php else: ?>None<?php endif; ?></td>
 					</tr>
