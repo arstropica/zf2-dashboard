@@ -181,7 +181,7 @@ abstract class AbstractEmailService implements ServiceLocatorAwareInterface, Api
 			if ($asset) {
 				switch ($property) {
 					case 'id' :
-					case 'referrer' :
+					// case 'referrer' :
 						$data ['summary'] [$property] = $asset;
 						break;
 					case 'ipaddress' :
