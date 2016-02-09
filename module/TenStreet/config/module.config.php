@@ -41,9 +41,9 @@ return array(
 		),
 		'hydrators' => array(
 				'factories' => array(
-						'ApplicationDataHydrator' => 'TenStreet\Hydrator\Factory\ApplicationDataHydratorFactory',
-						'PersonalDataHydrator' => 'TenStreet\Hydrator\Factory\PersonalDataHydratorFactory',
-						'TenStreetDataHydrator' => 'TenStreet\Hydrator\Factory\TenStreetDataHydratorFactory'
+						'TenStreet\Hydrator\ApplicationDataHydrator' => 'TenStreet\Hydrator\Factory\ApplicationDataHydratorFactory',
+						'TenStreet\Hydrator\PersonalDataHydrator' => 'TenStreet\Hydrator\Factory\PersonalDataHydratorFactory',
+						'TenStreet\Hydrator\TenStreetDataHydrator' => 'TenStreet\Hydrator\Factory\TenStreetDataHydratorFactory'
 				)
 		),
 		'log' => array(
