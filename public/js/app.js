@@ -823,7 +823,11 @@ $(function() {
 	$('#exportLeads').on('click', function(e) {
 		e.preventDefault();
 		var url = $(this).prop('href');
-		var params = $('#leadFilterForm').serialize();
+		if ($('#hiddenFilterForm').length) {
+			var params = $('#hiddenFilterForm').serialize();
+		} else {
+			var params = $('#leadFilterForm').serialize();
+		}
 		window.location.href = url + '?' + params;
 		return false;
 	});

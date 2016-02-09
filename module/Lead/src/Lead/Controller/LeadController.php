@@ -803,16 +803,10 @@ class LeadController extends AbstractCrudController {
 	{
 		$result = [ ];
 		if ($name) {
-			$terms = explode(" ", $name);
-			foreach ( $terms as $i => $term ) {
-				switch ($i) {
-					case 0 :
-						$result ['attributeDesc'] ['First Name'] = $term;
-						break;
-					case 1 :
-						$result ['attributeDesc'] ['Last Name'] = $term;
-						break;
-				}
+			$terms = array_filter(explode(" ", $name));
+			if ($terms) {
+				$result ['attributeDesc'] ['First Name'] = $terms;
+				$result ['attributeDesc'] ['Last Name'] = $terms;
 			}
 		}
 		return $result;
@@ -832,18 +826,32 @@ class LeadController extends AbstractCrudController {
 			$where = [ ];
 			$params = [ ];
 			$i = 0;
+			$orX = $qb->expr()
+				->orX();
 			foreach ( $filters as $condition ) {
 				if (isset($query [$condition])) {
 					if (is_array($query [$condition])) {
-						foreach ( $query [$condition] as $criteria => $value ) {
+						foreach ( $query [$condition] as $criteria => $values ) {
 							$qb->innerJoin('e.attributes', 'v' . $i);
 							$qb->innerJoin('v' . $i . '.attribute', 'a' . $i);
 							switch ($condition) {
 								case 'attributeDesc' :
+									$expr = $qb->expr();
+									$andX = $expr->andX();
 									$where ["desc_{$i}"] = "%{$criteria}%";
-									$qb->andWhere("a" . $i . ".attributeDesc LIKE :desc_{$i}");
-									$where ["value_{$i}"] = "%{$value}%";
-									$qb->andWhere("v" . $i . ".value LIKE :value_{$i}");
+									$andX->add($expr->like("a" . $i . ".attributeDesc", ":desc_{$i}"));
+									if (is_array($values)) {
+										$j = 0;
+										foreach ( $values as $value ) {
+											$where ["value_{$j}"] = "%{$value}%";
+											$andX->add($expr->like("v" . $i . ".value", ":value_{$j}"));
+											$j++;
+										}
+									} else {
+										$where ["value_{$i}"] = "%{$values}%";
+										$andX->add($expr->like("v" . $i . ".value", ":value_{$i}"));
+									}
+									$orX->add($andX);
 									$i++;
 									break;
 							}
@@ -860,7 +868,8 @@ class LeadController extends AbstractCrudController {
 					}
 				}
 			}
-			if ($where) {
+			if ($where && $orX->getParts()) {
+				$qb->andWhere($orX);
 				foreach ( $where as $key => $value ) {
 					$qb->setParameter($key, $value);
 				}
@@ -873,6 +882,7 @@ class LeadController extends AbstractCrudController {
 	{
 		$query = $this->getRequest()
 			->getQuery();
+		
 		$filters = [ 
 				'lastsubmitted',
 				'timecreated',
