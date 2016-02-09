@@ -18,32 +18,41 @@ class AjaxController extends AbstractCrudController {
 		return new JsonModel([ ]);
 	}
 
+	/**
+	 * Lead Name Ajax Search
+	 *
+	 * @return array
+	 */
 	public function nameAction()
 	{
+		$results = [ ];
+		$data = [ ];
+		
 		$query = $this->params()
 			->fromQuery('query');
 		
 		$criteria = $this->buildNameCriteria($query);
 		
-		$limit = $this->params()
-			->fromQuery('limit');
-		
-		/* @var $qb \Doctrine\ORM\QueryBuilder */
-		$qb = $this->getEntityManager()
-			->createQueryBuilder();
-		$qb->add('select', 'e')
-			->add('from', $this->getEntityClass() . ' e');
-		
-		$qb = $this->handleSearch($qb, $criteria);
-		
-		$qb->orderBy('e.id');
-		
-		$results = $qb->getQuery()
-			->getResult();
-		
-		$data = [ ];
-		// 'status' => 0
-		
+		if ($criteria) {
+			$limit = $this->params()
+				->fromQuery('limit');
+			
+			/* @var $qb \Doctrine\ORM\QueryBuilder */
+			$qb = $this->getEntityManager()
+				->createQueryBuilder();
+			$qb->add('select', 'e')
+				->add('from', $this->getEntityClass() . ' e');
+			
+			$qb = $this->handleSearch($qb, $criteria);
+			
+			$qb->orderBy('e.id');
+			
+			$results = $qb->getQuery()
+				->getResult();
+			
+			$data = [ ];
+			// 'status' => 0
+		}
 		if ($results) {
 			// $data ['status'] = 1;
 			foreach ( $results as $result ) {
@@ -63,16 +72,10 @@ class AjaxController extends AbstractCrudController {
 	{
 		$result = [ ];
 		if ($name) {
-			$terms = explode(" ", $name);
-			foreach ( $terms as $i => $term ) {
-				switch ($i) {
-					case 0 :
-						$result ['attributeDesc'] ['First Name'] = $term;
-						break;
-					case 1 :
-						$result ['attributeDesc'] ['Last Name'] = $term;
-						break;
-				}
+			$terms = array_filter(explode(" ", $name));
+			if ($terms) {
+				$result ['attributeDesc'] ['First Name'] = $terms;
+				$result ['attributeDesc'] ['Last Name'] = $terms;
 			}
 		}
 		return $result;
@@ -95,15 +98,27 @@ class AjaxController extends AbstractCrudController {
 			foreach ( $filters as $condition ) {
 				if (isset($query [$condition])) {
 					if (is_array($query [$condition])) {
-						foreach ( $query [$condition] as $criteria => $value ) {
+						foreach ( $query [$condition] as $criteria => $values ) {
 							$qb->innerJoin('e.attributes', 'v' . $i);
 							$qb->innerJoin('v' . $i . '.attribute', 'a' . $i);
 							switch ($condition) {
 								case 'attributeDesc' :
+									$expr = $qb->expr();
+									$andX = $expr->andX();
 									$where ["desc_{$i}"] = "%{$criteria}%";
-									$qb->andWhere("a" . $i . ".attributeDesc LIKE :desc_{$i}");
-									$where ["value_{$i}"] = "%{$value}%";
-									$qb->andWhere("v" . $i . ".value LIKE :value_{$i}");
+									$andX->add($expr->like("a" . $i . ".attributeDesc", ":desc_{$i}"));
+									if (is_array($values)) {
+										$j = 0;
+										foreach ( $values as $value ) {
+											$where ["value_{$j}"] = "%{$value}%";
+											$andX->add($expr->like("v" . $i . ".value", ":value_{$j}"));
+											$j++;
+										}
+									} else {
+										$where ["value_{$i}"] = "%{$values}%";
+										$andX->add($expr->like("v" . $i . ".value", ":value_{$i}"));
+									}
+									$qb->orWhere($andX);
 									$i++;
 									break;
 							}
