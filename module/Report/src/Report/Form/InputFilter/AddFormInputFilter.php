@@ -77,11 +77,6 @@ class AddFormInputFilter extends InputFilter implements ServiceLocatorAwareInter
 				) 
 		)));
 		
-		$this->add($factory->createInput(array (
-				'name' => 'csrf',
-				'required' => true 
-		)));
-		
 		$this->add(new AgentFieldsetInputFilter($this->getServiceLocator()), 'agent');
 	}
 }

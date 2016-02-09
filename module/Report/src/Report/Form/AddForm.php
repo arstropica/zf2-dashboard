@@ -113,11 +113,6 @@ class AddForm extends AbstractForm implements ObjectManagerAwareInterface, Servi
 		));
 		
 		$this->add(array (
-				'type' => 'Zend\Form\Element\Csrf',
-				'name' => 'csrf' 
-		));
-		
-		$this->add(array (
 				'name' => 'submit',
 				'type' => 'Zend\Form\Element\Submit',
 				'attributes' => array (

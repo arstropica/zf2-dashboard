@@ -110,11 +110,6 @@ class EditForm extends AbstractForm implements ObjectManagerAwareInterface, Serv
 		));
 		
 		$this->add(array (
-				'type' => 'Zend\Form\Element\Csrf',
-				'name' => 'csrf' 
-		));
-		
-		$this->add(array (
 				'name' => 'submit',
 				'type' => 'Zend\Form\Element\Submit',
 				'attributes' => array (
