@@ -102,7 +102,7 @@ class AgentFieldset extends AbstractFieldset implements InputFilterProviderInter
 				'attributes' => array (
 						'id' => 'orphan',
 						'class' => 'has-chosen',
-						'value' => '1' 
+						'value' => '0' 
 				) 
 		));
 		

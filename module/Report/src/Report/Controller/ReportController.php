@@ -282,7 +282,7 @@ class ReportController extends AbstractCrudController {
 		$entity = new $classe();
 		
 		$entity->getAgent()
-			->setOrphan(1);
+			->setOrphan(0);
 		
 		$account = $this->params()
 			->fromQuery('account');
