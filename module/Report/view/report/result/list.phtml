@@ -8,10 +8,13 @@ $report = $this->entity;
 ?>
 <h1>
 <?php echo $this->escapeHtml($title); ?>
-<span class="pull-right" style="margin-left: 15px;"> <a target="_blank"
+	<span class="pull-right" style="margin-left: 15px;"> <a target="_blank"
 		href="<?php echo $this->url('report/application/result/export', array('action' => 'export', 'id' => $report->getId())); ?>"
 		class="btn btn-info" id="exportLeads" title="Export Results">Export
 			Results</a>
+	</span> <span class="pull-right" style="margin-left: 15px;"> <a
+		href="<?php echo $this->url('report/delete', array('action' => 'delete', 'id' => $report->getId())); ?>"
+		class="btn btn-danger" title="Delete Report">Delete Report</a>
 	</span> <span class="pull-right" style="margin-left: 15px;"> <a
 		href="<?php echo $this->url('report/edit', array('action' => 'edit', 'id' => $report->getId())); ?>"
 		class="btn btn-primary" title="Edit Report">Edit Report</a>
