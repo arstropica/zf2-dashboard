@@ -1,8 +1,10 @@
 <?php
+
 namespace Application\Service\Factory;
+
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
-use Doctrine\Common\Cache\RedisCache;
+use Application\ORM\Tools\Cache\RedisCache;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
 
 /**
@@ -10,8 +12,7 @@ use Zend\ServiceManager\ServiceLocatorAwareTrait;
  * @author arstropica
  *        
  */
-class DoctrineRedisCacheFactory implements FactoryInterface
-{
+class DoctrineRedisCacheFactory implements FactoryInterface {
 	use ServiceLocatorAwareTrait;
 
 	/**
@@ -21,7 +22,7 @@ class DoctrineRedisCacheFactory implements FactoryInterface
 	 *
 	 * @return mixed
 	 */
-	public function createService (ServiceLocatorInterface $serviceLocator)
+	public function createService(ServiceLocatorInterface $serviceLocator)
 	{
 		$this->setServiceLocator($serviceLocator);
 		
@@ -32,7 +33,7 @@ class DoctrineRedisCacheFactory implements FactoryInterface
 			} else {
 				throw new \Exception('Cannot connect to Redis Instance');
 			}
-		} catch (\Exception $e) {
+		} catch ( \Exception $e ) {
 			return false;
 		}
 	}
@@ -42,16 +43,17 @@ class DoctrineRedisCacheFactory implements FactoryInterface
 	 *
 	 * @return RedisCache|boolean
 	 */
-	public function init ()
+	public function init()
 	{
 		$redis_cache = false;
-		$config = $this->getServiceLocator()->get('Config');
-		$config = $config['caches']['redis'];
+		$config = $this->getServiceLocator()
+			->get('Config');
+		$config = $config ['caches'] ['redis'];
 		
-		$namespace = $config['adapter']['options']['namespace'];
-		$host = $config['adapter']['options']['server']['host'];
-		$port = $config['adapter']['options']['server']['port'];
-		$ttl = $config['adapter']['options']['ttl'];
+		$namespace = $config ['adapter'] ['options'] ['namespace'];
+		$host = $config ['adapter'] ['options'] ['server'] ['host'];
+		$port = $config ['adapter'] ['options'] ['server'] ['port'];
+		$ttl = $config ['adapter'] ['options'] ['ttl'];
 		
 		$redis = new \Redis();
 		
@@ -62,7 +64,7 @@ class DoctrineRedisCacheFactory implements FactoryInterface
 		try {
 			$conn = $redis->pconnect($host, $port, $ttl);
 			$redis->setOption(\Redis::OPT_SERIALIZER, \Redis::SERIALIZER_PHP);
-		} catch (\Exception $e) {
+		} catch ( \Exception $e ) {
 			$conn = false;
 		}
 		
