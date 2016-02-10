@@ -39,6 +39,10 @@ class Paginator extends DoctrinePaginator implements \Countable, \IteratorAggreg
 	 *        	A Doctrine ORM query or query builder.
 	 * @param boolean $fetchJoinCollection
 	 *        	Whether the query joins a collection (true by default).
+	 * @param boolean $cache
+	 *        	Use result cache (true by default).
+	 * @param boolean $count
+	 *        	Execute count query (true by default).
 	 */
 	public function __construct($query, $fetchJoinCollection = true, $cached = true, $count = true)
 	{
@@ -51,6 +55,9 @@ class Paginator extends DoctrinePaginator implements \Countable, \IteratorAggreg
 			
 			$this->countQuery = $countQuery;
 		}
+		
+		$q = $query;
+		
 		if ($cached) {
 			$this->cache_prefix = '';
 			if ($query instanceof QueryBuilder) {
@@ -60,8 +67,6 @@ class Paginator extends DoctrinePaginator implements \Countable, \IteratorAggreg
 					$entity = $entities [0];
 					$this->cache_prefix = strtolower(substr(strrchr($entity, '\\'), 1) ?  : $entity) . '-';
 				}
-			} else {
-				$q = $query;
 			}
 			$q->useQueryCache(true)
 				->useResultCache(true, 3600, $this->cache_prefix . md5($q->getDQL()));
