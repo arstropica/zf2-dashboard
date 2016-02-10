@@ -352,5 +352,6 @@ BODY A.inline {
 }
 /**** Typeography ****/
 .chosen-container .chosen-drop .chosen-results {
-	font-size: 15px;
+	font-size: 14px;
+	font-weight: bold;
 }
