@@ -51,7 +51,8 @@ class EntityCacheAwareListener implements ServiceLocatorAwareInterface {
 				case 'LeadAttribute' :
 				case 'LeadAttributeValue' :
 				case 'Account' :
-					$this->_deleteCache($oArgs);
+					$prefix = strtolower($entityName) . "-";
+					$this->_deleteCache($oArgs, $prefix);
 					break;
 			}
 		} catch ( \Exception $e ) {
@@ -80,7 +81,8 @@ class EntityCacheAwareListener implements ServiceLocatorAwareInterface {
 				case 'LeadAttribute' :
 				case 'LeadAttributeValue' :
 				case 'Account' :
-					$this->_deleteCache($oArgs);
+					$prefix = strtolower($entityName) . "-";
+					$this->_deleteCache($oArgs, $prefix);
 					break;
 			}
 		} catch ( \Exception $e ) {
@@ -109,26 +111,46 @@ class EntityCacheAwareListener implements ServiceLocatorAwareInterface {
 				case 'LeadAttribute' :
 				case 'LeadAttributeValue' :
 				case 'Account' :
-					$this->_deleteCache($oArgs);
+					$prefix = strtolower($entityName) . "-";
+					$this->_deleteCache($oArgs, $prefix);
 					break;
 			}
 		} catch ( \Exception $e ) {
 		}
 	}
 
-	private function _deleteCache(LifecycleEventArgs $oArgs)
+	/**
+	 * Delete Cache Entry
+	 *
+	 * @param LifecycleEventArgs $oArgs        	
+	 * @param string $prefix        	
+	 *
+	 * @return void
+	 */
+	private function _deleteCache(LifecycleEventArgs $oArgs, $prefix = null)
 	{
+		$result = [ ];
 		$em = $oArgs->getEntityManager();
 		// Get an instance of the configuration
 		$config = $em->getConfiguration();
 		
 		// Gets Query Cache Driver
+		/* @var $queryCacheDriver \Application\ORM\Tools\Cache\RedisCache */
 		$queryCacheDriver = $config->getQueryCacheImpl();
-		$queryCacheDriver->deleteAll();
 		
 		// Gets Result Cache Driver
+		/* @var $resultCacheDriver \Application\ORM\Tools\Cache\RedisCache */
 		$resultCacheDriver = $config->getResultCacheImpl();
-		$resultCacheDriver->deleteAll();
+		
+		if ($prefix) {
+			$result [] = $queryCacheDriver->deleteByPrefix($prefix);
+			$result [] = $resultCacheDriver->deleteByPrefix($prefix);
+		} else {
+			$result [] = $queryCacheDriver->deleteAll();
+			$result [] = $resultCacheDriver->deleteAll();
+		}
+		echo "<script>console.dir(" . json_encode($result) . ");</script>";
+		return $result;
 	}
 }
 
