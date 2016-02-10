@@ -350,3 +350,7 @@ BODY A.inline {
 	display: inline !important;
 	padding: 0;
 }
+/**** Typeography ****/
+.chosen-container .chosen-drop .chosen-results {
+	font-size: 15px;
+}
