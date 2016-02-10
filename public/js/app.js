@@ -837,17 +837,13 @@ $(function() {
 		$('.description.typeahead').typeahead({
 			hint : true,
 			highlight : true,
-			minLength : 2
+			minLength : 2,
+			limit : Infinity
 		}, {
 			source : function(query, sync, process) {
 				return $.getJSON('/lead/ajax/name', {
 					query : query
 				}, function(data) {
-					if ($.isPlainObject(data)) {
-						data = $.map(data, function(el) {
-							return el
-						});
-					}
 					return process(data);
 				});
 			}

@@ -58,14 +58,14 @@ class AjaxController extends AbstractCrudController {
 			foreach ( $results as $result ) {
 				$data [] = $result->getFullName();
 			}
-			$data = array_unique(array_values($data));
+			$data = array_unique($data);
 			if ($limit) {
 				$data = array_slice($data, 0, $limit);
 			}
 		
 		}
 		
-		return new JsonModel($data);
+		return new JsonModel(array_values($data));
 	}
 
 	public function buildNameCriteria($name = null)
