@@ -58,7 +58,7 @@ class AjaxController extends AbstractCrudController {
 			foreach ( $results as $result ) {
 				$data [] = $result->getFullName();
 			}
-			$data = array_unique($data);
+			$data = array_unique(array_values($data));
 			if ($limit) {
 				$data = array_slice($data, 0, $limit);
 			}
