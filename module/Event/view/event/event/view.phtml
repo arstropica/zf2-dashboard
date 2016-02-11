@@ -83,7 +83,7 @@ $events = $this->events;
 					<tr>
 						<th>View Lead</th>
 						<td><a
-							href="<?php echo $this->url('lead/view', ['action' => 'view', 'id' => $lead->getId()]); ?>"><?php echo "Lead #" . $lead->getId(); ?></a></td>
+							href="<?php echo $this->url('lead/view', ['action' => 'view', 'id' => $lead->getId()]); ?>"><?php echo $lead->getFullName(); ?></a></td>
 					</tr>
 										<?php break; ?>
 									<?php case 'api' : ?>
