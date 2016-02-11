@@ -58,6 +58,7 @@ trait ResultAwareTrait {
 						}
 						$query->setQuery($lead_query);
 						$size = 10;
+						$query->setParam('track_scores', true);
 						$query->addSort([ 
 								$sort => [ 
 										'order' => $order 
@@ -202,7 +203,7 @@ trait ResultAwareTrait {
 				$data = $response->getData();
 				if ($data && isset($data ['hits'] ['hits'])) {
 					$hits = $data ['hits'] ['hits'];
-					$max_score = $data ['hits'] ['max_score'];
+					$max_score = $data ['hits'] ['max_score'] ?  : 1;
 					$results ['total'] = $data ['hits'] ['total'];
 					foreach ( $hits as $hit ) {
 						$lead = $objRepository->findOneBy([ 
