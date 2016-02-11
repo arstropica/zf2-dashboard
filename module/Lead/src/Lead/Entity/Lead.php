@@ -53,7 +53,6 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	 *      @MAP\ElasticField(
 	 *      type="date",
 	 *      includeInAll=true,
-	 *      index="no"
 	 *      )
 	 */
 	private $timecreated;
