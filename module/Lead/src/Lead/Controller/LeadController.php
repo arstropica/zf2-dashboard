@@ -90,7 +90,7 @@ class LeadController extends AbstractCrudController {
 			->setMaxResults($limit);
 		
 		// Hack to bypass Doctrine's busted Paginator
-		if (array_key_exists('description', $query)) {
+		if (!empty($query['description'])) {
 			$sort = 'id';
 			$order = 'desc';
 		} else {
