@@ -146,7 +146,7 @@ abstract class AbstractEmailService implements ServiceLocatorAwareInterface, Api
 		$em = $this->getEntityManager();
 		
 		$lead = $this->lead;
-		if (!$lead) {
+		if (!$lead || ($lead instanceof Lead && $lead->getId() != $id)) {
 			$leadRepository = $em->getRepository("Lead\\Entity\\Lead");
 			$lead = $leadRepository->findOneBy([ 
 					'id' => $id 
@@ -181,7 +181,7 @@ abstract class AbstractEmailService implements ServiceLocatorAwareInterface, Api
 			if ($asset) {
 				switch ($property) {
 					case 'id' :
-					// case 'referrer' :
+						// case 'referrer' :
 						$data ['summary'] [$property] = $asset;
 						break;
 					case 'ipaddress' :
