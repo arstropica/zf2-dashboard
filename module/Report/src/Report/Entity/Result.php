@@ -23,7 +23,7 @@ class Result {
 	 *
 	 * @var float
 	 */
-	private $score;
+	private $_score;
 	
 	/**
 	 *
@@ -59,22 +59,22 @@ class Result {
 
 	/**
 	 *
-	 * @return number $score
+	 * @return number $_score
 	 */
 	public function getScore()
 	{
-		return $this->score;
+		return $this->_score;
 	}
 
 	/**
 	 *
-	 * @param float $score        	
+	 * @param float $_score        	
 	 *
 	 * @return Result
 	 */
-	public function setScore($score)
+	public function setScore($_score)
 	{
-		$this->score = $score;
+		$this->_score = $_score;
 		return $this;
 	}
 
