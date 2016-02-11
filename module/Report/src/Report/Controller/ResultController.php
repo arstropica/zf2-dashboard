@@ -91,7 +91,7 @@ class ResultController extends AbstractCrudController {
 		
 		$pager = $this->getPagerForm($limit);
 		
-		$results = $report ? $report->getResults(false, null, $sort) : [ ];
+		$results = $report ? $report->getResults(false, null, $sort, $order) : [ ];
 		
 		$paginator = new Paginator(new ArrayAdapter($results));
 		$paginator->setCacheEnabled(true);
@@ -101,7 +101,7 @@ class ResultController extends AbstractCrudController {
 		
 		$ui = [ 
 				'table' => [ 
-						"score" => [ 
+						"_score" => [ 
 								"col" => 1,
 								"label" => "Score",
 								"sort" => true 
@@ -116,10 +116,10 @@ class ResultController extends AbstractCrudController {
 								"label" => "Account",
 								"sort" => false 
 						],
-						"updated" => [ 
+						"lastsubmitted" => [ 
 								"col" => 2,
 								"label" => "Submitted",
-								"sort" => false 
+								"sort" => true 
 						],
 						"timecreated" => [ 
 								"col" => 2,
