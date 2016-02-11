@@ -149,7 +149,6 @@ class EntityCacheAwareListener implements ServiceLocatorAwareInterface {
 			$result [] = $queryCacheDriver->deleteAll();
 			$result [] = $resultCacheDriver->deleteAll();
 		}
-		echo "<script>console.dir(" . json_encode($result) . ");</script>";
 		return $result;
 	}
 }
