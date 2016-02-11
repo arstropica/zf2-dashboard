@@ -97,14 +97,14 @@ $report = $this->entity;
 									?>
 		        	<tr class="leaditem">
 					<td><div class="checkbox"><?php echo $this->formElement($form->get("sel[" . $lead->getId() . "]")); ?></div></td>
-					<td class="col-xs-1 score">
+					<td class="col-xs-1 _score">
 							<?php echo $result->getScore(); ?>
 						</td>
 					<td class="col-xs-3 name"><a
 						href="<?php echo $this->losUrl()->from('report/application/result/view',['id' => $report->getId(), 'lead' => $lead->getId()], ['query' => ['report' => $report->getId()]], true)?>"><?php echo $lead->getFullName(); ?></a>
 					</td>
 					<td class="col-xs-2 account"><?php $account = $lead->getAccount(); echo $account ? '<a href="' . $this->url('account/view', ['action'=>'view', 'id' => $account->getId()]) . '">' . $account->getName() . '</a>' : 'None'; ?></td>
-					<td class="col-xs-2 updated"><?php $lastSubmitted = $lead->getLastsubmitted(); if ($lastSubmitted) echo date_format($lastSubmitted, 'd M, Y h:i A') ?></td>
+					<td class="col-xs-2 lastsubmitted"><?php $lastSubmitted = $lead->getLastsubmitted(); if ($lastSubmitted) echo date_format($lastSubmitted, 'd M, Y h:i A') ?></td>
 					<td class="col-xs-2 timecreated"><?php echo date_format($lead->getTimecreated(), 'd M, Y h:i A') ?></td>
 					<td class="action col-xs-1 text-right"><a
 						href="<?php echo $this->losUrl()->from('report/application/result/view',['id'=>$report->getId(), 'action' => 'view', 'lead' => $lead->getId()], ['query' => ['report' => $report->getId()]], true)?>"
