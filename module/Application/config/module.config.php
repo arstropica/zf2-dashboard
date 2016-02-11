@@ -713,14 +713,7 @@ return array (
 										array (
 												'label' => 'Display Reports',
 												'route' => 'report/list',
-												'action' => 'list',
-												'pages' => array (
-														array (
-																'label' => 'View Results',
-																'route' => 'report/application/result/list',
-																'action' => 'list' 
-														) 
-												) 
+												'action' => 'list' 
 										),
 										array (
 												'label' => 'View Report',
@@ -729,9 +722,16 @@ return array (
 												'dynamic' => true,
 												'pages' => array (
 														array (
-																'label' => 'View Result',
-																'route' => 'report/application/result/view',
-																'action' => 'view' 
+																'label' => 'View Results',
+																'route' => 'report/application/result/list',
+																'action' => 'list',
+																'pages' => array (
+																		array (
+																				'label' => 'View Result',
+																				'route' => 'report/application/result/view',
+																				'action' => 'view' 
+																		) 
+																) 
 														) 
 												) 
 										),
