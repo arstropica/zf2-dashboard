@@ -117,7 +117,7 @@ class AddForm extends AbstractForm implements ObjectManagerAwareInterface, Servi
 				'type' => 'Zend\Form\Element\Submit',
 				'attributes' => array (
 						'type' => 'submit',
-						'value' => 'Add Report',
+						'value' => 'Create Report',
 						'id' => 'submit',
 						'class' => 'btn btn-primary' 
 				) 
