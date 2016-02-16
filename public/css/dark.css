@@ -6,7 +6,7 @@ HTML {
 }
 BODY {
 	background: #F1F1F1;
-	font-family: 'Lato', sans-serif;
+	font-family: 'Lato', "Helvetica Neue", Helvetica, Arial, sans-serif;
 	/*height:100%;*/
 	min-height: 100%;
 	position: relative;
