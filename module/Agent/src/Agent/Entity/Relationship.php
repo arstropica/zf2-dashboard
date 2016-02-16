@@ -48,6 +48,14 @@ class Relationship {
 	
 	/**
 	 *
+	 * @var string @ORM\Column(name="label", type="string", length=45,
+	 *      nullable=false)
+	 *      @Annotation\Type("Zend\Form\Element\Hidden")
+	 */
+	private $label;
+	
+	/**
+	 *
 	 * @var string @ORM\Column(name="symbol", type="string", length=45,
 	 *      nullable=false)
 	 *      @Annotation\Type("Zend\Form\Element\Hidden")
@@ -140,6 +148,27 @@ class Relationship {
 	public function setType($type)
 	{
 		$this->type = $type;
+		return $this;
+	}
+
+	/**
+	 *
+	 * @return the $label
+	 */
+	public function getLabel()
+	{
+		return $this->label;
+	}
+
+	/**
+	 *
+	 * @param string $label
+	 *         	
+	 * @return Relationship
+	 */
+	public function setLabel($label)
+	{
+		$this->label = $label;
 		return $this;
 	}
 

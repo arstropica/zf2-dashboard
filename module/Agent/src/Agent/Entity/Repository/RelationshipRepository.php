@@ -27,6 +27,26 @@ class RelationshipRepository extends EntityRepository {
 		
 		return $results;
 	}
+
+	public function getLabels()
+	{
+		$querybuilder = $this->createQueryBuilder('c');
+		$query = $querybuilder->select('c')
+			->getQuery();
+		
+		$query->useResultCache(true, 3600, self::CACHE_PREFIX . md5($query->getDQL()))
+			->useQueryCache(true);
+		
+		/* @var $results Relationship[] */
+		$results = $query->getResult();
+		
+		foreach ( $results as &$relationship ) {
+			$label = $relationship->getLabel() . " ( " . $relationship->getSymbol() . " )";
+			$relationship->setLabel($label);
+		}
+		
+		return $results;
+	}
 }
 
 ?>

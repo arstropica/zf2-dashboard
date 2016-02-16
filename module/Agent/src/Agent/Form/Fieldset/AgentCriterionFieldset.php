@@ -74,9 +74,9 @@ class AgentCriterionFieldset extends AbstractFieldset implements InputFilterProv
 						'empty_option' => 'Choose Comparison',
 						'object_manager' => $this->getObjectManager(),
 						'target_class' => 'Agent\Entity\Relationship',
-						'property' => 'description',
+						'property' => 'label',
 						'find_method' => array (
-								'name' => 'generateOptions' 
+								'name' => 'getLabels' 
 						) 
 				),
 				'attributes' => array (
