@@ -6,9 +6,13 @@ $this->headTitle($title);
 ?>
 <h1>
 <?php echo $this->escapeHtml($title); ?>
-	<span class="pull-right"> <a
+	<span class="pull-right" style="margin-left: 15px;"> <a
 		href="<?php echo $this->url('home', array('action' => 'index')); ?>"
 		class="btn btn-info" title="Back">Back</a>
+	</span> <span class="pull-right"> <a
+		href="<?php echo $this->url('event/export', array('action' => 'export'), array('query' => $this->query), true); ?>"
+		class="btn btn-success" id="exportEvents" title="Export Events">Export
+			Events</a>
 	</span>
 </h1>
 <hr class="small">
@@ -26,15 +30,15 @@ $this->headTitle($title);
 						
 						$filters->setAttribute('id', 'eventFilterForm');
 						
-						echo $this->form(null, 
-								\Application\Form\View\Helper\Form::LAYOUT_INLINE)->openTag(
-								$filters);
+						echo $this->form(null, \Application\Form\View\Helper\Form::LAYOUT_INLINE)
+							->openTag($filters);
 						
-						foreach ($filters as $filter) {
+						foreach ( $filters as $filter ) {
 							echo $this->formRow($filter);
 						}
 						
-						echo $this->form()->closeTag($filter);
+						echo $this->form()
+							->closeTag($filter);
 					}
 					?>
 				</div>
@@ -49,10 +53,11 @@ $this->headTitle($title);
 				<thead>
 					<tr>
 						<?php
-						$sl = $this->getHelperPluginManager()->getServiceLocator();
+						$sl = $this->getHelperPluginManager()
+							->getServiceLocator();
 						$em = $sl->get('doctrine.entitymanager.orm_default');
 						$r = $em->getRepository("Event\\Entity\\AccountEvent");
-						foreach ($this->ui['table'] as $field => $ui) :
+						foreach ( $this->ui ['table'] as $field => $ui ) :
 							$selected = $this->sort == $field;
 							$rorder = $this->order == 'asc' ? 'desc' : 'asc';
 							?>
@@ -82,16 +87,14 @@ $this->headTitle($title);
 						<td class="col-xs-3 account">
 							<?php
 								$ae = $r->getAccount($entity->getId(), 'entity');
-								$links = [];
+								$links = [ ];
 								if ($ae) :
-									foreach ($ae as $ev) :
+									foreach ( $ae as $ev ) :
 										$account = $ev->getAccount();
-										$links[] = '<a href="' . $this->losUrl()->from(
-												'account/view', 
-												[
-														'id' => $account->getId()
-												], false) . '">' .
-												 $account->getName() . '</a>';
+										$links [] = '<a href="' . $this->losUrl()
+											->from('account/view', [ 
+												'id' => $account->getId() 
+										], false) . '">' . $account->getName() . '</a>';
 									endforeach
 									;
 									echo implode(', ', $links);

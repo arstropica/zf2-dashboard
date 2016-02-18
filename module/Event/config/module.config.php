@@ -44,6 +44,16 @@ return array(
 														)
 												)
 										),
+										'export' => array(
+												'type' => 'Literal',
+												'options' => array(
+														'route' => '/export',
+														'defaults' => array(
+																'controller' => 'Event\Controller\Event',
+																'action' => 'export'
+														)
+												)
+										),
 										'view' => array(
 												'type' => 'Segment',
 												'options' => array(
