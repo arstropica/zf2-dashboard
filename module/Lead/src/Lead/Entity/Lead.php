@@ -470,13 +470,14 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	/**
 	 *
 	 * @param string $attributeName        	
+	 * @param bool $desc        	
 	 *
 	 * @return \Lead\Entity\LeadAttributeValue|boolean
 	 */
-	public function findAttribute($attributeName)
+	public function findAttribute($attributeName, $desc = false)
 	{
 		$attribute = false;
-		$attributes = $this->findAttributes($attributeName);
+		$attributes = $this->findAttributes($attributeName, $desc);
 		if ($attributes->count() > 0) {
 			$attribute = $attributes->first();
 		}
@@ -486,19 +487,20 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	/**
 	 *
 	 * @param string $attributeName        	
+	 * @param bool $desc        	
 	 *
 	 * @return ArrayCollection
 	 */
-	public function findAttributes($attributeName)
+	public function findAttributes($attributeName, $desc = false)
 	{
 		$attributes = $this->getAttributes(true);
 		if (!$attributes instanceof Collection) {
 			$attributes = new ArrayCollection($attributes);
 		}
-		return $attributes->filter(function ($leadAttribute) use($attributeName) {
+		return $attributes->filter(function ($leadAttribute) use($attributeName, $desc) {
 			$attribute = $leadAttribute->getAttribute();
-			return $attribute ? $leadAttribute->getAttribute()
-				->getAttributeName() == $attributeName : false;
+			$name = $desc ? $attribute->getAttributeDesc() : $attribute->getAttributeName();
+			return $attribute ? preg_match('/' . $attributeName . '/i', $name) : false;
 		});
 	}
 

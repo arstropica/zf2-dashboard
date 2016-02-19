@@ -1,5 +1,7 @@
 <?php
+
 namespace TenStreet\Mapper;
+
 use Zend\ServiceManager\ServiceManager;
 use Zend\Db\Adapter\Adapter;
 use TenStreet\Entity\TenStreetData;
@@ -16,29 +18,29 @@ use Lead\Entity\Lead;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use TenStreet\Utility\Utility;
+use Application\Utility\Helper;
 
-class TenStreetDataMapper implements ServiceLocatorAwareInterface
-{
+class TenStreetDataMapper implements ServiceLocatorAwareInterface {
 	
 	use EntityManagerAwareTrait;
-
+	
 	protected $dbAdapter;
-
+	
 	protected $sm;
-
+	
 	protected $objectRepository;
 
-	public function __construct (ServiceManager $sm, Adapter $dbAdapter)
+	public function __construct(ServiceManager $sm, Adapter $dbAdapter)
 	{
 		$this->setServiceLocator($sm);
 		
 		$this->dbAdapter = $dbAdapter;
 		
-		$this->objRepository = $this->getEntityManager()->getRepository(
-				"Lead\\Entity\\Lead");
+		$this->objRepository = $this->getEntityManager()
+			->getRepository("Lead\\Entity\\Lead");
 	}
 
-	public function getById ($id)
+	public function getById($id)
 	{
 		$tenStreetData = false;
 		
@@ -69,20 +71,20 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface
 		return $tenStreetData;
 	}
 
-	public function extract ($object)
+	public function extract($object)
 	{
 		$hydrator = new TenStreetHydrator(false);
 		
 		return $hydrator->extract($object);
 	}
 
-	public function getCredentials ($service = 'subject_upload')
+	public function getCredentials($service = 'subject_upload')
 	{
-		$objRepository = $this->getEntityManager()->getRepository(
-				"Api\\Entity\\Api");
+		$objRepository = $this->getEntityManager()
+			->getRepository("Api\\Entity\\Api");
 		
-		$criteria = [
-				'name' => 'Tenstreet'
+		$criteria = [ 
+				'name' => 'Tenstreet' 
 		];
 		
 		$api = $objRepository->findOneBy($criteria);
@@ -90,11 +92,11 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface
 		$authEntity = new Authentication();
 		
 		if ($api) {
-			foreach ([
+			foreach ( [ 
 					'ClientId',
 					'Password',
-					'Service'
-			] as $key) {
+					'Service' 
+			] as $key ) {
 				$option = $api->findOption($key) ?  : false;
 				${$key} = $option ? $option->getValue() : "";
 				$authEntity->{'set' . $key}(${$key});
@@ -104,49 +106,50 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface
 		return $authEntity;
 	}
 
-	protected function getAuthorization (Lead $lead, $options = [])
+	protected function getAuthorization(Lead $lead, $options = [])
 	{
-		if (! $options) {
+		if (!$options) {
 			$options = $this->isValid($lead);
 			
-			if (! $options) {
+			if (!$options) {
 				return false;
 			}
 		}
 		
 		$authEntity = new Authentication();
 		
-		foreach ([
+		foreach ( [ 
 				'ClientId',
 				'Password',
-				'Service'
-		] as $key) {
-			${$key} = isset($options[$key]) ? $options[$key] : "";
+				'Service' 
+		] as $key ) {
+			${$key} = isset($options [$key]) ? $options [$key] : "";
 			$authEntity->{'set' . $key}(${$key});
 		}
 		
 		return $authEntity;
 	}
 
-	protected function getTenStreetData (Lead $lead, $options = array())
+	protected function getTenStreetData(Lead $lead, $options = array())
 	{
-		if (! $options) {
+		if (!$options) {
 			$options = $this->isValid($lead);
 			
-			if (! $options) {
+			if (!$options) {
 				return false;
 			}
 		}
 		
 		$tenStreetEntity = new TenStreetData();
 		
-		$Mode = $options['Mode'];
+		$Mode = $options ['Mode'];
 		
-		$Source = $options['Source'];
+		$Source = $options ['Source'];
 		
-		$CompanyId = $options['CompanyId'];
+		$CompanyId = $options ['CompanyId'];
 		
-		$Company = isset($options['Company']) ? $options['Company'] : $lead->getAccount()->getName();
+		$Company = isset($options ['Company']) ? $options ['Company'] : $lead->getAccount()
+			->getName();
 		
 		// $DriverId = $lead->getLead()->getDriverid();
 		
@@ -163,26 +166,27 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface
 		return $tenStreetEntity;
 	}
 
-	protected function getDisplayFields (Lead $lead)
+	protected function getDisplayFields(Lead $lead)
 	{
 		$leadAttributeValues = $lead->findAttributes('Question');
 		
-		$displayFields = array();
+		$displayFields = array ();
 		
 		if ($leadAttributeValues->count() > 0) {
-			foreach ($leadAttributeValues as $attribute) {
+			foreach ( $leadAttributeValues as $attribute ) {
 				$displayField = new DisplayField();
-				$DisplayPrompt = $attribute->getAttribute()->getAttributeDesc();
+				$DisplayPrompt = $attribute->getAttribute()
+					->getAttributeDesc();
 				$DisplayValue = $attribute->getValue();
 				$displayField->setDisplayPrompt($DisplayPrompt);
 				$displayField->setDisplayValue($DisplayValue);
-				$displayFields[] = $displayField;
+				$displayFields [] = $displayField;
 			}
 		}
 		return $displayFields;
 	}
 
-	protected function getApplicationData (Lead $lead)
+	protected function getApplicationData(Lead $lead)
 	{
 		$applicationData = new ApplicationData();
 		
@@ -197,16 +201,16 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface
 		return $applicationData;
 	}
 
-	protected function getPersonName (Lead $lead)
+	protected function getPersonName(Lead $lead)
 	{
 		$personName = new PersonName();
 		
 		$FirstName = $LastName = "";
 		
-		foreach ([
+		foreach ( [ 
 				'LastName',
-				'FirstName'
-		] as $key) {
+				'FirstName' 
+		] as $key ) {
 			${$key} = $this->getLeadAttributeValue($lead, $key);
 		}
 		
@@ -217,16 +221,16 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface
 		return $personName;
 	}
 
-	protected function getPostalAddress (Lead $lead)
+	protected function getPostalAddress(Lead $lead)
 	{
 		$postalAddress = new PostalAddress();
 		
 		$City = $State = "";
 		
-		foreach ([
+		foreach ( [ 
 				'City',
-				'State'
-		] as $key) {
+				'State' 
+		] as $key ) {
 			if ($key == 'State') {
 				$state = $this->getLeadAttributeValue($lead, $key);
 				${$key} = Utility::getState($state, "short", $state);
@@ -242,16 +246,16 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface
 		return $postalAddress;
 	}
 
-	protected function getContactData (Lead $lead)
+	protected function getContactData(Lead $lead)
 	{
 		$contactData = new ContactData();
 		
 		$Email = $Phone = "";
 		
-		foreach ([
+		foreach ( [ 
 				'Email',
-				'Phone'
-		] as $key) {
+				'Phone' 
+		] as $key ) {
 			${$key} = $this->getLeadAttributeValue($lead, $key);
 		}
 		
@@ -262,7 +266,18 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface
 		return $contactData;
 	}
 
-	protected function getPersonalData (Lead $lead)
+	protected function getDateOfBirth(Lead $lead)
+	{
+		$DateOfBirth = null;
+		$match = $lead->findAttribute('birth|dob', true);
+		if ($match) {
+			$date = $match->getValue();
+			$DateOfBirth = ($date instanceof \DateTime) ? date_format('m/d/Y', $date) : (Helper::validateDate($date) ? date('m/d/Y', strtotime($date)) : null);
+		}
+		return $DateOfBirth;
+	}
+
+	protected function getPersonalData(Lead $lead)
 	{
 		$personalData = new PersonalData();
 		
@@ -272,16 +287,20 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface
 		
 		$ContactData = $this->getContactData($lead);
 		
+		$DateOfBirth = $this->getDateOfBirth($lead);
+		
 		$personalData->setPersonName($PersonName);
 		
 		$personalData->setPostalAddress($PostalAddress);
 		
 		$personalData->setContactData($ContactData);
 		
+		$personalData->setDateOfBirth($DateOfBirth);
+		
 		return $personalData;
 	}
 
-	protected function isValid (Lead $lead)
+	protected function isValid(Lead $lead)
 	{
 		$valid = true;
 		$tenstreet = false;
@@ -291,7 +310,7 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface
 		$apis = $account->getApis();
 		// Check Tenstreet API
 		if ($apis) {
-			foreach ($apis as $api) {
+			foreach ( $apis as $api ) {
 				if ($api->getName() == 'Tenstreet') {
 					$tenstreet = $api;
 				}
@@ -299,50 +318,43 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface
 		}
 		
 		if ($tenstreet) {
-			$options = [];
+			$options = [ ];
 			$apiOptions = $tenstreet->getOptions();
-			$values = array_map(
-					function  ($option)
-					{
-						return [
-								$option->getOption() => $option->getValue()
-						];
-					}, 
-					array_filter($apiOptions, 
-							function  ($option)
-							{
-								return $option->getApi()->getName() ==
-										 'Tenstreet' &&
-										 ! empty($option->getValue()) &&
-										 $option->getScope() == 'global';
-							}));
+			$values = array_map(function ($option) {
+				return [ 
+						$option->getOption() => $option->getValue() 
+				];
+			}, array_filter($apiOptions, function ($option) {
+				return $option->getApi()
+					->getName() == 'Tenstreet' && !empty($option->getValue()) && $option->getScope() == 'global';
+			}));
 			
-			foreach ($values as $option) {
-				foreach ($option as $key => $value) {
-					$options[$key] = $value;
+			foreach ( $values as $option ) {
+				foreach ( $option as $key => $value ) {
+					$options [$key] = $value;
 				}
 			}
 			
-			foreach ($account->getApiSettings() as $apiSetting) {
+			foreach ( $account->getApiSettings() as $apiSetting ) {
 				$option = $apiSetting->getApiOption();
 				switch ($option->getOption()) {
-					case 'CompanyId':
-						$options['CompanyId'] = $apiSetting->getApiValue();
+					case 'CompanyId' :
+						$options ['CompanyId'] = $apiSetting->getApiValue();
 						break;
-					case 'Company':
-						$options['Company'] = $apiSetting->getApiValue();
+					case 'Company' :
+						$options ['Company'] = $apiSetting->getApiValue();
 						break;
 				}
 			}
-			foreach ([
+			foreach ( [ 
 					'Source',
 					'ClientId',
 					'Password',
 					'Mode',
 					'Service',
-					'CompanyId'
-			] as $option) {
-				if (! in_array($option, array_keys($options))) {
+					'CompanyId' 
+			] as $option ) {
+				if (!in_array($option, array_keys($options))) {
 					$valid = false;
 				}
 			}
@@ -353,20 +365,20 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface
 		return $valid ? $options : false;
 	}
 
-	protected function getLeadAttributeValue (Lead $lead, $key, $default = "")
+	protected function getLeadAttributeValue(Lead $lead, $key, $default = "")
 	{
 		$attribute = $lead->findAttribute($key);
 		return ($attribute) ? $attribute->getValue() : $default;
 	}
 
-	public function setServiceLocator (ServiceLocatorInterface $sm)
+	public function setServiceLocator(ServiceLocatorInterface $sm)
 	{
 		$this->sm = $sm;
 		
 		return $this;
 	}
 
-	public function getServiceLocator ()
+	public function getServiceLocator()
 	{
 		return $this->sm;
 	}

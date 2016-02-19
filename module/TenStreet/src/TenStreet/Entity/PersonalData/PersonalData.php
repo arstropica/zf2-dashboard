@@ -9,6 +9,8 @@ class PersonalData
 	protected $PostalAddress;
 
 	protected $ContactData;
+	
+	protected $DateOfBirth;
 
 	public function getArrayCopy ()
 	{
@@ -72,4 +74,24 @@ class PersonalData
 		$this->ContactData = $ContactData;
 		return $this;
 	}
+	
+	/**
+	 * @return \DateTime $DateOfBirth
+	 */
+	public function getDateOfBirth()
+	{
+		return $this->DateOfBirth;
+	}
+
+	/**
+	 * @param \DateTime $DateOfBirth
+	 * 
+	 * @return PersonalData
+	 */
+	public function setDateOfBirth($DateOfBirth)
+	{
+		$this->DateOfBirth = $DateOfBirth;
+		return $this;
+	}
+
 }

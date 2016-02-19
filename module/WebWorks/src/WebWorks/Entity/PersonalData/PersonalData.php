@@ -72,4 +72,24 @@ class PersonalData {
 		$this->ContactData = $ContactData;
 		return $this;
 	}
+	
+	/**
+	 * @return \DateTime $DateOfBirth
+	 */
+	public function getDateOfBirth()
+	{
+		return $this->DateOfBirth;
+	}
+
+	/**
+	 * @param \DateTime $DateOfBirth
+	 * 
+	 * @return PersonalData
+	 */
+	public function setDateOfBirth($DateOfBirth)
+	{
+		$this->DateOfBirth = $DateOfBirth;
+		return $this;
+	}
+
 }

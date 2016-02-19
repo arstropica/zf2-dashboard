@@ -17,6 +17,7 @@ use Lead\Entity\Lead;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use WebWorks\Utility\Utility;
+use Application\Utility\Helper;
 
 class WebWorksDataMapper implements ServiceLocatorAwareInterface {
 	
@@ -204,6 +205,17 @@ class WebWorksDataMapper implements ServiceLocatorAwareInterface {
 		return $contactData;
 	}
 
+	protected function getDateOfBirth(Lead $lead)
+	{
+		$DateOfBirth = null;
+		$match = $lead->findAttribute('birth|dob', true);
+		if ($match) {
+			$date = $match->getValue();
+			$DateOfBirth = ($date instanceof \DateTime) ? date_format('m/d/Y', $date) : (Helper::validateDate($date) ? date('m/d/Y', strtotime($date)) : null);
+		}
+		return $DateOfBirth;
+	}
+
 	protected function getPersonalData(Lead $lead)
 	{
 		$personalData = new PersonalData();
@@ -214,11 +226,15 @@ class WebWorksDataMapper implements ServiceLocatorAwareInterface {
 		
 		$ContactData = $this->getContactData($lead);
 		
+		$DateOfBirth = $this->getDateOfBirth($lead);
+		
 		$personalData->setPersonName($PersonName);
 		
 		$personalData->setPostalAddress($PostalAddress);
 		
 		$personalData->setContactData($ContactData);
+		
+		$personalData->setDateOfBirth($DateOfBirth);
 		
 		return $personalData;
 	}
