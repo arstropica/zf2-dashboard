@@ -352,7 +352,7 @@ return array (
 												'visible' => false 
 										),
 										array (
-												'label' => 'Add Report',
+												'label' => 'Create Report',
 												'route' => 'report/add',
 												'action' => 'add' 
 										),
@@ -736,7 +736,7 @@ return array (
 												) 
 										),
 										array (
-												'label' => 'Add Report',
+												'label' => 'Create Report',
 												'route' => 'report/add',
 												'action' => 'add' 
 										),
