@@ -89,6 +89,13 @@ class ResultController extends AbstractCrudController {
 				'id' => $id 
 		]);
 		
+		if (!$report) {
+			return $this->redirect()
+				->toRoute('report/list', [ 
+					'action' => 'list' 
+			], true);
+		}
+		
 		$pager = $this->getPagerForm($limit);
 		
 		$results = $report ? $report->getResults(false, null, $sort, $order) : [ ];
