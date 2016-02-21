@@ -3,6 +3,7 @@
 namespace Application\Service;
 
 use Zend\Cache\Storage\StorageInterface;
+use Zend\Session\Container;
 
 /**
  * Get / Set Cache Implementation
@@ -27,6 +28,16 @@ interface CacheAwareInterface {
 	 * @return StorageInterface
 	 */
 	public function getCache();
+
+	/**
+	 *
+	 * Get Session Cache
+	 *
+	 * @param string $name        	
+	 *
+	 * @return Container
+	 */
+	public function getSessionCache($name);
 
 }
 

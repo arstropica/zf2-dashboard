@@ -3,6 +3,7 @@
 namespace Application\Provider;
 
 use Zend\Cache\Storage\StorageInterface;
+use Zend\Session\Container;
 
 /**
  * Gets / Sets Cache Implementation
@@ -38,6 +39,19 @@ trait CacheAwareTrait {
 				->get('Utils\Cache');
 		}
 		return $this->cache;
+	}
+
+	/**
+	 *
+	 * Get Session Cache
+	 *
+	 * @param string $name        	
+	 *
+	 * @return Container
+	 */
+	public function getSessionCache($name)
+	{
+		return new Container($name);
 	}
 }
 

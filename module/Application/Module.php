@@ -20,6 +20,9 @@ use Application\Controller\Plugin\DataDump;
 use Application\Event\Listener\ServiceLocatorListener;
 use Doctrine\ORM\Events;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
+use Zend\Session\Config\SessionConfig;
+use Zend\Session\SessionManager;
+use Zend\Session\Container;
 
 class Module implements AutoloaderProviderInterface {
 
@@ -77,6 +80,13 @@ class Module implements AutoloaderProviderInterface {
 		$doctrine_evm->addEventListener([ 
 				Events::postLoad 
 		], $listener);
+		
+		// Init Session Manager
+		self::initSession(array (
+				'remember_me_seconds' => 180,
+				'use_cookies' => true,
+				'cookie_httponly' => true 
+		));
 	}
 
 	public function getConfig()
@@ -117,6 +127,15 @@ class Module implements AutoloaderProviderInterface {
 			header("Location: " . $redirect_url);
 		}
 		return false;
+	}
+
+	public static function initSession($config)
+	{
+		$sessionConfig = new SessionConfig();
+		$sessionConfig->setOptions($config);
+		$sessionManager = new SessionManager($sessionConfig);
+		$sessionManager->start();
+		Container::setDefaultManager($sessionManager);
 	}
 
 	public function getServiceConfig()
