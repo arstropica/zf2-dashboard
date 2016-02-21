@@ -499,8 +499,11 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 		}
 		return $attributes->filter(function ($leadAttribute) use($attributeName, $desc) {
 			$attribute = $leadAttribute->getAttribute();
-			$name = $desc ? $attribute->getAttributeDesc() : $attribute->getAttributeName();
-			return $attribute ? preg_match('/' . preg_quote($attributeName, '/') . '/i', $name) : false;
+			if ($attribute) {
+				$name = $desc ? $attribute->getAttributeDesc() : $attribute->getAttributeName();
+				return preg_match('/' . preg_quote($attributeName, '/') . '/i', $name);
+			}
+			return false;
 		});
 	}
 
