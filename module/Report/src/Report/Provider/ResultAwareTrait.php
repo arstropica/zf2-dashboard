@@ -77,10 +77,18 @@ trait ResultAwareTrait {
 							$limit = $limit ?  : $total;
 							for($page = 1; $page < ceil($limit / $size); $page++) {
 								$query->setFrom($page * $size);
-								$results = $this->runQuery($query);
+								$results = $this->runQuery($query, $silent);
 								if ($results ['results']) {
 									foreach ( $results as $result ) {
-										$data->add($result);
+										if (is_array($result)) {
+											foreach ( $result as $r ) {
+												if ($r instanceof Result) {
+													$data->add($r);
+												}
+											}
+										} elseif ($result instanceof Result) {
+											$data->add($result);
+										}
 									}
 								}
 							}
