@@ -1513,6 +1513,8 @@ form#pagerform label {
 .panel-heading .clickable {
 	margin-top: -20px;
 	font-size: 15px;
+	width: 100%;
+	text-align: right;
 }
 
 .clickable {
