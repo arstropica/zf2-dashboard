@@ -813,6 +813,22 @@ $(function() {
 	$('BODY:not(.folded) .navbar-nav .dropdown').on('hide.bs.dropdown', function(e) {
 		$(this).find('.dropdown-menu').first().stop(true, true).slideUp();
 	});
+	
+	// COLLAPSIBLE PANEL
+	$('.panel-collapse').on('shown.bs.collapse', function(){
+		var $icon = $(this).closest('.panel').find('.panel-heading .clickable .glyphicon');
+		if ($icon.length > 0) {
+			$icon.removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+		}
+	})
+	.on('hidden.bs.collapse', function(){
+		var $icon = $(this).closest('.panel').find('.panel-heading .clickable .glyphicon');
+		if ($icon.length > 0) {
+			$icon.removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+		}
+	});
+
+	$('.panel-heading .clickable')
 
 	// SELECT ALL CHECKBOXES
 	var $enabled = $("TABLE.sel TD .checkbox INPUT[type=checkbox][disabled!=disabled]");
