@@ -1,6 +1,7 @@
 <?php
 use Application\Form\View\Helper\Form as FormHelper;
 use Report\Entity\Result;
+use Report\Entity\Report;
 
 $title = 'Search Leads';
 $this->headTitle($title);
@@ -15,11 +16,14 @@ $report = $this->entity;
 	</span> <span class="pull-right" style="margin-left: 15px;"> <a
 		href="<?php echo $this->url('report/add', array('action' => 'add')); ?>"
 		class="btn btn-success" title="Create Report">Create Report</a>
-	</span> <span class="pull-right"> <a target="_blank"
-		href="<?php echo $this->url('lead/search/export', array('action' => 'export')); ?>"
+	</span>
+	<?php if ($report instanceof Report && $report->getId()) : ?> 
+		<span class="pull-right"> <a target="_blank"
+		href="<?php echo $this->url('lead/search/export', array('action' => 'export', 'id' => $report->getId())); ?>"
 		class="btn btn-primary" id="exportLeads" title="Export Results">Export
 			Results</a>
 	</span>
+	<?php endif; ?>
 </h1>
 <hr class="small">
 <br />

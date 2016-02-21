@@ -13,6 +13,7 @@ use Zend\Paginator\Adapter\ArrayAdapter;
 use Application\Hydrator\Strategy\DateTimeStrategy;
 use Agent\Entity\Agent;
 use Application\Provider\CacheAwareTrait;
+use Report\Entity\Result;
 
 /**
  *
@@ -277,7 +278,102 @@ class ReportController extends AbstractCrudController {
 	}
 
 	public function exportAction()
-	{}
+	{
+		$results = array ();
+		$labels = array ();
+		$headings = array ();
+		$this->exportHeadings = $headings;
+		
+		$id = $this->getEvent()
+			->getRouteMatch()
+			->getParam('id', 0);
+		
+		$limit = $this->getLimit($this->defaultPageSize);
+		
+		$sort = $this->getRequest()
+			->getQuery('sort', $this->defaultSort);
+		$order = $this->getRequest()
+			->getQuery('order', $this->defaultOrder);
+		
+		if (empty($sort)) {
+			$sort = $this->defaultSort;
+		}
+		
+		$classe = $this->getEntityClass();
+		
+		/* @var $report \Report\Entity\Report */
+		$report = new $classe();
+		$report->setServiceLocator($this->getServiceLocator());
+		
+		if (method_exists($this, 'getSearchForm')) {
+			$form = $this->getSearchForm();
+		} else {
+			$form = $this->getForm();
+		}
+		
+		$form->bind($report);
+		
+		if ($id) {
+			$form->get('id')
+				->setValue($id);
+			// Retrieve Session-Cached data
+			$cachedData = $this->getCachedParams($id);
+			if ($cachedData) {
+				$form->setData($cachedData);
+				if ($form->isValid()) {
+					$form->get('id')
+						->setValue($id);
+					
+					if ($report) {
+						$report = $this->setRelationships($report, $cachedData);
+						$results = $report->getResults(false, null, $sort, $order);
+						
+						if ($results) {
+							
+							$em = $this->getEntityManager();
+							$attributeRepository = $em->getRepository("Lead\\Entity\\LeadAttribute");
+							
+							$attributes = $attributeRepository->getUniqueArray();
+							
+							$headings = [ 
+									'lead' => [ 
+											'score' => 'Score',
+											'account' => [ 
+													'name' => 'Account' 
+											],
+											'timecreated' => 'Time Created',
+											'lastsubmitted' => 'Last Submitted',
+											'referrer' => 'Referrer',
+											'ipaddress' => 'IP Address',
+											'attributes' => $attributes 
+									] 
+							];
+							
+							foreach ( $headings ['lead'] as $property => $field ) {
+								$key = $property;
+								if (is_array($field)) {
+									foreach ( $field as $externalKey => $value ) {
+										$key = $property . "[{$externalKey}]";
+										$labels [$key] = $value;
+									}
+								} else {
+									$labels [$key] = $field;
+								}
+							}
+							
+							$this->exportHeadings = array_values($labels);
+						
+						}
+					}
+				}
+			}
+		}
+		
+		return $this->csvExport('Search Results (' . date('Y-m-d') . ').csv', $this->exportHeadings, $results, array (
+				$this,
+				'extractResult' 
+		));
+	}
 
 	/**
 	 * (non-PHPdoc)
@@ -421,6 +517,74 @@ class ReportController extends AbstractCrudController {
 			return isset($_data [$id]) ? $_data [$id] : false;
 		}
 		return false;
+	}
+
+	public function extractResult(Result $result)
+	{
+		$headings = $this->exportHeadings;
+		$lead = $result->getLead();
+		
+		$entityManager = $this->getEntityManager();
+		$hydrator = new DoctrineHydrator($entityManager);
+		$leadArray = $hydrator->extract($lead);
+		$output = array_combine($headings, array_pad([ ], count($headings), ""));
+		
+		foreach ( $headings as $heading ) {
+			switch ($heading) {
+				case "Score" :
+					$score = $result->getScore();
+					$output [$heading] = $score ? $score : "N/A";
+					break;
+				case "Account" :
+					$account = $lead->getAccount();
+					$output [$heading] = $account ? $account->getName() : "N/A";
+					break;
+				case "Last Submitted" :
+					$time = $lead->getLastsubmitted();
+					if ($time instanceof \DateTime) {
+						$time = date_format($time, 'Y-m-d H:i:s');
+					}
+					$output [$heading] = $time;
+					break;
+				case "Time Created" :
+					$time = $lead->getTimecreated();
+					if ($time instanceof \DateTime) {
+						$time = date_format($time, 'Y-m-d H:i:s');
+					}
+					$output [$heading] = $time;
+					break;
+				case "Referrer" :
+					$output [$heading] = $lead->getReferrer();
+					break;
+				case "IP Address" :
+					$output [$heading] = $lead->getIpaddress();
+					break;
+				default :
+					$attribute = $lead->findAttribute($heading);
+					if (!$attribute) {
+						$attributes = $lead->getAttributes(true)
+							->filter(function ($attribute) use($heading) {
+							$real_attribute = false;
+							$attribute_desc = false;
+							if ($attribute) {
+								$real_attribute = $attribute->getAttribute();
+							}
+							if ($real_attribute) {
+								$attribute_desc = $real_attribute->getAttributeDesc();
+							}
+							return $attribute_desc == $heading;
+						});
+						if ($attributes->count() > 0) {
+							$attribute = $attributes->first();
+						}
+					}
+					if ($attribute) {
+						$output [$heading] = $attribute->getValue();
+					}
+					break;
+			}
+		}
+		return $output;
 	}
 
 	protected function logEvent($event)
