@@ -642,7 +642,11 @@ $.fn.initChosen = function(options) {
 			if (opts.resize) {
 				$(window).on('resize', resize);
 			}
+			
+			$control.on('resize', resize);
 
+			$('#form-panel-wrapper').on('shown.bs.collapse', resize);
+			
 			if (!placeholder) {
 				if (!!$control.prop('placeholder')) {
 					placeholder = $control.prop('placeholder');
