@@ -147,6 +147,18 @@ class Report implements ServiceLocatorAwareInterface, ObjectManagerAwareInterfac
 
 	/**
 	 *
+	 * @param integer $id        	
+	 *
+	 * @return Report
+	 */
+	public function setId($id)
+	{
+		$this->id = $id;
+		return $this;
+	}
+
+	/**
+	 *
 	 * @return string $name
 	 */
 	public function getName()
@@ -323,12 +335,12 @@ class Report implements ServiceLocatorAwareInterface, ObjectManagerAwareInterfac
 		$results = $this->getResults(true);
 		$result = null;
 		if ($results && $results instanceof Collection) {
-			$result = $results->filter(function ($r) use($id) {
-				return $r->getLead()
-					->getId() == $id;
+			$filtered = $results->filter(function ($r) use($id) {
+				return ($r instanceof Result) ? $r->getLead()
+					->getId() == $id : false;
 			});
-			if ($result && $result->count() > 0) {
-				$result = $result->first();
+			if ($filtered && $filtered->count() > 0) {
+				$result = $filtered->first();
 			}
 		}
 		return $result;
