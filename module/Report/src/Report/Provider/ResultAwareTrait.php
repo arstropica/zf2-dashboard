@@ -40,6 +40,9 @@ trait ResultAwareTrait {
 	public function generateResults(Report $report, $limit = 0, $sort = '_score', $order = 'desc', $silent = false)
 	{
 		$data = new ArrayCollection();
+		$request = $this->getServiceLocator()
+			->get('Request');
+		$silent = $request->getQuery('debug') ? false : $silent;
 		if ($report instanceof Report) {
 			$agent = $report->getAgent();
 			// $account = $report->getAccount();
