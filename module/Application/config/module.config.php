@@ -221,6 +221,11 @@ return array (
 												'action' => 'list' 
 										),
 										array (
+												'label' => 'Search Leads',
+												'route' => 'lead/search',
+												'action' => 'search' 
+										),
+										array (
 												'label' => 'Import Leads',
 												'route' => 'import',
 												'action' => 'import' 
@@ -234,6 +239,12 @@ return array (
 												'label' => 'Display Attributes',
 												'route' => 'attribute',
 												'action' => 'list' 
+										),
+										array (
+												'label' => 'Search Result',
+												'route' => 'lead/search/result',
+												'action' => 'result',
+												'visible' => false 
 										),
 										array (
 												'label' => 'View Lead',
@@ -452,6 +463,21 @@ return array (
 												'label' => 'Display Leads',
 												'route' => 'lead/list',
 												'action' => 'list' 
+										),
+										array (
+												'label' => 'Search Leads',
+												'route' => 'lead/search',
+												'action' => 'search',
+												'visible' => true,
+												'dynamic' => true,
+												'pages' => array (
+														array (
+																'label' => 'Search Result',
+																'route' => 'lead/search/result',
+																'action' => 'result',
+																'visible' => true 
+														) 
+												) 
 										),
 										array (
 												'label' => 'Import Leads',
