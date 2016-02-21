@@ -1508,6 +1508,22 @@ form#pagerform label {
 	width: 100%;
 }
 
+/*Lead Search 
+----------------------------- */
+.panel-heading .clickable {
+	margin-top: -20px;
+	font-size: 15px;
+}
+
+.clickable {
+	cursor: pointer;
+}
+
+.form-horizontal .form-panel .row > .form-group {
+	margin-left: 0;
+	margin-right: 0;
+}
+
 /* Flexbox Styles 
 ----------------------------- */
 .row-flex {
