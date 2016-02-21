@@ -95,7 +95,7 @@ $(function() {
 	}
 
 	// Add Report
-	if ($('BODY.action-add.controller-report.module-report, BODY.action-edit.controller-report.module-report').length > 0) {
+	if ($('BODY.action-add.controller-report.module-report, BODY.action-edit.controller-report.module-report, BODY.action-search.controller-report.module-lead').length > 0) {
 		$('#criteria').delegate('.addremove-fieldset', 'formcollection_add', function() {
 			init_controls($(this));
 		});
