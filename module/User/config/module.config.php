@@ -341,6 +341,15 @@ return array (
 								),
 								
 								array (
+										'controller' => 'Lead\Controller\Report',
+										'roles' => array (
+												'user',
+												'moderator',
+												'administrator' 
+										) 
+								),
+								
+								array (
 										'controller' => 'Account\Controller\Account',
 										'roles' => array (
 												'user',

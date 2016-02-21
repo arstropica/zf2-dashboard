@@ -1,0 +1,109 @@
+<?php
+use Application\Form\View\Helper\Form as FormHelper;
+use Report\Entity\Result;
+
+$title = 'Search Leads';
+$this->headTitle($title);
+/* $report \Report\Entity\Report */
+$report = $this->entity;
+?>
+<h1>
+<?php echo $this->escapeHtml($title); ?>
+	<span class="pull-right" style="margin-left: 15px;"> <a
+		href="<?php echo $this->url('lead/list', array('action' => 'list')); ?>"
+		class="btn btn-info" title="Back">Back</a>
+	</span> <span class="pull-right" style="margin-left: 15px;"> <a
+		href="<?php echo $this->url('report/add', array('action' => 'add')); ?>"
+		class="btn btn-success" title="Create Report">Create Report</a>
+	</span> <span class="pull-right"> <a target="_blank"
+		href="<?php echo $this->url('lead/search/export', array('action' => 'export')); ?>"
+		class="btn btn-primary" id="exportLeads" title="Export Results">Export
+			Results</a>
+	</span>
+</h1>
+<hr class="small">
+<br />
+<div class="row formtable-header">
+	<div class="col-xs-12">
+		<div class="row pager-control">
+			<div class="col-xs-6">
+				<div class="pager-header pull-left">
+							<?php echo $this->form($this->pager, FormHelper::LAYOUT_HORIZONTAL); ?>
+						</div>
+			</div>
+			<div class="col-xs-6">
+				<div class="total-item-count pull-right">
+							<?php echo $this->paginatorPosition($this->paginator); ?>
+						</div>
+			</div>
+		</div>
+	</div>
+</div>
+<?php include __DIR__ . '/partial/form.phtml'; ?>
+<div class="row">
+	<div class="col-xs-12">
+		<table class="table table-hover table-striped sel" id="leadstable">
+			<thead>
+				<tr>
+				<?php
+				foreach ( $this->ui ['table'] as $field => $ui ) :
+					$selected = $this->sort == $field;
+					$rorder = $this->order == 'asc' ? 'desc' : 'asc';
+					?>
+				<th class="col-xs-<?php echo $ui['col']; ?> <?php echo $field; ?>">
+				<?php if ($ui['sort']) : ?>
+				<a class="sort <?php if ($selected) : echo "selected"; endif; ?>"
+						title="Sort by <?php echo $ui['label']; ?>"
+						href="<?php echo $this->url('lead/search', array('action' => 'search'), array('query' => array_merge($this->query, array('page' => $this->page, 'sort' => $field, 'order' => ($selected ? $rorder : $this->order)))), true); ?>">
+							<span>
+				<?php echo $ui['label']; ?> <span
+								class="glyphicon <?php echo $this->order; ?>" aria-hidden="true"></span>
+						</span>
+					</a>
+				<?php else: echo $ui['label']; endif; ?>
+				</th>
+				<?php endforeach; ?>
+				<th class="action col-xs-1 text-right">Action</th>
+				</tr>
+			</thead>
+			<tbody>
+	    		<?php
+							foreach ( $this->paginator as $result ) :
+								if ($result instanceof Result) :
+									$lead = $result->getLead();
+									?>
+		        <tr class="leaditem">
+					<td class="col-xs-1 _score">
+							<?php echo $result->getScore(); ?>
+						</td>
+					<td class="col-xs-3 name"><a
+						href="<?php echo $this->losUrl()->from('lead/search/result',['action' => 'result', 'id' => $report->getId(), 'lead' => $lead->getId()], true)?>"><?php echo $lead->getFullName(); ?></a>
+					</td>
+					<td class="col-xs-2 account"><?php $account = $lead->getAccount(); echo $account ? '<a href="' . $this->url('account/view', ['action'=>'view', 'id' => $account->getId()]) . '">' . $account->getName() . '</a>' : 'None'; ?></td>
+					<td class="col-xs-2 lastsubmitted"><?php $lastSubmitted = $lead->getLastsubmitted(); if ($lastSubmitted) echo date_format($lastSubmitted, 'd M, Y h:i A') ?></td>
+					<td class="col-xs-2 timecreated"><?php echo date_format($lead->getTimecreated(), 'd M, Y h:i A') ?></td>
+					<td class="action col-xs-1 text-right"><a
+						href="<?php echo $this->losUrl()->from('lead/search/result',['action' => 'result', 'id' => $report->getId(), 'lead' => $lead->getId()], true)?>"
+						title="View Lead" class="btn btn-xs btn-info"><?php echo $this->losIcon('glyphicon-eye-open') ?></a>
+						<a
+						href="<?php echo $this->losUrl()->from('lead/edit',['id'=>$lead->getId()], true)?>"
+						title="Edit Lead" class="btn btn-xs btn-warning"><?php echo $this->losIcon('glyphicon-edit') ?></a>
+					</td>
+				</tr>
+				<?php endif;?>
+			<?php endforeach;?>
+			</tbody>
+		</table>
+	</div>
+</div>
+<?php if ($this->paginator->count() > 1):?>
+<div class="row">
+	<div class="col-xs-12 text-center"><?php echo $this->losPaginationControl($this->paginator,'Sliding',null,['query'=>$this->query]); ?></div>
+</div>
+<?php endif?>
+<?php echo $this->losHeadLink()->setBasePath('/js')->appendChosen()?>
+<?php echo $this->losHeadScript()->setBasePath('/js')->appendChosen()?>
+<?php echo $this->losHeadScript()->setBasePath('/js')->appendFile('/js/report.js?v=2')?>
+<script type="text/javascript">
+	<?php echo "var query = " . json_encode($this->query) . ";"; ?>
+</script>

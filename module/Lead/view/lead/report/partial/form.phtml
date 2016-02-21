@@ -1,0 +1,75 @@
+<?php 
+use Zend\Form\Fieldset;
+use Application\Form\Element\Collection;
+?>
+<hr class="small">
+<div class="row" id="reportForm">
+	<div class="col-xs-12">
+		<?php
+			$this->form->prepare();
+			echo $this->form(null, \Application\Form\View\Helper\Form::LAYOUT_HORIZONTAL)->openTag($this->form);
+			echo $this->formHidden($form->get('id'));
+			echo $this->formHidden($form->get('name'));
+			echo $this->formHidden($form->get('updated'));
+			$agent = $this->form->get('agent'); 
+		?>
+		<div class="panel form-panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<?php if ($agent->getLabel()) : ?>
+						<?php echo $this->formLabel($agent); ?>
+					<?php endif; ?>
+				</h3>
+				<a data-toggle="collapse" href="#form-panel-wrapper" class="pull-right clickable"><i class="glyphicon glyphicon-chevron-down"></i></a>
+			</div>
+			<div id="form-panel-wrapper" class="panel-collapse collapse">
+				<div class="panel-body">
+					<fieldset id="<?php echo $agent->getAttribute('id'); ?>-wrapper">
+						<fieldset id="filter-wrapper" class="collection-fieldset addremove">
+							<legend>1. Filter By Account</legend>
+							<fieldset>
+								<fieldset class="addremove-fieldset">
+									<?php echo $this->formRow($agent->get('account')); ?>
+									<?php echo $this->formRow($agent->get('orphan')); ?>
+								</fieldset>
+							</fieldset>
+						</fieldset>
+						<?php foreach ($agent as $fieldName => $element) : ?>
+							<?php switch ($fieldName) : case 'account' : case 'orphan' : break; default: ?>
+							<?php if ($element instanceof Collection) : ?>
+									<fieldset id="<?php echo $element->getAttribute('id'); ?>-wrapper">
+										<?php echo $this->fieldCollection($element); ?>
+									</fieldset>
+								<?php elseif ($element instanceof Fieldset) : ?>
+									<fieldset
+							<?php if (($elementId = $element->getAttribute('id')) === true) :?>
+							id="<?php echo $elementId; ?>-wrapper" <?php endif; ?>>
+										<?php foreach ($element as $oElement) : ?>
+											<?php echo $this->formRow($oElement); ?>
+										<?php endforeach; ?>
+									</fieldset>
+								<?php elseif (in_array($element->getAttribute('type'), ['hidden', 'csrf'])) : ?>
+									<?php echo $this->formElement($element); ?>
+								<?php else: ?>
+									<?php echo $this->formRow($element); ?>
+								<?php endif; ?>
+								<?php break; ?>
+							<?php endswitch; ?>
+						<?php endforeach; ?>
+					</fieldset>
+					<div class="row">
+						<div class="form-group col-sm-12">
+							<div class="pull-left" style="margin-right: 15px;">
+								<?php echo $this->formElement($this->form->get('submit')); ?>
+							</div>
+							<div class="pull-left" style="margin-right: 15px;">
+								<?php echo $this->formElement($this->form->get('cancel')); ?>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<?php echo $this->form()->closeTag($this->form); ?>
+	</div>
+</div>

@@ -8,7 +8,8 @@ return array (
 						'Lead\Controller\Import' => 'Lead\Controller\ImportController',
 						'Lead\Controller\Services' => 'Lead\Controller\ServicesController',
 						'Lead\Controller\Attribute' => 'Lead\Controller\AttributeController',
-						'Lead\Controller\Ajax' => 'Lead\Controller\AjaxController' 
+						'Lead\Controller\Ajax' => 'Lead\Controller\AjaxController',
+						'Lead\Controller\Report' => 'Lead\Controller\ReportController' 
 				),
 				'factories' => array (
 						'Lead\Controller\Rest' => 'Lead\Controller\Factory\RestControllerFactory' 
@@ -133,6 +134,47 @@ return array (
 																		'defaults' => array (
 																				'controller' => 'Lead\Controller\Ajax',
 																				'action' => 'name' 
+																		) 
+																) 
+														) 
+												) 
+										),
+										'search' => array (
+												'type' => 'Segment',
+												'options' => array (
+														'route' => '/search[/:id]',
+														'constraints' => array (
+																'id' => '[a-zA-Z0-9_-]*' 
+														),
+														'defaults' => array (
+																'controller' => 'Lead\Controller\Report',
+																'action' => 'search',
+																'id' => 0 
+														) 
+												),
+												'may_terminate' => true,
+												'child_routes' => array (
+														'export' => array (
+																'type' => 'Literal',
+																'options' => array (
+																		'route' => '/export',
+																		'defaults' => array (
+																				'controller' => 'Lead\Controller\Report',
+																				'action' => 'export' 
+																		) 
+																) 
+														),
+														'result' => array (
+																'type' => 'Segment',
+																'options' => array (
+																		'route' => '/result[/:lead]',
+																		'constraints' => array (
+																				'lead' => '[0-9]+' 
+																		),
+																		'defaults' => array (
+																				'controller' => 'Lead\Controller\Report',
+																				'action' => 'result',
+																				'lead' => 0 
 																		) 
 																) 
 														) 
@@ -453,14 +495,16 @@ return array (
 						'Lead\Form\AddForm' => 'Lead\Form\AddForm',
 						'Lead\Form\EditForm' => 'Lead\Form\EditForm',
 						'Lead\Form\Attribute\AddForm' => 'Lead\Form\Attribute\AddForm',
-						'Lead\Form\Attribute\MergeForm' => 'Lead\Form\Attribute\MergeForm' 
+						'Lead\Form\Attribute\MergeForm' => 'Lead\Form\Attribute\MergeForm',
+						'Lead\Form\SearchForm' => 'Lead\Form\SearchForm' 
 				),
 				'factories' => array (
 						'Lead\Form\FilterForm' => 'Lead\Form\Factory\FilterFormFactory',
 						'Lead\Form\HiddenFilterForm' => 'Lead\Form\Factory\HiddenFilterFormFactory',
 						'Lead\Form\Attribute\FilterForm' => 'Lead\Form\Factory\Attribute\FilterFormFactory',
 						'Lead\Form\ListForm' => 'Lead\Form\Factory\ListFormFactory',
-						'Lead\Form\ImportForm' => 'Lead\Form\Factory\ImportFormFactory' 
+						'Lead\Form\ImportForm' => 'Lead\Form\Factory\ImportFormFactory',
+						'Lead\Form\SearchFormFactory' => 'Lead\Form\Factory\SearchFormFactory' 
 				) 
 		) 
 );
