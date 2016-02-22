@@ -48,6 +48,7 @@ trait ResultAwareTrait {
 			// $account = $report->getAccount();
 			$this->hasAccount = false;
 			$lead_query = new \Agent\Elastica\Query\BoolQuery();
+			$lead_query->addMust(new Elastica\Query\Match('active', 1));
 			$client = $this->getElasticaClient();
 			if ($agent && $client) {
 				$account = $agent->getOrphan() ? false : $agent->getAccount();
