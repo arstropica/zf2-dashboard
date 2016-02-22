@@ -308,6 +308,7 @@ BODY {
 .user-logged-in .nav-pills.nav-wizard > LI {
 	border-right: 15px solid #FFF;
 	border-left: 15px solid #FFF;
+	margin-left: 0;
 }
 .user-logged-in .nav-pills.nav-wizard > LI .nav-wedge {
 	border-color: #CCC #CCC #CCC transparent;
