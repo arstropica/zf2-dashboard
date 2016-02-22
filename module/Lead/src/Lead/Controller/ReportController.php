@@ -186,7 +186,7 @@ class ReportController extends AbstractCrudController {
 			$form->get('id')
 				->setValue($_id);
 			$this->setCachedParams($_id, $prg);
-			if ($id && ($_id != $id)) {
+			if ($_id != $id) {
 				$this->redirect()
 					->toRoute($this->getActionRoute(), [ 
 						'id' => $_id 
