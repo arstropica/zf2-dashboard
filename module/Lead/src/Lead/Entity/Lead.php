@@ -45,6 +45,20 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	
 	/**
 	 *
+	 * @var integer @ORM\Column(name="active", type="integer", nullable=false)
+	 *      @Annotation\Exclude()
+	 *      @JMS\Type("integer")
+	 *      @JMS\Expose @JMS\Groups({"list", "details"})
+	 *      @MAP\ElasticField(
+	 *      type="integer",
+	 *      nullValue="1",
+	 *      includeInAll=true
+	 *      )
+	 */
+	private $active;
+	
+	/**
+	 *
 	 * @var \DateTime @ORM\Column(name="timecreated", type="datetime",
 	 *      nullable=false)
 	 *      @Annotation\Exclude()
@@ -211,6 +225,7 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 		$this->events = new ArrayCollection();
 		$this->reports = new ArrayCollection();
 		$this->timecreated = new \DateTime();
+		$this->active = 1;
 	}
 
 	/**
@@ -221,6 +236,29 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	public function getId()
 	{
 		return $this->id;
+	}
+
+	/**
+	 * Get active
+	 *
+	 * @return integer $active
+	 */
+	public function getActive()
+	{
+		return $this->active;
+	}
+
+	/**
+	 * Set active
+	 *
+	 * @param integer $active        	
+	 *
+	 * @return Lead
+	 */
+	public function setActive($active)
+	{
+		$this->active = $active;
+		return $this;
 	}
 
 	/**
