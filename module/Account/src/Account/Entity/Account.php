@@ -14,6 +14,7 @@ use Application\Service\ElasticSearch\SearchableEntityInterface;
 use Application\Provider\SearchManagerAwareTrait;
 use Application\Provider\ServiceLocatorAwareTrait;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
+use Doctrine\Common\Collections\Criteria;
 
 /**
  * Account
@@ -222,6 +223,7 @@ class Account implements SearchableEntityInterface, ServiceLocatorAwareInterface
 		$this->leads = new ArrayCollection();
 		$this->reports = new ArrayCollection();
 		$this->events = new ArrayCollection();
+		$this->active = 1;
 	}
 
 	/**
@@ -420,12 +422,22 @@ class Account implements SearchableEntityInterface, ServiceLocatorAwareInterface
 
 	/**
 	 * Get leads.
+	 * 
+	 * @param boolean $ac        	
+	 * @param boolean $activeOnly        	
 	 *
 	 * @return array
 	 */
-	public function getLeads($ac = false)
+	public function getLeads($ac = false, $activeOnly = true)
 	{
-		return $ac ? $this->leads : $this->leads->getValues();
+		$leads = $this->leads;
+		$criteria = Criteria::create();
+		if ($activeOnly) {
+			$criteria->where(Criteria::expr()->eq('active', 1));
+		}
+		$filtered = $leads->matching($criteria);
+		
+		return $ac ? $filtered : $filtered->getValues();
 	}
 
 	/**

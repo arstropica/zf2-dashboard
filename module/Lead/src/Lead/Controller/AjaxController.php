@@ -141,6 +141,7 @@ class AjaxController extends AbstractCrudController {
 				}
 			}
 		}
+		$qb->andWhere('e.active = 1');
 		return $qb;
 	}
 }
