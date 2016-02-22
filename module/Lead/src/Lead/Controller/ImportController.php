@@ -78,6 +78,7 @@ class ImportController extends AbstractCrudController {
 		
 		// Stage 1
 		$this->init();
+		
 		// Get Form
 		$form = $this->getImportForm();
 		$request = $this->getRequest();
@@ -189,6 +190,7 @@ class ImportController extends AbstractCrudController {
 			if ($files) {
 				$file = isset($post ['leadsUpload']) ? $post ['leadsUpload'] : $this->params()
 					->fromFiles('leadsUpload');
+				
 				$tmp_file = $this->validateImportFile($file);
 				if ($tmp_file) {
 					$extract = $this->parseFile($this->getUploadPath() . '/' . $tmp_file);
@@ -704,14 +706,20 @@ JTPL;
 				$mime 
 		), $file ['name']);
 		$isValid = $adapter->isValid();
+		
 		if (!$isValid) {
 			$dataError = $adapter->getMessages();
 			$this->flashMessenger()
 				->addErrorMessage($this->errorImportTypeMessage . '<br>' . implode(' <br>', $dataError));
 		} else {
 			$adapter->setDestination($this->getUploadPath());
-			if ($adapter->receive($file ['name'])) {
-				$isValid = $file ['name'];
+			if ($adapter->receive()) {
+				$isValid = $adapter->getFileName(null, false);
+			} else {
+				$dataError = $adapter->getMessages();
+				$this->flashMessenger()
+					->addErrorMessage($this->errorImportTypeMessage . '<br>' . implode(' <br>', $dataError));
+				$isValid = false;
 			}
 		}
 		return $isValid;
