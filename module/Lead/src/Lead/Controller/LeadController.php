@@ -90,7 +90,7 @@ class LeadController extends AbstractCrudController {
 			->setMaxResults($limit);
 		
 		// Hack to bypass Doctrine's busted Paginator
-		if (!empty($query['description'])) {
+		if (!empty($query ['description'])) {
 			$sort = 'id';
 			$order = 'desc';
 		} else {
@@ -556,7 +556,7 @@ class LeadController extends AbstractCrudController {
 				}
 			}
 			if ($this->getEntityService()
-				->delete($entity)) {
+				->archive($entity)) {
 				$this->createServiceEvent()
 					->setEntityId($id)
 					->setEntityClass($this->getEntityClass())
@@ -805,8 +805,13 @@ class LeadController extends AbstractCrudController {
 		if ($name) {
 			$terms = array_filter(explode(" ", $name));
 			if ($terms) {
-				$result ['attributeDesc'] ['First Name'] = $terms;
-				$result ['attributeDesc'] ['Last Name'] = $terms;
+				if (count($terms) > 1) {
+					$result ['attributeDesc'] ['First Name'] = $terms [0];
+					$result ['attributeDesc'] ['Last Name'] = $terms [1];
+				} else {
+					$result ['attributeDesc'] ['First Name'] = $terms;
+					$result ['attributeDesc'] ['Last Name'] = $terms;
+				}
 			}
 		}
 		return $result;
@@ -826,11 +831,24 @@ class LeadController extends AbstractCrudController {
 			$where = [ ];
 			$params = [ ];
 			$i = 0;
-			$orX = $qb->expr()
-				->orX();
+			
 			foreach ( $filters as $condition ) {
 				if (isset($query [$condition])) {
 					if (is_array($query [$condition])) {
+						$uValues = [ ];
+						foreach ( $query [$condition] as $values ) {
+							if (is_array($values)) {
+								$uValues = array_merge($uValues, $values);
+							} else {
+								$uValues = array_merge($uValues, [ 
+										$values 
+								]);
+							}
+						}
+						$uValues = array_unique($uValues);
+						$boolX = (count($uValues) > 1) ? $qb->expr()
+							->andX() : $qb->expr()
+							->orX();
 						foreach ( $query [$condition] as $criteria => $values ) {
 							$qb->innerJoin('e.attributes', 'v' . $i);
 							$qb->innerJoin('v' . $i . '.attribute', 'a' . $i);
@@ -840,21 +858,27 @@ class LeadController extends AbstractCrudController {
 									$andX = $expr->andX();
 									$where ["desc_{$i}"] = "%{$criteria}%";
 									$andX->add($expr->like("a" . $i . ".attributeDesc", ":desc_{$i}"));
-									if (is_array($values)) {
+									if ($values && is_array($values)) {
 										$j = 0;
+										$_orX = $qb->expr()
+											->orX();
 										foreach ( $values as $value ) {
 											$where ["value_{$j}"] = "%{$value}%";
-											$andX->add($expr->like("v" . $i . ".value", ":value_{$j}"));
+											$_orX->add($expr->like("v" . $i . ".value", ":value_{$j}"));
 											$j++;
 										}
+										$andX->add($_orX);
 									} else {
 										$where ["value_{$i}"] = "%{$values}%";
 										$andX->add($expr->like("v" . $i . ".value", ":value_{$i}"));
 									}
-									$orX->add($andX);
+									$boolX->add($andX);
 									$i++;
 									break;
 							}
+						}
+						if ($boolX->getParts()) {
+							$qb->andWhere($boolX);
 						}
 					}
 				} elseif ("" !== $query [$condition]) {
@@ -868,8 +892,7 @@ class LeadController extends AbstractCrudController {
 					}
 				}
 			}
-			if ($where && $orX->getParts()) {
-				$qb->andWhere($orX);
+			if ($where) {
 				foreach ( $where as $key => $value ) {
 					$qb->setParameter($key, $value);
 				}
@@ -952,6 +975,7 @@ class LeadController extends AbstractCrudController {
 				}
 			}
 		}
+		$qb->andWhere('e.active = 1');
 		return $qb;
 	}
 
@@ -978,7 +1002,6 @@ class LeadController extends AbstractCrudController {
 				$actions [] = 'unassign';
 				break;
 			case 'delete' :
-				$actions [] = 'unassign';
 				$actions [] = 'delete';
 				break;
 			case 'submit' :
@@ -1085,7 +1108,7 @@ class LeadController extends AbstractCrudController {
 						$this->logEvent("DeleteAction.post");
 						$this->createServiceEvent();
 						if ($this->getEntityService()
-							->delete($lead)) {
+							->archive($lead)) {
 							$shouldLog = true;
 						} else {
 							$this->logError(new \Exception("Lead #{$lead_id} could not be deleted.", 400));

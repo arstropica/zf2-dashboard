@@ -568,7 +568,7 @@ class AccountController extends AbstractCrudController {
 		}
 		
 		if ($this->getEntityService()
-			->delete($entity)) {
+			->archive($entity)) {
 			$result = true;
 		} else {
 			$result = false;

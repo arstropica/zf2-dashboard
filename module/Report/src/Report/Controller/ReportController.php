@@ -861,7 +861,7 @@ class ReportController extends AbstractCrudController {
 						$this->logEvent("DeleteAction.post");
 						$this->createServiceEvent();
 						if ($this->getEntityService()
-							->delete($report)) {
+							->archive($report)) {
 							$shouldLog = true;
 						} else {
 							$this->logError(new \Exception("Report: \"{$report_name}\" could not be deleted.", 400));
