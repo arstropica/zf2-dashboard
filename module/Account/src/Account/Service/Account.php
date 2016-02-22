@@ -1,6 +1,6 @@
 <?php
 namespace Account\Service;
-use LosBase\Service\AbstractEntity;
+use Application\Service\AbstractEntity;
 
 /**
  *

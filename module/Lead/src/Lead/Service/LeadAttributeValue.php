@@ -2,7 +2,7 @@
 
 namespace Lead\Service;
 
-use LosBase\Service\AbstractEntity;
+use Application\Service\AbstractEntity;
 
 /**
  *
