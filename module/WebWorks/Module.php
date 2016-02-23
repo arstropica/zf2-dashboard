@@ -7,7 +7,6 @@
  * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
-
 namespace WebWorks;
 
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
@@ -98,6 +97,9 @@ class Module implements AutoloaderProviderInterface {
 						'WebWorks\Hydrator\DisplayFieldHydrator' => function ($sm) {
 							return new WebWorksHydrator(false);
 						},
+						'WebWorks\Hydrator\LicenseHydrator' => function ($sm) {
+							return new WebWorksHydrator(false);
+						},
 						'WebWorks\Hydrator\ContactDataHydrator' => function ($sm) {
 							$hydrator = new WebWorksHydrator(false);
 							$hydrator->addStrategy('PrimaryPhone', new PhoneNumberStrategy());
@@ -106,6 +108,9 @@ class Module implements AutoloaderProviderInterface {
 							)));
 							
 							return $hydrator;
+						},
+						'WebWorks\Hydrator\AuthenticationHydrator' => function ($sm) {
+							return new WebWorksHydrator(false);
 						},
 						'WebWorksDataMapper' => function ($sm) {
 							$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');

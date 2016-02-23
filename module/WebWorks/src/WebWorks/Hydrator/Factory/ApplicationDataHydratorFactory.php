@@ -6,6 +6,7 @@ use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use WebWorks\Hydrator\WebWorksHydrator;
 use WebWorks\Hydrator\Strategy\DisplayFieldHydratorStrategy;
+use WebWorks\Hydrator\Strategy\LicenseHydratorStrategy;
 
 class ApplicationDataHydratorFactory implements FactoryInterface {
 
@@ -17,6 +18,8 @@ class ApplicationDataHydratorFactory implements FactoryInterface {
 		
 		$hydrator->addStrategy('DisplayFields', new DisplayFieldHydratorStrategy($parentlocator->get('WebWorks\Hydrator\DisplayFieldHydrator')));
 		
+		$hydrator->addStrategy( 'Licenses', new LicenseHydratorStrategy( $parentlocator->get( 'WebWorks\Hydrator\LicenseHydrator' ) ) );
+
 		return $hydrator;
 	}
 }

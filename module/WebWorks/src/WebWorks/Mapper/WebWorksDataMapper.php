@@ -18,6 +18,7 @@ use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use WebWorks\Utility\Utility;
 use Application\Utility\Helper;
+use WebWorks\Entity\ApplicationData\Licenses\License;
 
 class WebWorksDataMapper implements ServiceLocatorAwareInterface {
 	
@@ -105,6 +106,28 @@ class WebWorksDataMapper implements ServiceLocatorAwareInterface {
 		return $webWorksEntity;
 	}
 
+	protected function getLicenses(Lead $lead)
+	{
+		$leadAttributeValue = $lead->findAttribute('cdl', true);
+		
+		$licenses = array ();
+		
+		if ($leadAttributeValue) {
+			$hasCDL = preg_match('/y|yes/i', $leadAttributeValue->getValue());
+			$License = new License();
+			if ($hasCDL) {
+				$License->setCommercialDriversLicense('y');
+				$License->setCurrentLicense('y');
+				$License->setLicenseClass('Class A');
+			} else {
+				$License->setCommercialDriversLicense('n');
+			}
+			$licenses [] = $License;
+		}
+		
+		return $licenses;
+	}
+
 	protected function getDisplayFields(Lead $lead)
 	{
 		$leadAttributeValues = $lead->findAttributes('Question');
@@ -131,9 +154,13 @@ class WebWorksDataMapper implements ServiceLocatorAwareInterface {
 		
 		$AppReferrer = $lead->getReferrer();
 		
+		$Licenses = $this->getLicenses($lead);
+		
 		$DisplayFields = $this->getDisplayFields($lead);
 		
 		$applicationData->setAppReferrer($AppReferrer);
+		
+		$applicationData->setLicenses($Licenses);
 		
 		$applicationData->setDisplayFields($DisplayFields);
 		
@@ -208,7 +235,7 @@ class WebWorksDataMapper implements ServiceLocatorAwareInterface {
 	protected function getDateOfBirth(Lead $lead)
 	{
 		$DateOfBirth = null;
-		$match = $lead->findAttribute('birth|dob', true);
+		$match = $lead->findAttribute('birth', true);
 		if ($match) {
 			$date = $match->getValue();
 			$DateOfBirth = ($date instanceof \DateTime) ? date_format('m/d/Y', $date) : (Helper::validateDate($date) ? date('m/d/Y', strtotime($date)) : null);

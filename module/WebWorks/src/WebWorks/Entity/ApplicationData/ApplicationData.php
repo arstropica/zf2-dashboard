@@ -6,6 +6,8 @@ class ApplicationData {
 	
 	protected $AppReferrer;
 	
+	protected $Licenses;
+	
 	protected $DisplayFields;
 
 	public function getArrayCopy()
@@ -30,6 +32,27 @@ class ApplicationData {
 	public function setAppReferrer($AppReferrer)
 	{
 		$this->AppReferrer = $AppReferrer;
+		return $this;
+	}
+
+	/**
+	 *
+	 * @return the $Licenses
+	 */
+	public function getLicenses()
+	{
+		return $this->Licenses;
+	}
+
+	/**
+	 *
+	 * @param field_type $Licenses        	
+	 *
+	 * @return ApplicationData
+	 */
+	public function setLicenses($Licenses)
+	{
+		$this->Licenses = $Licenses;
 		return $this;
 	}
 

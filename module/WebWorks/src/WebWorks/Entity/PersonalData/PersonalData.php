@@ -10,6 +10,8 @@ class PersonalData {
 	
 	protected $ContactData;
 
+	protected $DateOfBirth;
+
 	public function getArrayCopy()
 	{
 		$array = get_object_vars($this);
