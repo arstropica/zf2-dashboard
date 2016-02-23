@@ -236,7 +236,7 @@ return array (
 												'action' => 'add' 
 										),
 										array (
-												'label' => 'Display Attributes',
+												'label' => 'Lead Attributes',
 												'route' => 'attribute',
 												'action' => 'list' 
 										),
@@ -512,7 +512,7 @@ return array (
 												'route' => 'attribute',
 												'pages' => array (
 														array (
-																'label' => 'Display Attributes',
+																'label' => 'Lead Attributes',
 																'route' => 'attribute/list',
 																'action' => 'list' 
 														),
