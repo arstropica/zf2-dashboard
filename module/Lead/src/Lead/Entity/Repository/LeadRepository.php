@@ -96,9 +96,12 @@ DQL;
 	 * Finds a single entity by a set of criteria.
 	 *
 	 * @param array $criteria        	
+	 * @param string $alias        	
+	 * @param boolean $activeOnly        	
+	 *
 	 * @return object
 	 */
-	public function findLeadBy(array $criteria, $alias = 'v')
+	public function findLeadBy(array $criteria, $alias = 'v', $activeOnly = true)
 	{
 		$querybuilder = $this->createQueryBuilder('c');
 		$query = $querybuilder->select('c')
@@ -106,6 +109,10 @@ DQL;
 		
 		if ($criteria) {
 			self::buildWhere($query, $criteria, $alias);
+		}
+		
+		if ($activeOnly) {
+			$query->andWhere('c.active = 1');
 		}
 		
 		$query = $query->getQuery();

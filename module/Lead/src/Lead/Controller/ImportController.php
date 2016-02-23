@@ -1029,14 +1029,6 @@ JTPL;
 			}
 		}
 		
-		if ($where) {
-			$where = [ 
-					'and' => [ 
-							'active' => 1 
-					] 
-			];
-		}
-		
 		// Execute Query
 		if (isset($where ['and'])) {
 			/* @var $lead \Lead\Entity\Lead */
