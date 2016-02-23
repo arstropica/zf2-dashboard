@@ -558,7 +558,7 @@ class ReportController extends AbstractCrudController {
 				}
 			}
 			if ($this->getEntityService()
-				->delete($entity)) {
+				->archive($entity)) {
 				$this->createServiceEvent()
 					->setEntityId($id)
 					->setEntityClass($this->getEntityClass())
