@@ -1,14 +1,16 @@
 <?php
+
 namespace TenStreet\Entity\ApplicationData;
 
-class ApplicationData
-{
-
+class ApplicationData {
+	
 	protected $AppReferrer;
-
+	
+	protected $Licenses;
+	
 	protected $DisplayFields;
 
-	public function getArrayCopy ()
+	public function getArrayCopy()
 	{
 		$array = get_object_vars($this);
 		return $array;
@@ -18,7 +20,7 @@ class ApplicationData
 	 *
 	 * @return the $AppReferrer
 	 */
-	public function getAppReferrer ()
+	public function getAppReferrer()
 	{
 		return $this->AppReferrer;
 	}
@@ -27,7 +29,7 @@ class ApplicationData
 	 *
 	 * @param field_type $AppReferrer        	
 	 */
-	public function setAppReferrer ($AppReferrer)
+	public function setAppReferrer($AppReferrer)
 	{
 		$this->AppReferrer = $AppReferrer;
 		return $this;
@@ -35,9 +37,30 @@ class ApplicationData
 
 	/**
 	 *
+	 * @return the $Licenses
+	 */
+	public function getLicenses()
+	{
+		return $this->Licenses;
+	}
+
+	/**
+	 *
+	 * @param field_type $Licenses        	
+	 *
+	 * @return ApplicationData
+	 */
+	public function setLicenses($Licenses)
+	{
+		$this->Licenses = $Licenses;
+		return $this;
+	}
+
+	/**
+	 *
 	 * @return array
 	 */
-	public function getDisplayFields ()
+	public function getDisplayFields()
 	{
 		return $this->DisplayFields;
 	}
@@ -46,7 +69,7 @@ class ApplicationData
 	 *
 	 * @param array $DisplayFields        	
 	 */
-	public function setDisplayFields ($DisplayFields)
+	public function setDisplayFields($DisplayFields)
 	{
 		$this->DisplayFields = $DisplayFields;
 		return $this;
@@ -56,9 +79,9 @@ class ApplicationData
 	 *
 	 * @param \TenStreet\Entity\ApplicationData\DisplayField $DisplayField        	
 	 */
-	public function addDisplayFields ($DisplayField)
+	public function addDisplayFields($DisplayField)
 	{
-		$this->DisplayFields[] = $DisplayField;
+		$this->DisplayFields [] = $DisplayField;
 		return $this;
 	}
 }
