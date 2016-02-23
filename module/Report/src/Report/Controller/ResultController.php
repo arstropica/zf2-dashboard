@@ -20,6 +20,8 @@ use Report\Entity\Result;
  */
 class ResultController extends AbstractCrudController {
 	
+	protected $batchSize = 20;
+	
 	protected $defaultSort = '_score';
 	
 	protected $defaultOrder = 'desc';
@@ -172,11 +174,11 @@ class ResultController extends AbstractCrudController {
 		
 		$form = $this->getListForm($paginator, $prg);
 		
-		$action = $prg ['bulk_action'] ?  : false;
+		$action = isset($prg ['bulk_action']) ? $prg ['bulk_action'] : false;
 		$sel = isset($prg ['sel']) ? array_filter($prg ['sel']) : false;
-		$account_id = $prg ['account'] ?  : false;
+		$account_id = isset($prg ['account']) ? $prg ['account'] : false;
 		if ($action && $prg && $sel && ($account_id || in_array($action, [ 
-				'assign',
+				'submit',
 				'unassign',
 				'delete' 
 		]))) {
@@ -395,7 +397,7 @@ class ResultController extends AbstractCrudController {
 		$result = true;
 		$account = false;
 		$actions = [ ];
-		$entityClass = "Lead\\Entity\\Lead";
+		$entityClass = 'Lead\Entity\Lead';
 		
 		$em = $this->getEntityManager();
 		$leadRepository = $em->getRepository($entityClass);
@@ -414,7 +416,6 @@ class ResultController extends AbstractCrudController {
 				$actions [] = 'unassign';
 				break;
 			case 'delete' :
-				$actions [] = 'unassign';
 				$actions [] = 'delete';
 				break;
 			case 'submit' :
@@ -521,7 +522,7 @@ class ResultController extends AbstractCrudController {
 						$this->logEvent("DeleteAction.post");
 						$this->createServiceEvent();
 						if ($this->getEntityService()
-							->delete($lead)) {
+							->archive($lead)) {
 							$shouldLog = true;
 						} else {
 							$this->logError(new \Exception("Lead #{$lead_id} could not be deleted.", 400));
