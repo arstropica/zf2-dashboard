@@ -7,6 +7,7 @@ use Application\Form\Element\Collection;
 	<div class="col-xs-12">
 		<?php
 			$this->form->prepare();
+			$search_id = $form->get('id')->getValue();
 			echo $this->form(null, \Application\Form\View\Helper\Form::LAYOUT_HORIZONTAL)->openTag($this->form);
 			echo $this->formHidden($form->get('id'));
 			echo $this->formHidden($form->get('name'));
@@ -20,9 +21,9 @@ use Application\Form\Element\Collection;
 						<?php echo $this->formLabel($agent); ?>
 					<?php endif; ?>
 				</h3>
-				<a data-toggle="collapse" href="#form-panel-wrapper" class="pull-right clickable"><i class="glyphicon glyphicon-chevron-down"></i></a>
+				<a data-toggle="collapse" href="#form-panel-wrapper" class="pull-right clickable"><i class="glyphicon glyphicon-chevron-<?php echo $search_id ? 'down' : 'up'; ?>"></i></a>
 			</div>
-			<div id="form-panel-wrapper" class="panel-collapse collapse">
+			<div id="form-panel-wrapper" class="panel-collapse <?php echo $search_id ? 'collapse' : ''; ?>">
 				<div class="panel-body">
 					<fieldset id="<?php echo $agent->getAttribute('id'); ?>-wrapper">
 						<fieldset id="filter-wrapper" class="collection-fieldset addremove">
