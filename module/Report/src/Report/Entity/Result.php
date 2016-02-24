@@ -5,13 +5,20 @@ namespace Report\Entity;
 use Lead\Entity\Lead;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
+use Application\Provider\ServiceLocatorAwareTrait;
+use DoctrineModule\Persistence\ObjectManagerAwareInterface;
+use Application\Provider\ObjectManagerAwareTrait;
+use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
  *
  * @author arstropica
  *        
  */
-class Result {
+class Result implements ServiceLocatorAwareInterface, ObjectManagerAwareInterface {
+	
+	use ServiceLocatorAwareTrait, ObjectManagerAwareTrait;
 	
 	/**
 	 *
@@ -31,8 +38,11 @@ class Result {
 	 */
 	private $reports;
 
-	public function __construct()
+	public function __construct(ServiceLocatorInterface $serviceLocator = null)
 	{
+		if ($serviceLocator) {
+			$this->setServiceLocator($serviceLocator);
+		}
 		$this->reports = new ArrayCollection();
 	}
 
@@ -42,7 +52,12 @@ class Result {
 	 */
 	public function getLead()
 	{
-		return $this->lead;
+		$lead = $this->lead;
+		if ($lead instanceof Lead && $lead->getProxy()) {
+			$lead = $this->_hydrate($lead);
+			$this->lead = $lead;
+		}
+		return $lead;
 	}
 
 	/**
@@ -127,6 +142,30 @@ class Result {
 		}
 	}
 
+	/**
+	 *
+	 * @param Lead $proxy        	
+	 *
+	 * @return \Lead\Entity\Lead
+	 */
+	private function _hydrate(Lead $proxy)
+	{
+		$lead = null;
+		$reports = $this->getReports();
+		$objectManager = $this->getObjectManager();
+		if ($objectManager) {
+			$leadRepo = $objectManager->getRepository('Lead\Entity\Lead');
+			if ($proxy && $proxy->getProxy() && (($id = $proxy->getId()) == true)) {
+				$lead = $leadRepo->findLead($id);
+				if ($lead) {
+					$lead->setProxy(false);
+				}
+			} elseif (!$proxy->getProxy()) {
+				$lead = $proxy;
+			}
+		}
+		return $lead;
+	}
 }
 
 ?>
