@@ -47,7 +47,7 @@ class ReportListener implements ServiceLocatorAwareInterface, ObjectManagerAware
 	{
 		$report = $oArgs->getEntity();
 		if ($report instanceof Report) {
-			$data = $this->generateResults($report, 0, '_score', 'desc', true);
+			$data = $this->generateResults($report, 0, '_score', 'desc', true, true, true);
 			if ($data && $data->count()) {
 				$report->addResults($data);
 			}
