@@ -74,7 +74,7 @@ class Location extends AbstractQuery {
 					$locality = $localityQuery->request($location);
 					if ($locality) {
 						list ( $latlon ['lat'], $latlon ['lon'] ) = $locality ['_source'] ['latlon'];
-						$query = new Elastica\Query\GeoDistance('locality', $latlon, $distance);
+						$query = new Elastica\Query\GeoDistance('locality', $latlon, $distance . "mi");
 					}
 				} catch ( \Exception $e ) {
 					//
