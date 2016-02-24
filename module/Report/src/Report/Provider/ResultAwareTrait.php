@@ -33,11 +33,16 @@ trait ResultAwareTrait {
 	/**
 	 *
 	 * @param Report $report        	
+	 * @param number $limit        	
+	 * @param string $sort        	
+	 * @param string $order        	
+	 * @param boolean $lazy        	
+	 * @param boolean $active        	
 	 * @param boolean $silent        	
 	 *
 	 * @return ArrayCollection $data
 	 */
-	public function generateResults(Report $report, $limit = 0, $sort = '_score', $order = 'desc', $silent = false)
+	public function generateResults(Report $report, $limit = 0, $sort = '_score', $order = 'desc', $lazy = true, $active = true, $silent = false)
 	{
 		$data = new ArrayCollection();
 		$request = $this->getServiceLocator()
@@ -48,7 +53,9 @@ trait ResultAwareTrait {
 			// $account = $report->getAccount();
 			$this->hasAccount = false;
 			$lead_query = new \Agent\Elastica\Query\BoolQuery();
-			$lead_query->addMust(new Elastica\Query\Match('active', 1));
+			if ($active) {
+				$lead_query->addMust(new Elastica\Query\Match('active', 1));
+			}
 			$client = $this->getElasticaClient();
 			if ($agent && $client) {
 				$account = $agent->getOrphan() ? false : $agent->getAccount();
@@ -69,7 +76,7 @@ trait ResultAwareTrait {
 								] 
 						]);
 						$query->setSize($size);
-						$results = $this->runQuery($query, $silent);
+						$results = $this->runQuery($query, $lazy, $silent);
 						$total = isset($results ['total']) ? $results ['total'] : false;
 						if ($total && $results ['results']) {
 							foreach ( $results ['results'] as $result ) {
@@ -190,11 +197,12 @@ trait ResultAwareTrait {
 	/**
 	 *
 	 * @param AbstractQuery $query        	
+	 * @param boolean $lazy        	
 	 * @param boolean $silent        	
 	 *
 	 * @return array $results
 	 */
-	protected function runQuery($query, $silent = false)
+	protected function runQuery($query, $lazy = false, $silent = false)
 	{
 		$results = [ 
 				'results' => [ ],
@@ -218,13 +226,20 @@ trait ResultAwareTrait {
 					$max_score = $data ['hits'] ['max_score'] ?  : 1;
 					$results ['total'] = $data ['hits'] ['total'];
 					foreach ( $hits as $hit ) {
-						$lead = $objRepository->findOneBy([ 
-								'id' => $hit ['_id'] 
-						]);
+						$_score = isset($hit ['_score']) ? $hit ['_score'] : 1;
+						$score = round(($_score / $max_score) * 100);
+						$result = new Result($this->getServiceLocator());
+						$result->setScore($score);
+						if ($lazy) {
+							$lead = new Lead();
+							$lead->setId($hit ['_id']);
+							$lead->setProxy(true);
+						} else {
+							$lead = $objRepository->findOneBy([ 
+									'id' => $hit ['_id'] 
+							]);
+						}
 						if ($lead && $lead instanceof Lead) {
-							$result = new Result();
-							$score = round(($hit ['_score'] / $max_score) * 100);
-							$result->setScore($score);
 							$result->setLead($lead);
 							$results ['results'] [] = $result;
 						}
