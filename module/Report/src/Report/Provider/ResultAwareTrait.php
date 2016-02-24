@@ -126,6 +126,9 @@ trait ResultAwareTrait {
 	 */
 	protected function buildQuery(BoolQuery $lead_query, AgentCriterion $criterion, $account = null)
 	{
+		if (! $criterion->getServiceLocator()) {
+			$criterion->setServiceLocator($this->getServiceLocator());
+		}
 		$criteria_query = false;
 		$relationship = $criterion->getRelationship();
 		$required = $criterion->getRequired();
