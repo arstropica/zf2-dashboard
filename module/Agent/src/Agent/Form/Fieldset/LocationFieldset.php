@@ -93,7 +93,7 @@ class LocationFieldset extends AbstractFieldset implements InputFilterProviderIn
 		$this->add(array (
 				'options' => array (
 						'column-size' => 'xs-12 col-sm-7 col-md-4',
-						'label' => '(Optional) Distance:',
+						'label' => '(Optional, mi.) Distance:',
 						'label_attributes' => array (
 								'class' => 'horizontal' 
 						),
