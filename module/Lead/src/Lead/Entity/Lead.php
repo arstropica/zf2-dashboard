@@ -215,6 +215,12 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	 * @var Collection
 	 */
 	protected $reports;
+	
+	/**
+	 *
+	 * @var boolean
+	 */
+	protected $_proxy;
 
 	/**
 	 * Initialies the array variables.
@@ -226,6 +232,7 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 		$this->reports = new ArrayCollection();
 		$this->timecreated = new \DateTime();
 		$this->active = 1;
+		$this->_proxy = false;
 	}
 
 	/**
@@ -236,6 +243,18 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	public function getId()
 	{
 		return $this->id;
+	}
+
+	/**
+	 *
+	 * @param integer $id        	
+	 *
+	 * @return Lead
+	 */
+	public function setId($id)
+	{
+		$this->id = $id;
+		return $this;
 	}
 
 	/**
@@ -865,6 +884,27 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	public function setLocality($locality)
 	{
 		$this->locality = $locality;
+		return $this;
+	}
+
+	/**
+	 *
+	 * @return boolean $_proxy
+	 */
+	public function getProxy()
+	{
+		return $this->_proxy;
+	}
+
+	/**
+	 *
+	 * @param boolean $_proxy        	
+	 *
+	 * @return Lead
+	 */
+	public function setProxy($_proxy)
+	{
+		$this->_proxy = $_proxy;
 		return $this;
 	}
 
