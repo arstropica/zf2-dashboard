@@ -68,7 +68,7 @@ trait ResultAwareTrait {
 							$lead_query = $this->buildQuery($lead_query, $criterion, $account);
 						}
 						$query->setQuery($lead_query);
-						$size = 10;
+						$size = $limit ? $limit : 1000;
 						$query->setParam('track_scores', true);
 						$query->addSort([ 
 								$sort => [ 
@@ -84,7 +84,7 @@ trait ResultAwareTrait {
 							}
 						}
 						
-						if ($total > 10) {
+						if ($total > $size) {
 							$limit = $limit ?  : $total;
 							for($page = 1; $page < ceil($limit / $size); $page++) {
 								$query->setFrom($page * $size);
