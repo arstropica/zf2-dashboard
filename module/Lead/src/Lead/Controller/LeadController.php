@@ -533,28 +533,6 @@ class LeadController extends AbstractCrudController {
 		$entity = $objRepository->find($id);
 		
 		if ($this->validateDelete($post)) {
-			if (null !== $entity->getAccount()) {
-				$entity->setAccount(null);
-				$this->createServiceEvent()
-					->setEntityId($id)
-					->setEntityClass($this->getEntityClass())
-					->setDescription("Lead Edited")
-					->setMessage("Lead #{$id} was unassigned.");
-				try {
-					$em->persist($entity);
-					$em->flush();
-					$this->getServiceEvent()
-						->setMessage("Lead #{$id} was unassigned");
-					$this->logEvent("EditAction.post");
-				} catch ( \Exception $e ) {
-					$this->logError($e);
-					$this->flashMessenger()
-						->addErrorMessage($this->getServiceLocator()
-						->get('translator')
-						->translate($this->errorDeleteMessage));
-					return false;
-				}
-			}
 			if ($this->getEntityService()
 				->archive($entity)) {
 				$this->createServiceEvent()
