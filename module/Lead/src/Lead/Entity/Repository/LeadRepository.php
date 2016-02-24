@@ -93,13 +93,37 @@ DQL;
 	}
 
 	/**
+	 *
+	 * @param integer $id        	
+	 *
+	 * @return Lead|boolean
+	 */
+	public function findLead($id)
+	{
+		$querybuilder = $this->createQueryBuilder('c');
+		$query = $querybuilder->select('c')
+			->setMaxResults(1)
+			->where('c.id = :id')
+			->setParameter('id', $id);
+		
+		$query = $query->getQuery();
+		
+		$query->useQueryCache(true);
+		$query->useResultCache(true, 3600, self::CACHE_PREFIX . md5($query->getDQL()));
+		
+		$results = $query->getResult();
+		
+		return $results ? $results [0] : false;
+	}
+
+	/**
 	 * Finds a single entity by a set of criteria.
 	 *
 	 * @param array $criteria        	
 	 * @param string $alias        	
 	 * @param boolean $activeOnly        	
 	 *
-	 * @return object
+	 * @return Lead|boolean
 	 */
 	public function findLeadBy(array $criteria, $alias = 'v', $activeOnly = true)
 	{
@@ -117,8 +141,9 @@ DQL;
 		
 		$query = $query->getQuery();
 		
-		$query->useResultCache(true, 3600, md5($query->getDQL()))
-			->useQueryCache(true);
+		$query->useQueryCache(true);
+		$query->useResultCache(true, 3600, self::CACHE_PREFIX . md5($query->getDQL()));
+		
 		$results = $query->getResult();
 		
 		return $results ? $results [0] : false;
