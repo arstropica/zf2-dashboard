@@ -254,11 +254,11 @@ class Report implements ServiceLocatorAwareInterface, ObjectManagerAwareInterfac
 	 *
 	 * @return Collection $results
 	 */
-	public function getResults($ac = false, $limit = null, $sort = '_score', $order = 'desc')
+	public function getResults($ac = false, $limit = null, $sort = '_score', $order = 'desc', $lazy = true)
 	{
 		$results = $this->results;
 		if (!$results instanceof Collection || !$results->count()) {
-			$data = $this->generateResults($this, $limit, $sort, $order, false);
+			$data = $this->generateResults($this, $limit, $sort, $order, $lazy, true, false);
 			if ($data) {
 				$this->setResults($data);
 				$results = $this->results;
@@ -332,7 +332,7 @@ class Report implements ServiceLocatorAwareInterface, ObjectManagerAwareInterfac
 	 */
 	public function findResult($id)
 	{
-		$results = $this->getResults(true);
+		$results = $this->getResults(true, null, '_score', 'desc');
 		$result = null;
 		if ($results && $results instanceof Collection) {
 			$filtered = $results->filter(function ($r) use($id) {
