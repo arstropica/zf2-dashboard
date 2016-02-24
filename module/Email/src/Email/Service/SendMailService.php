@@ -30,6 +30,7 @@ class SendMailService extends AbstractEmailService implements EventManagerAwareI
 		}
 		
 		$options = $this->getOptions($id, $service);
+		
 		if ($options) {
 			$fields = [ 
 					'address_from' => null,
@@ -106,6 +107,18 @@ class SendMailService extends AbstractEmailService implements EventManagerAwareI
 							$body = isset($text) ? $text : '';
 							$message->setBody($body);
 							break;
+					}
+					
+					if (is_array($address_to)) {
+						$address_to = array_map('strtolower', $address_to);
+					} elseif (is_string($address_to)) {
+						$address_to = strtolower($address_to);
+					}
+					
+					if (is_array($address_from)) {
+						$address_from = array_map('strtolower', $address_from);
+					} elseif (is_string($address_from)) {
+						$address_from = strtolower($address_from);
 					}
 					
 					$message->setFrom($address_from);
