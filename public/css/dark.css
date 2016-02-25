@@ -356,3 +356,8 @@ BODY A.inline {
 	font-size: 14px;
 	font-weight: bold;
 }
+@media screen {
+	.small, SMALL {
+		font-size: 100%;
+	}
+}
