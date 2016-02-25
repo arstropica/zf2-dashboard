@@ -150,10 +150,16 @@ class SendMailService extends AbstractEmailService implements EventManagerAwareI
 								) 
 						));
 						$transport->setOptions($_auth);
+						try {
+							$transport->send($message);
+						} catch ( \Exception $e ) {
+							$transport = new Mail\Transport\Sendmail();
+							$transport->send($message);
+						}
 					} else {
 						$transport = new Mail\Transport\Sendmail();
+						$transport->send($message);
 					}
-					$transport->send($message);
 				} else {
 					return $this->respondError(new \Exception('No Lead Data could be found.', 404));
 				}
