@@ -17,6 +17,12 @@ return array(
 					"CLIENT_ID": "Client ID for web application" > "CLIENT ID"
 					"CLIENT_SECRET": "Client ID for web application" > "CLIENT SECRET"
 					"CALLBACK": The callback URI you defined					
+				),
+				'smtp' => array(
+						'server' => 'smtp.example.com',
+						'port' => '25',
+						'username' => 'username',
+						'password' => 'password'
 				)
 		)
 );
