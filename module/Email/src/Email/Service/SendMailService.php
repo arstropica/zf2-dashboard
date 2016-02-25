@@ -30,6 +30,7 @@ class SendMailService extends AbstractEmailService implements EventManagerAwareI
 		}
 		
 		$options = $this->getOptions($id, $service);
+		$smtp_options = false;
 		
 		if ($options) {
 			$fields = [ 
@@ -48,6 +49,13 @@ class SendMailService extends AbstractEmailService implements EventManagerAwareI
 										break;
 									case 'local' :
 										$fields [$option] = $value;
+										break;
+								}
+								break;
+							case 'smtp' :
+								switch ($scope) {
+									case 'global' :
+										$smtp_options = $value;
 										break;
 								}
 								break;
@@ -128,7 +136,23 @@ class SendMailService extends AbstractEmailService implements EventManagerAwareI
 					$message->setSubject($subject);
 					$message->setEncoding("UTF-8");
 					
-					$transport = new Mail\Transport\Sendmail();
+					if ($smtp_options) {
+						$transport = new Mail\Transport\Smtp();
+						$_auth = new Mail\Transport\SmtpOptions(array (
+								'name' => $smtp_options ['server'],
+								'host' => $smtp_options ['server'],
+								'port' => $smtp_options ['port'],
+								'connection_class' => 'login',
+								'connection_config' => array (
+										'username' => $smtp_options ['username'],
+										'password' => $smtp_options ['password'],
+										'ssl' => 'tls' 
+								) 
+						));
+						$transport->setOptions($_auth);
+					} else {
+						$transport = new Mail\Transport\Sendmail();
+					}
 					$transport->send($message);
 				} else {
 					return $this->respondError(new \Exception('No Lead Data could be found.', 404));
@@ -196,6 +220,14 @@ class SendMailService extends AbstractEmailService implements EventManagerAwareI
 			foreach ( $localSettings as $setting ) {
 				$results ['local'] [$setting->getApiOption()
 					->getOption()] [] = $setting->getApiValue();
+			}
+		}
+		if ($service == 'Email') {
+			$config = $this->getServiceLocator()
+				->get('Config');
+			$smtp_options = isset($config ['User'] ['smtp']) ? $config ['User'] ['smtp'] : false;
+			if ($smtp_options) {
+				$results ['global'] ['smtp'] = $smtp_options;
 			}
 		}
 		return $results;
