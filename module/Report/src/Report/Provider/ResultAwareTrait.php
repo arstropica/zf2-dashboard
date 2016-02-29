@@ -16,6 +16,7 @@ use Agent\Elastica\Query\BoolQuery;
 use Doctrine\Common\Persistence\ObjectManager;
 use Zend\Mvc\Controller\Plugin\FlashMessenger;
 use Elastica\Query\AbstractQuery;
+use Agent\Entity\Filter;
 
 /**
  *
@@ -23,12 +24,6 @@ use Elastica\Query\AbstractQuery;
  *        
  */
 trait ResultAwareTrait {
-	
-	/**
-	 *
-	 * @var boolean
-	 */
-	private $hasAccount;
 
 	/**
 	 *
@@ -50,22 +45,23 @@ trait ResultAwareTrait {
 		$silent = $request->getQuery('debug') ? false : $silent;
 		if ($report instanceof Report) {
 			$agent = $report->getAgent();
-			// $account = $report->getAccount();
-			$this->hasAccount = false;
 			$lead_query = new \Agent\Elastica\Query\BoolQuery();
 			if ($active) {
 				$lead_query->addMust(new Elastica\Query\Match('active', 1));
 			}
 			$client = $this->getElasticaClient();
 			if ($agent && $client) {
-				$account = $agent->getOrphan() ? false : $agent->getAccount();
+				$filters = $agent->getFilter();
+				if ($filters) {
+					$lead_query = $this->applyFilters($lead_query, $filters);
+				}
 				$criteria = $agent->getCriteria(false);
 				if ($criteria) {
 					try {
 						$query = new Elastica\Query();
 						/* @var $criterion \Agent\Entity\AgentCriterion */
 						foreach ( $criteria as $i => $criterion ) {
-							$lead_query = $this->buildQuery($lead_query, $criterion, $account);
+							$lead_query = $this->buildQuery($lead_query, $criterion);
 						}
 						$query->setQuery($lead_query);
 						$size = $limit ? $limit : 1000;
@@ -119,14 +115,137 @@ trait ResultAwareTrait {
 	/**
 	 *
 	 * @param BoolQuery $lead_query        	
-	 * @param AgentCriterion $criterion        	
-	 * @param Account|boolean $account        	
+	 * @param Filter $filter        	
 	 *
 	 * @return BoolQuery $lead_query
 	 */
-	protected function buildQuery(BoolQuery $lead_query, AgentCriterion $criterion, $account = null)
+	protected function applyFilters(BoolQuery $lead_query, Filter $filter = null)
 	{
-		if (! $criterion->getServiceLocator()) {
+		if ($filter) {
+			$account = $filter->getAccountFilter();
+			$date = $filter->getDateFilter();
+			
+			if ($account) {
+				$mode = $account->getMode();
+				switch ($mode) {
+					case 'orphan' :
+						$account_query = new Elastica\Query\Nested();
+						$account_query->setPath('account')
+							->setScoreMode('avg');
+						$account_query->setQuery(new Elastica\Query\MatchAll());
+						$lead_query->addMustNot($account_query);
+						break;
+					case 'account' :
+						if (($account = $account->getAccount()) == true) {
+							$account_id = $account->getId();
+							$account_query = new Elastica\Query\Nested();
+							$account_query->setPath('account')
+								->setScoreMode('avg');
+							$account_match_query = new Elastica\Query\Match('account.id', $account_id);
+							$account_bool_query = new Elastica\Query\BoolQuery();
+							$account_bool_query->addMust($account_match_query);
+							$account_query->setQuery($account_bool_query);
+							$lead_query->addMust($account_query);
+						}
+						break;
+				}
+			}
+			
+			if ($date) {
+				$dates = [ ];
+				$mode = $date->getMode();
+				switch ($mode) {
+					case null :
+					case false :
+						break;
+					case 'timecreated' :
+						if (($range = $date->getTimecreated()) == true) {
+							$dates = explode(" - ", $range);
+						}
+						break;
+					default :
+						switch ($mode) {
+							// Today
+							case "1" :
+								$dates = [ 
+										date('Y-m-d\T00:00:00', time()),
+										date('Y-m-d\T23:59:59', time()) 
+								];
+								break;
+							// Last 7 days
+							case "7" :
+								$dates = [ 
+										date('Y-m-d\T00:00:00', strtotime('-7 days')),
+										date('Y-m-d\T23:59:59', time()) 
+								];
+								break;
+							// Last 30 days
+							case "30" :
+								$dates = [ 
+										date('Y-m-d\T00:00:00', strtotime('-30 days')),
+										date('Y-m-d\T23:59:59', time()) 
+								];
+								break;
+							// This Month
+							case "month" :
+								$dates = [ 
+										date('Y-m-01\T00:00:00', time()),
+										date('Y-m-t\T23:59:59', time()) 
+								];
+								break;
+							// Last Month
+							case "lmonth" :
+								$dates = [ 
+										date('Y-m-01\T00:00:00', strtotime('last month')),
+										date('Y-m-t\T23:59:59', strtotime('last month')) 
+								];
+								break;
+							// This Year
+							case "year" :
+								$dates = [ 
+										date('Y-01-01\T00:00:00', time()),
+										date('Y-m-d\T23:59:59', time()) 
+								];
+								break;
+						
+						}
+						break;
+				}
+				if ($dates) {
+					$date_query = new Elastica\Query\Range();
+					foreach ( $dates as &$date ) {
+						$time = strtotime($date);
+						if ($time) {
+							$date = date('Y-m-d\TH:i:s', $time);
+						} else {
+							$date = date('Y-m-d\TH:i:s', -9999999999);
+						}
+					}
+					@list ( $from, $to ) = $dates;
+					if (isset($from, $to)) {
+						$date_query->addField('timecreated', [ 
+								'gte' => $from,
+								'lte' => $to 
+						]);
+						$lead_query->addMust($date_query);
+					}
+				}
+			}
+		}
+		
+		return $lead_query;
+	}
+
+	/**
+	 *
+	 * @param BoolQuery $lead_query        	
+	 * @param AgentCriterion $criterion        	
+	 *
+	 * @return BoolQuery $lead_query
+	 */
+	protected function buildQuery(BoolQuery $lead_query, AgentCriterion $criterion)
+	{
+		if (!$criterion->getServiceLocator()) {
 			$criterion->setServiceLocator($this->getServiceLocator());
 		}
 		$criteria_query = false;
@@ -173,22 +292,6 @@ trait ResultAwareTrait {
 						} else {
 							$lead_query->addShould($criteria_query);
 							$lead_query->setBoost($boost);
-						}
-						if (($account || $account === false) && !$this->hasAccount) {
-							$account_query = new Elastica\Query\Nested();
-							$account_query->setPath('account')
-								->setScoreMode('avg');
-							if ($account) {
-								$account_match_query = new Elastica\Query\Match('account.id', $account->getId());
-								$account_bool_query = new Elastica\Query\BoolQuery();
-								$account_bool_query->addMust($account_match_query);
-								$account_query->setQuery($account_bool_query);
-								$lead_query->addMust($account_query);
-							} else {
-								$account_query->setQuery(new Elastica\Query\MatchAll());
-								$lead_query->addMustNot($account_query);
-							}
-							$this->hasAccount = true;
 						}
 					}
 				}

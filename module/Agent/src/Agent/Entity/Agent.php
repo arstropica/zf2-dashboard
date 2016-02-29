@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Zend\Form\Annotation;
 use Application\Provider\EntityDataTrait;
-use Account\Entity\Account;
 
 /**
  * Agent
@@ -33,7 +32,7 @@ class Agent {
 	 *
 	 * @var \DateTime @ORM\Column(name="updated", type="datetime",
 	 *      nullable=false)
-	 *      @Annotation\Exclude()
+	 *      @Annotation\Type("Zend\Form\Element\Hidden")
 	 */
 	private $updated;
 	
@@ -47,34 +46,17 @@ class Agent {
 	
 	/**
 	 *
-	 * @var \Account\Entity\Account @ORM\ManyToOne(targetEntity="Account\Entity\Account")
-	 *      @ORM\JoinColumn(name="account_id",
-	 *      referencedColumnName="id",
-	 *      nullable=true
+	 * @var Filter @ORM\ManyToOne(
+	 *      targetEntity="Agent\Entity\Filter",
+	 *      inversedBy="agents",
+	 *      fetch="EXTRA_LAZY",
+	 *      cascade={"persist", "remove"}
 	 *      )
-	 *      @Annotation\Instance("\Account\Entity\Account")
-	 *      @Annotation\Type("DoctrineModule\Form\Element\ObjectSelect")
-	 *      @Annotation\Filter({"name":"StripTags"})
-	 *      @Annotation\Filter({"name":"StringTrim"})
-	 *      @Annotation\Validator({"name":"Digits"})
-	 *      @Annotation\Required(false)
-	 *      @Annotation\Options({
-	 *      "required":"false",
-	 *      "label":"Account",
-	 *      "empty_option": "Account Filter",
-	 *      "target_class":"Account\Entity\Account",
-	 *      "property": "description"
-	 *      })
+	 *      @ORM\JoinColumn(name="filter_id", referencedColumnName="id")
+	 *     
+	 *      @Annotation\Exclude()
 	 */
-	private $account;
-	
-	/**
-	 *
-	 * @var integer @ORM\Column(name="orphan", type="integer", length=1,
-	 *      nullable=true)
-	 *      @Annotation\Type("Zend\Form\Element\Hidden")
-	 */
-	private $orphan;
+	private $filter;
 	
 	/**
 	 *
@@ -186,48 +168,6 @@ class Agent {
 
 	/**
 	 *
-	 * @return Account $account
-	 */
-	public function getAccount()
-	{
-		return $this->account;
-	}
-
-	/**
-	 *
-	 * @return integer $orphan
-	 */
-	public function getOrphan()
-	{
-		return $this->orphan;
-	}
-
-	/**
-	 *
-	 * @param \Account\Entity\Account $account        	
-	 *
-	 * @return Agent
-	 */
-	public function setAccount($account)
-	{
-		$this->account = $account;
-		return $this;
-	}
-
-	/**
-	 *
-	 * @param integer $orphan        	
-	 *
-	 * @return Agent
-	 */
-	public function setOrphan($orphan)
-	{
-		$this->orphan = $orphan;
-		return $this;
-	}
-
-	/**
-	 *
 	 * @param bool $ac        	
 	 *
 	 * @return mixed $criteria
@@ -281,6 +221,27 @@ class Agent {
 			}
 		}
 		
+		return $this;
+	}
+
+	/**
+	 *
+	 * @return Filter $filter
+	 */
+	public function getFilter()
+	{
+		return $this->filter;
+	}
+
+	/**
+	 *
+	 * @param Filter $filter        	
+	 *
+	 * @return Filter
+	 */
+	public function setFilter($filter)
+	{
+		$this->filter = $filter;
 		return $this;
 	}
 

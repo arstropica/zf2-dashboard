@@ -83,17 +83,33 @@ $this->entityForm->prepare();
 			<?php if ($agent->getLabel()) : ?>
 				<legend><?php echo $this->formLabel($agent); ?></legend>
 			<?php endif; ?>
-			<fieldset id="filter-wrapper" class="collection-fieldset addremove">
-				<legend>1. Filter By Account</legend>
-				<fieldset>
-					<fieldset class="addremove-fieldset">
-						<?php echo $this->formRow($agent->get('account')); ?>
-						<?php echo $this->formRow($agent->get('orphan')); ?>
-					</fieldset>
+			<?php if ($agent->has('filter')) : $filter = $agent->get('filter'); ?>
+				<?php echo $this->formHidden($filter->get('id')); ?>
+				<fieldset id="filter-wrapper" class="collection-fieldset addremove">
+				<?php foreach ($filter as $entityName => $elementOrFieldset) : ?>
+					<?php if ($elementOrFieldset instanceof Fieldset) : ?>
+						<?php if ($elementOrFieldset->getLabel()) : ?>
+							<legend><?php echo $elementOrFieldset->getLabel(); ?></legend>
+						<?php endif; ?>
+						<fieldset>
+							<fieldset class="addremove-fieldset">
+								<?php foreach ($elementOrFieldset as $fieldName => $element) : ?>
+									<?php switch ($fieldName) : case 'id' : ?>
+										<?php echo $this->formHidden($element); ?>
+										<?php break; ?>
+										<?php default: ?>
+										<?php echo $this->formRow($element); ?>
+										<?php break; ?>
+									<?php endswitch; ?>
+								<?php endforeach; ?>
+							</fieldset>
+						</fieldset>
+					<?php endif; ?>
+				<?php endforeach; ?>
 				</fieldset>
-			</fieldset>
+			<?php endif; ?>
 			<?php foreach ($agent as $fieldName => $element) : ?>
-				<?php switch ($fieldName) : case 'account' : case 'orphan' : break; default: ?>
+				<?php switch ($fieldName) : case 'account' : case 'filter' : break; default: ?>
 				<?php if ($element instanceof Collection) : ?>
 						<fieldset id="<?php echo $element->getAttribute('id'); ?>-wrapper">
 							<?php echo $this->fieldCollection($element); ?>

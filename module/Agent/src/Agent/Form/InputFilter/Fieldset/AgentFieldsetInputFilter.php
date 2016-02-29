@@ -52,10 +52,8 @@ class AgentFieldsetInputFilter extends InputFilter implements ServiceLocatorAwar
 				'required' => false 
 		)));
 		
-		$this->add($factory->createInput(array (
-				'name' => 'orphan',
-				'required' => false 
-		)));
+		$filtersFilter = new FilterFieldsetInputFilter($this->getServiceLocator());
+		$this->add($filtersFilter, 'filter');
 		
 		$criteriaFilter = new CriteriaInputFilter();
 		$criteriaFilter->setInputFilter(new CriterionFieldsetInputFilter($this->getServiceLocator()));

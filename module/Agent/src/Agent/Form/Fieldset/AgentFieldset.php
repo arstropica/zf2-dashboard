@@ -58,51 +58,15 @@ class AgentFieldset extends AbstractFieldset implements InputFilterProviderInter
 		));
 		
 		$this->add(array (
-				'name' => 'account',
-				'type' => 'DoctrineModule\Form\Element\ObjectSelect',
-				'required' => false,
-				'allow_empty' => true,
-				'continue_if_empty' => true,
+				'name' => 'filter',
+				'type' => 'Agent\Form\Fieldset\FilterFieldset',
 				'options' => array (
-						'column-size' => 'xs-12 col-sm-8 col-md-10',
-						'label' => 'Filter Account',
-						'label_attributes' => array (
-								'class' => 'horizontal' 
-						),
-						'empty_option' => 'None',
-						'object_manager' => $this->getObjectManager(),
-						'target_class' => 'Account\Entity\Account',
-						'property' => 'name',
-						'find_method' => array (
-								'name' => 'findAll' 
-						) 
+						'label' => "Filters",
+						'use_as_base_fieldset' => false 
 				),
 				'attributes' => array (
-						'id' => 'accountFilter' 
-				) 
-		));
-		
-		$this->add(array (
-				'type' => 'select',
-				'name' => 'orphan',
-				'required' => false,
-				'allow_empty' => true,
-				'continue_if_empty' => true,
-				'options' => array (
-						'column-size' => 'xs-6 col-sm-4 col-md-2',
-						'label' => 'Unassigned Only',
-						'label_attributes' => array (
-								'class' => 'horizontal' 
-						),
-						'value_options' => array (
-								'0' => 'No',
-								'1' => 'Yes' 
-						) 
-				),
-				'attributes' => array (
-						'id' => 'orphan',
-						'class' => 'has-chosen',
-						'value' => '0' 
+						'id' => 'filter',
+						'class' => 'collection-fieldset' 
 				) 
 		));
 		
@@ -112,7 +76,7 @@ class AgentFieldset extends AbstractFieldset implements InputFilterProviderInter
 				'required' => false,
 				'options' => array (
 						'column-size' => 'md-12',
-						'label' => '2. Add Criteria',
+						'label' => '3. Add Criteria',
 						'count' => 1,
 						'should_create_template' => true,
 						'template_placeholder' => '__index__',
@@ -148,12 +112,6 @@ class AgentFieldset extends AbstractFieldset implements InputFilterProviderInter
 										'name' => 'StringTrim' 
 								) 
 						) 
-				),
-				'account' => array (
-						'required' => false 
-				),
-				'orphan' => array (
-						'required' => false 
 				) 
 		);
 	}

@@ -23,7 +23,7 @@ HTPL;
 		var \$inputId = '#%s';
 		function resize (e) {
 				var l = \$(\$inputId).val().length;
-				\$(\$inputId).width(((l + 1) * 6) + 'px');
+				\$(\$inputId).width(((l + 1) * 7) + 'px');
 		}
 		\$(\$inputId).on('change', resize);
 		\$(window).on('resize', resize);

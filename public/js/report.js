@@ -329,12 +329,15 @@ $(function() {
 			placeholder : 'Filter Results by Account',
 			max : 1
 		});
-		$('#orphan').on('change', function(e) {
-			var val = $(this).val();
-			if (val == 1) {
-				$('#accountFilter').val([]).disable().trigger('chosen:updated');
+		$('#filter-wrapper .mode.filter').on('change', function(e) {
+			if ($(this).find('OPTION:last-child').is(':selected')) {
+				$(this).closest('fieldset').find('.form-control.control.filter').enable().trigger('chosen:updated');
 			} else {
-				$('#accountFilter').enable().trigger('chosen:updated');
+				$(this).closest('fieldset').find('.form-control.control.filter').val(
+					function(){
+						return $(this).is('[multiple]') ? [] : '';
+					}).disable()
+				.trigger('chosen:updated');
 			}
 		}).trigger('change');
 
@@ -342,26 +345,29 @@ $(function() {
 			init_controls($(this));
 		});
 
-		$('#leadSearchForm').on('submit', function(e) {
-			var required = false, fields;
-			fields = $(this).serializeArray();
-			if (fields && $.isArray(fields)) {
-				fields.forEach(function(field) {
-					if ((typeof field.name != 'undefined') && (/\[required\]$/i.test(field.name))) {
-						required = (field.value == 1) ? true : required;
-					}
-				});
-			}
-			if (!required) {
-				var r = confirm("Your search has no required criteria, and will return sorted, but unfiltered results.\n\nThis may take a long time to execute. Do you wish to proceed?");
-				if (r == true) {
-					return true;
-				} else {
-					e.preventDefault();
-					return false;
-				}
-			}
-		});
+		$('#leadSearchForm')
+				.on(
+						'submit',
+						function(e) {
+							var required = false, fields;
+							fields = $(this).serializeArray();
+							if (fields && $.isArray(fields)) {
+								fields.forEach(function(field) {
+									if ((typeof field.name != 'undefined') && (/\[required\]$/i.test(field.name))) {
+										required = (field.value == 1) ? true : required;
+									}
+								});
+							}
+							if (!required) {
+								var r = confirm("Your search has no required criteria, and will return sorted, but unfiltered results.\n\nThis may take a long time to execute. Do you wish to proceed?");
+								if (r == true) {
+									return true;
+								} else {
+									e.preventDefault();
+									return false;
+								}
+							}
+						});
 	}
 
 });
