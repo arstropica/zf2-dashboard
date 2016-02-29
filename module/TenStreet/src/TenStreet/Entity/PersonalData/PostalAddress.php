@@ -1,14 +1,20 @@
 <?php
+
 namespace TenStreet\Entity\PersonalData;
 
-class PostalAddress
-{
-
+class PostalAddress {
+	
+	protected $Address1;
+	
 	protected $Municipality;
-
+	
 	protected $Region;
+	
+	protected $PostalCode;
+	
+	protected $CountryCode;
 
-	public function getArrayCopy ()
+	public function getArrayCopy()
 	{
 		$array = get_object_vars($this);
 		return $array;
@@ -16,9 +22,28 @@ class PostalAddress
 
 	/**
 	 *
+	 * @return the $Address1
+	 */
+	public function getAddress1()
+	{
+		return $this->Address1;
+	}
+
+	/**
+	 *
+	 * @param field_type $Address1        	
+	 */
+	public function setAddress1($Address1)
+	{
+		$this->Address1 = $Address1;
+		return $this;
+	}
+
+	/**
+	 *
 	 * @return the $Municipality
 	 */
-	public function getMunicipality ()
+	public function getMunicipality()
 	{
 		return $this->Municipality;
 	}
@@ -27,7 +52,7 @@ class PostalAddress
 	 *
 	 * @return the $Region
 	 */
-	public function getRegion ()
+	public function getRegion()
 	{
 		return $this->Region;
 	}
@@ -36,7 +61,7 @@ class PostalAddress
 	 *
 	 * @param field_type $Municipality        	
 	 */
-	public function setMunicipality ($Municipality)
+	public function setMunicipality($Municipality)
 	{
 		$this->Municipality = $Municipality;
 		return $this;
@@ -46,9 +71,48 @@ class PostalAddress
 	 *
 	 * @param field_type $Region        	
 	 */
-	public function setRegion ($Region)
+	public function setRegion($Region)
 	{
 		$this->Region = $Region;
 		return $this;
 	}
+
+	/**
+	 *
+	 * @return the $PostalCode
+	 */
+	public function getPostalCode()
+	{
+		return $this->PostalCode;
+	}
+
+	/**
+	 *
+	 * @param field_type $PostalCode        	
+	 */
+	public function setPostalCode($PostalCode)
+	{
+		$this->PostalCode = $PostalCode;
+		return $this;
+	}
+
+	/**
+	 *
+	 * @return the $CountryCode
+	 */
+	public function getCountryCode()
+	{
+		return $this->CountryCode;
+	}
+
+	/**
+	 *
+	 * @param field_type $CountryCode        	
+	 */
+	public function setCountryCode($CountryCode)
+	{
+		$this->CountryCode = $CountryCode;
+		return $this;
+	}
+
 }
