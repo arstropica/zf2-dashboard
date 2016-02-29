@@ -20,6 +20,10 @@ $this->headTitle($title);
 			style="margin-left: 15px;"
 			href="<?php echo $this->url('lead/edit', array('action'=>'edit', 'id' => $entity->getId()));?>">Edit
 				Lead</a>
+		</span> <span class="pull-right"> <a class="btn btn-primary"
+			style="margin-left: 15px;"
+			href="<?php echo $this->url('lead/submit', array('action'=>'submit', 'id' => $entity->getId()));?>">Submit
+				Lead</a>
 		</span>
 	<?php endif; ?> 
 	<?php if ($report) : ?>

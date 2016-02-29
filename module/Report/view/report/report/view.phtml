@@ -16,8 +16,12 @@ $this->headTitle($title);
 		href="<?php echo $this->url('report/delete', array('action'=>'delete', 'id' => $entity->getId()));?>">Delete
 			Report</a>
 	</span> <span class="pull-right"> <a class="btn btn-success"
+		style="margin-left: 15px;"
 		href="<?php echo $this->url('report/edit', array('action'=>'edit', 'id' => $entity->getId()));?>">Edit
 			Report</a>
+	</span> <span class="pull-right"> <a class="btn btn-primary"
+		href="<?php echo $this->url('lead/submit', array('action'=>'submit', 'id' => $entity->getId()));?>">Submit
+			Lead</a>
 	</span>
 </h1>
 <?php

@@ -18,7 +18,12 @@ $this->headTitle($title);
 		href="<?php echo $this->url('lead/delete', array('action'=>'delete', 'id' => $entity->getId()));?>">Delete
 			Lead</a>
 	</span> <span class="pull-right"> <a class="btn btn-success"
-		href="<?php echo $this->url('lead/edit', array('action'=>'edit', 'id' => $entity->getId()));?>">Edit Lead</a>
+		style="margin-left: 15px;"
+		href="<?php echo $this->url('lead/edit', array('action'=>'edit', 'id' => $entity->getId()));?>">Edit
+			Lead</a>
+	</span> <span class="pull-right"> <a class="btn btn-primary"
+		href="<?php echo $this->url('lead/submit', array('action'=>'submit', 'id' => $entity->getId()));?>">Submit
+			Lead</a>
 	</span>
 </h1>
 <?php
@@ -51,7 +56,7 @@ $events = $entity->getEvents();
 					</tr>
 					<tr>
 						<th>Account</th>
-						<td><?php echo $account ? $account->getName() : 'None'; ?></td>
+						<td><?php echo $account ? "<a href=\"" . $this->url('account/view', array('action'=>'view', 'id' => $account->getId())) . "\">" . $account->getName() . "</a>" : 'None'; ?></td>
 					</tr>
 				</table>
 			</div>
@@ -66,11 +71,13 @@ $events = $entity->getEvents();
 			</div>
 			<div class="panel-body">
 				<table class="table table-hover table-condensed nomargin">
-					<?php foreach ($detail as $attributeValue) : 
+					<?php
+					
+foreach ( $detail as $attributeValue ) :
 						if ($attributeValue) :
 							$attribute = $attributeValue->getAttribute();
 							if ($attribute) :
-					?>
+								?>
 					<tr>
 						<th><?php echo $attribute->getAttributeDesc(); ?></th>
 						<td><?php echo $attributeValue->getValue(); ?></td>

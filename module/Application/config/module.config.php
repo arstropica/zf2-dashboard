@@ -263,6 +263,12 @@ return array (
 												'route' => 'lead/delete',
 												'action' => 'delete',
 												'visible' => false 
+										),
+										array (
+												'label' => 'Submit Lead',
+												'route' => 'lead/submit',
+												'action' => 'submit',
+												'visible' => false 
 										) 
 								) 
 						),
@@ -505,6 +511,12 @@ return array (
 												'label' => 'Delete Lead',
 												'route' => 'lead/delete',
 												'action' => 'delete',
+												'visible' => true 
+										),
+										array (
+												'label' => 'Submit Lead',
+												'route' => 'lead/submit',
+												'action' => 'submit',
 												'visible' => true 
 										),
 										array (

@@ -133,6 +133,20 @@ class AbstractCrudController extends BaseController {
 		}
 		return implode($glue, $output);
 	}
+
+	protected function validateSubmit($post)
+	{
+		if (is_array($post) && array_key_exists('confirm', $post)) {
+			$confirm = $post ['confirm'];
+			
+			if ($confirm == "1") {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+
 }
 
 ?>

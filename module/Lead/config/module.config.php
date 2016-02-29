@@ -106,6 +106,20 @@ return array (
 														) 
 												) 
 										),
+										'submit' => array (
+												'type' => 'Segment',
+												'options' => array (
+														'route' => '/submit[/:id]',
+														'constraints' => array (
+																'id' => '[0-9]+' 
+														),
+														'defaults' => array (
+																'controller' => 'Lead\Controller\Lead',
+																'action' => 'submit',
+																'id' => 0 
+														) 
+												) 
+										),
 										'export' => array (
 												'type' => 'Literal',
 												'options' => array (

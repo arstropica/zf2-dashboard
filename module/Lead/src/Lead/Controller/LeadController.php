@@ -632,6 +632,58 @@ class LeadController extends AbstractCrudController {
 		));
 	}
 
+	public function submitAction()
+	{
+		$id = $this->getEvent()
+			->getRouteMatch()
+			->getParam('id', 0);
+		
+		$redirectUrl = $this->url()
+			->fromRoute($this->getActionRoute(), [ ], true);
+		$prg = $this->prg($redirectUrl, true);
+		
+		if ($prg instanceof Response) {
+			return $prg;
+		} elseif ($prg === false) {
+			$em = $this->getEntityManager();
+			$objRepository = $em->getRepository($this->getEntityClass());
+			$entity = $objRepository->find($id);
+			
+			return [ 
+					'entity' => $entity 
+			];
+		}
+		
+		$post = $prg;
+		
+		$em = $this->getEntityManager();
+		$objRepository = $em->getRepository($this->getEntityClass());
+		$entity = $objRepository->find($id);
+		
+		if ($this->validateSubmit($post)) {
+			$result = $this->editLead($id, false, 'submit', true);
+			
+			if ($result) {
+				$this->flashMessenger()
+					->addSuccessMessage($this->getServiceLocator()
+					->get('translator')
+					->translate($this->successSubmitMessage));
+				
+				return $this->redirect()
+					->toRoute($this->getActionRoute('list'), [ ], true);
+			}
+		}
+		
+		$this->flashMessenger()
+			->addErrorMessage($this->getServiceLocator()
+			->get('translator')
+			->translate($this->errorSubmitMessage));
+		
+		return [ 
+				'entity' => $entity 
+		];
+	}
+
 	/**
 	 * (non-PHPdoc)
 	 *
