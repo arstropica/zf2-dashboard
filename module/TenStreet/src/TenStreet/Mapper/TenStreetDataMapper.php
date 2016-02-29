@@ -57,7 +57,7 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface {
 				
 				$Authentication = $this->getAuthorization($lead, $options);
 				
-				$ApplicationData = $this->getApplicationData($lead);
+				$ApplicationData = $this->getApplicationData($lead, $options);
 				
 				$PersonalData = $this->getPersonalData($lead);
 				
@@ -209,11 +209,11 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface {
 		return $displayFields;
 	}
 
-	protected function getApplicationData(Lead $lead)
+	protected function getApplicationData(Lead $lead, $options = [])
 	{
 		$applicationData = new ApplicationData();
 		
-		$AppReferrer = $lead->getReferrer();
+		$AppReferrer = isset($options ['AppReferrer']) ? $options ['AppReferrer'] : $lead->getReferrer();
 		
 		$Licenses = $this->getLicenses($lead);
 		
@@ -252,23 +252,39 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface {
 	{
 		$postalAddress = new PostalAddress();
 		
-		$City = $State = "";
+		$Address = $City = $State = $Zip = "";
+		
+		$CountryCode = "US";
 		
 		foreach ( [ 
 				'City',
-				'State' 
+				'State',
+				'Address',
+				'Zip' 
 		] as $key ) {
-			if ($key == 'State') {
-				$state = $this->getLeadAttributeValue($lead, $key);
-				${$key} = Utility::getState($state, "short", $state);
-			} else {
-				${$key} = $this->getLeadAttributeValue($lead, $key);
+			switch ($key) {
+				case 'State' :
+					$state = $this->getLeadAttributeValue($lead, $key);
+					${$key} = Utility::getState($state, "short", $state);
+					break;
+				case 'City' :
+					${$key} = $this->getLeadAttributeValue($lead, $key);
+					break;
+				default :
+					${$key} = $this->getLeadAttributeValue($lead, $key, "", true);
+					break;
 			}
 		}
+		
+		$postalAddress->setAddress1($Address);
 		
 		$postalAddress->setMunicipality($City);
 		
 		$postalAddress->setRegion($State);
+		
+		$postalAddress->setPostalCode($Zip);
+		
+		$postalAddress->setCountryCode($CountryCode);
 		
 		return $postalAddress;
 	}
@@ -358,7 +374,14 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface {
 			
 			foreach ( $values as $option ) {
 				foreach ( $option as $key => $value ) {
-					$options [$key] = $value;
+					switch ($key) {
+						case 'AppReferrer' :
+							$options [$key] = preg_replace('/\{lead\}/i', "Lead #" . $lead->getId(), $value);
+							break;
+						default :
+							$options [$key] = $value;
+							break;
+					}
 				}
 			}
 			
@@ -371,6 +394,9 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface {
 					case 'Company' :
 						$options ['Company'] = $apiSetting->getApiValue();
 						break;
+					case 'AppReferrer' :
+						$options ['AppReferrer'] = $apiSetting->getApiValue();
+						break;
 				}
 			}
 			foreach ( [ 
@@ -379,7 +405,8 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface {
 					'Password',
 					'Mode',
 					'Service',
-					'CompanyId' 
+					'CompanyId',
+					'AppReferrer' 
 			] as $option ) {
 				if (!in_array($option, array_keys($options))) {
 					$valid = false;
@@ -392,9 +419,9 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface {
 		return $valid ? $options : false;
 	}
 
-	protected function getLeadAttributeValue(Lead $lead, $key, $default = "")
+	protected function getLeadAttributeValue(Lead $lead, $key, $default = "", $desc = false)
 	{
-		$attribute = $lead->findAttribute($key);
+		$attribute = $lead->findAttribute($key, $desc);
 		return ($attribute) ? $attribute->getValue() : $default;
 	}
 
