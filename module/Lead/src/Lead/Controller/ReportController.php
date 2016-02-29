@@ -81,9 +81,6 @@ class ReportController extends AbstractCrudController {
 		$report = new $classe();
 		$report->setServiceLocator($this->getServiceLocator());
 		
-		$report->getAgent()
-			->setOrphan(0);
-		
 		$account = $this->params()
 			->fromQuery('account');
 		if ($account) {
@@ -247,9 +244,6 @@ class ReportController extends AbstractCrudController {
 				/* @var $report \Report\Entity\Report */
 				$report = new $classe();
 				$report->setServiceLocator($this->getServiceLocator());
-				
-				$report->getAgent()
-					->setOrphan(0);
 				
 				if (method_exists($this, 'getSearchForm')) {
 					$form = $this->getSearchForm();
