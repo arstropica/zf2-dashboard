@@ -356,6 +356,9 @@ BODY A.inline {
 	font-size: 14px;
 	font-weight: bold;
 }
+.form-control-daterange INPUT.form-control {
+	font-size: 10pt;
+}
 @media screen {
 	.small, SMALL {
 		font-size: 100%;
