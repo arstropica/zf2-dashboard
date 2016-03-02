@@ -43,7 +43,7 @@ class AgentCriterion implements ServiceLocatorAwareInterface {
 	 * @var \Agent\Entity\Agent @ORM\ManyToOne(targetEntity="Agent\Entity\Agent",
 	 *      inversedBy="criteria", cascade={"persist"})
 	 *      @ORM\JoinColumns({
-	 *      @ORM\JoinColumn(name="agent_id", referencedColumnName="id")
+	 *      @ORM\JoinColumn(name="agent_id", referencedColumnName="id", onDelete="SET NULL")
 	 *      })
 	 */
 	private $agent;
