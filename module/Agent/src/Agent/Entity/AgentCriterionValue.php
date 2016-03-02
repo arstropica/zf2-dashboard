@@ -49,7 +49,7 @@ class AgentCriterionValue {
 	 *
 	 * @var \Agent\Entity\AgentCriterion @ORM\OneToOne(targetEntity="Agent\Entity\AgentCriterion",
 	 *      inversedBy="value", cascade={"persist"})
-	 *      @ORM\JoinColumn(name="criterion_id", referencedColumnName="id")
+	 *      @ORM\JoinColumn(name="criterion_id", referencedColumnName="id", onDelete="CASCADE")
 	 */
 	protected $criterion;
 	
