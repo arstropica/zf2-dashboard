@@ -249,6 +249,23 @@ class Helper {
 			return (!filter_var($ip, FILTER_VALIDATE_IP) === false);
 		}
 	}
+
+	/**
+	 * Add protocol
+	 *
+	 * @param string $uri        	
+	 *
+	 * @return string $uri
+	 */
+	public static function add_protocol($uri, $protocol = 'http')
+	{
+		if (!preg_match("~^(?:f|ht)tps?://~i", $uri)) {
+			$protocol = preg_replace('/[^\w]/i', '', $protocol);
+			$uri = $protocol . "://" . $uri;
+		}
+		return $uri;
+	}
+
 }
 
 ?>
