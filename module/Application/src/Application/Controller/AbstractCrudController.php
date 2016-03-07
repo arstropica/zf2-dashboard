@@ -12,6 +12,9 @@ use Zend\Session\Container as SessionContainer;
 use Application\Provider\EntityManagerAwareTrait;
 use Application\Provider\ServiceEventTrait;
 use Application\Utility\Helper;
+use Lead\Entity\LeadAttributeValue;
+use Lead\Entity\Lead;
+use Report\Entity\Result;
 
 class AbstractCrudController extends BaseController {
 	
@@ -80,6 +83,41 @@ class AbstractCrudController extends BaseController {
 		return false;
 	}
 
+	public function setHistory()
+	{
+		$referrer = $this->getRequest()
+			->getHeader('Referer');
+		
+		if ($referrer) {
+			$url = $referrer->getUri();
+			$this->SessionHistory($url);
+		} else {
+			$url = $this->getRequest()
+				->getRequestUri();
+		}
+		
+		return $url;
+	}
+
+	public function getHistory($last = true)
+	{
+		$history = $this->SessionHistory();
+		if ($history) {
+			return ($last) ? end($history) : $history;
+		}
+		return false;
+	}
+
+	public function getHistoricalRedirect($action = 'list', $current = false)
+	{
+		$history = $this->getHistory();
+		$uri = $this->getRequest()
+			->getRequestUri();
+		return ($history && !$current && $uri != $history) ? $this->redirect()
+			->toUrl($history) : $this->redirect()
+			->toRoute($this->getActionRoute($action), [ ], true);
+	}
+
 	public function getLimit($default = 10)
 	{
 		$limit = $default;
@@ -145,6 +183,35 @@ class AbstractCrudController extends BaseController {
 		}
 		
 		return false;
+	}
+
+	protected function extractAttributes(Array $results)
+	{
+		$attributes = [ ];
+		if ($results) {
+			foreach ( $results as $entity ) {
+				$lead = false;
+				if ($entity instanceof Lead) {
+					$lead = $entity;
+				} elseif ($entity instanceof Result) {
+					$lead = $entity->getLead();
+				}
+				if ($lead instanceof Lead) {
+					$values = $lead->getAttributes();
+					if ($values) {
+						foreach ( $values as $value ) {
+							if ($value instanceof LeadAttributeValue) {
+								$attribute = $value->getAttribute();
+								if ($attribute) {
+									$attributes [$attribute->getId()] = $attribute->getAttributeDesc();
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return $attributes;
 	}
 
 }

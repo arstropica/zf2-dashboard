@@ -8,9 +8,11 @@ $title = 'API Options';
 $this->headTitle($title);
 ?>
 <h1>
-<?php echo $this->escapeHtml($title); ?>
-<span class="pull-right"> <a class="btn btn-info"
-		href="<?php echo $this->url('home', array('action'=>'index'));?>">Back</a>
+	<span class="title">
+		<?php echo $this->escapeHtml($title); ?>
+	</span>
+	<span class="pull-right"> <a class="btn btn-info"
+		href="<?php echo $this->history ? : $this->url('home', array('action'=>'index'));?>">Back</a>
 	</span>
 </h1>
 <hr class="small">

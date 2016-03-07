@@ -5,8 +5,10 @@ $title = 'Display Leads';
 $this->headTitle($title);
 ?>
 <h1>
-<?php echo $this->escapeHtml($title); ?>
-<span class="pull-right" style="margin-left: 15px;"> <a target="_blank"
+	<span class="title">
+		<?php echo $this->escapeHtml($title); ?>
+	</span>
+	<span class="pull-right" style="margin-left: 15px;"> <a target="_blank"
 		href="<?php echo $this->url('lead/export', array('action' => 'export')); ?>"
 		class="btn btn-info" id="exportLeads" title="Export Leads">Export
 			Leads</a>
@@ -148,7 +150,7 @@ $this->headTitle($title);
 					<td class="col-xs-2 description">
 						<div class="checkbox"><?php echo $this->formElement($form->get("sel[" . $entity->getId() . "]")); ?></div>&nbsp;&nbsp;
 						<a
-						href="<?php echo $this->losUrl()->from('lead/view',['id'=>$entity->getId()], true)?>"><?php echo $entity->getFullName(); ?></a>
+						href="<?php echo $this->losUrl()->from('lead/view',['id'=>$entity->getId()], false)?>"><?php echo $entity->getFullName(); ?></a>
 					</td>
 					<td class="col-xs-2 account"><?php $account = $entity->getAccount(); echo $account ? '<a href="' . $this->url('account/view', ['action'=>'view', 'id' => $account->getId()]) . '">' . $account->getName() . '</a>' : 'None'; ?></td>
 					<td class="col-xs-2 source"><a
@@ -156,10 +158,10 @@ $this->headTitle($title);
 					<td class="col-xs-2 updated"><?php $lastSubmitted = $entity->getLastsubmitted(); if ($lastSubmitted) echo date_format($lastSubmitted, 'd M, Y h:i A') ?></td>
 					<td class="col-xs-2 date"><?php echo date_format($entity->getTimecreated(), 'd M, Y h:i A') ?></td>
 					<td class="action col-xs-2 text-right"><a
-						href="<?php echo $this->losUrl()->from('lead/view',['id'=>$entity->getId()], true)?>"
+						href="<?php echo $this->losUrl()->from('lead/view',['id'=>$entity->getId()], false)?>"
 						title="View Lead" class="btn btn-xs btn-info"><?php echo $this->losIcon('glyphicon-eye-open') ?></a>
 						<a
-						href="<?php echo $this->losUrl()->from('lead/edit',['id'=>$entity->getId()], true)?>"
+						href="<?php echo $this->losUrl()->from('lead/edit',['id'=>$entity->getId()], false)?>"
 						title="Edit Lead" class="btn btn-xs btn-warning"><?php echo $this->losIcon('glyphicon-edit') ?></a>
 					</td>
 				</tr>

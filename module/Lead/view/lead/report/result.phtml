@@ -14,7 +14,9 @@ $title = 'View Search Result';
 $this->headTitle($title);
 ?>
 <h1>
-<?php echo $this->escapeHtml($title); ?>
+	<span class="title">
+		<?php echo $this->escapeHtml($title); ?>
+	</span>
 	<?php if ($entity) : ?>
 		<span class="pull-right"> <a class="btn btn-info"
 			style="margin-left: 15px;"
@@ -28,7 +30,7 @@ $this->headTitle($title);
 	<?php endif; ?> 
 	<?php if ($report) : ?>
 		<span class="pull-right"> <a class="btn btn-success"
-			href="<?php echo $report ? $this->url('lead/search', ['action'=>'search', 'id' => $report->getId()], true) : $this->url('lead/search', ['action'=>'search'], true);?>">Back to Search Results</a>
+			href="<?php echo $report ? $this->url('lead/search', ['action'=>'search', 'id' => $report->getId()], true) : ($this->history ? : $this->url('lead/search', ['action'=>'search'], true)); ?>">Back to Search Results</a>
 		</span>
 	<?php endif; ?> 
 </h1>

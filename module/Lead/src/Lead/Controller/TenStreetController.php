@@ -138,7 +138,8 @@ class TenStreetController extends AbstractCrudController {
 						->fromQuery(),
 					'form' => $form,
 					'filters' => $filters,
-					'ui' => $ui 
+					'ui' => $ui,
+					'history' => $this->setHistory() 
 			];
 		}
 		
@@ -181,7 +182,8 @@ class TenStreetController extends AbstractCrudController {
 		$entity = $objRepository->find($id);
 		
 		return [ 
-				'entity' => $entity 
+				'entity' => $entity,
+				'history' => $this->setHistory() 
 		];
 	}
 
@@ -217,7 +219,8 @@ class TenStreetController extends AbstractCrudController {
 		}
 		
 		return [ 
-				'entity' => $entity 
+				'entity' => $entity,
+				'history' => $this->setHistory() 
 		];
 	}
 
@@ -259,7 +262,7 @@ class TenStreetController extends AbstractCrudController {
 		$em = $this->getEntityManager();
 		$attributeRepository = $em->getRepository("Lead\\Entity\\LeadAttribute");
 		
-		$attributes = $attributeRepository->getUniqueArray();
+		$attributes = $this->extractAttributes($results);
 		
 		$headings = [ 
 				'lead' => [ 

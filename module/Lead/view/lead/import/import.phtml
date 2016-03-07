@@ -10,8 +10,10 @@ $title = 'Import Leads';
 $this->headTitle($title);
 ?>
 <h1>
-<?php echo $this->escapeHtml($title); ?>
-<span class="pull-right"> <a class="btn btn-info"
+	<span class="title">
+		<?php echo $this->escapeHtml($title); ?>
+	</span>
+	<span class="pull-right"> <a class="btn btn-info"
 		href="<?php echo $this->url('import', array('action'=>'import'));?>">Back</a>
 	</span>
 </h1>

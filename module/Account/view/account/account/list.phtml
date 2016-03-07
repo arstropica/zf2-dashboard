@@ -20,8 +20,10 @@ $this->headTitle($title);
 	</div>
 </div>
 <h1>
-<?php echo $this->escapeHtml($title); ?>
-<span class="pull-right"> <a
+	<span class="title">
+		<?php echo $this->escapeHtml($title); ?>
+	</span>
+	<span class="pull-right"> <a
 		href="<?php echo $this->url('account/add', array('action' => 'add')); ?>"
 		class="btn btn-success" title="Add New Account">Add New Account</a>
 	</span>

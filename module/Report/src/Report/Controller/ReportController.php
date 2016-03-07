@@ -160,7 +160,8 @@ class ReportController extends AbstractCrudController {
 						->fromQuery(),
 					'form' => $form,
 					'filters' => $filters,
-					'ui' => $ui 
+					'ui' => $ui,
+					'history' => $this->setHistory() 
 			];
 		}
 		
@@ -238,8 +239,8 @@ class ReportController extends AbstractCrudController {
 				->get('translator')
 				->translate($message));
 		}
-		return $this->redirect()
-			->toRoute($this->getActionRoute('list'), [ ], true);
+		
+		return $this->getHistoricalRedirect('list', true);
 	}
 
 	/**
@@ -258,7 +259,8 @@ class ReportController extends AbstractCrudController {
 		$entity = $objRepository->find($id);
 		
 		return [ 
-				'entity' => $entity 
+				'entity' => $entity,
+				'history' => $this->setHistory() 
 		];
 	}
 
@@ -324,7 +326,8 @@ class ReportController extends AbstractCrudController {
 			}
 			return [ 
 					'entityForm' => $form,
-					'entity' => $entity 
+					'entity' => $entity,
+					'history' => $this->setHistory() 
 			];
 		}
 		
@@ -348,7 +351,8 @@ class ReportController extends AbstractCrudController {
 		} else {
 			return [ 
 					'entityForm' => $form,
-					'entity' => $entity 
+					'entity' => $entity,
+					'history' => $this->getHistory() 
 			];
 		}
 		
@@ -363,8 +367,7 @@ class ReportController extends AbstractCrudController {
 			$action = 'list';
 		}
 		
-		return $this->redirect()
-			->toRoute($this->getActionRoute($action), [ ], true);
+		return $this->getHistoricalRedirect('list');
 	}
 
 	/**
@@ -441,7 +444,8 @@ class ReportController extends AbstractCrudController {
 			
 			return [ 
 					'entityForm' => $form,
-					'entity' => $entity 
+					'entity' => $entity,
+					'history' => $this->setHistory() 
 			];
 		}
 		
@@ -484,7 +488,8 @@ class ReportController extends AbstractCrudController {
 		} else {
 			return [ 
 					'entityForm' => $form,
-					'entity' => $entity 
+					'entity' => $entity,
+					'history' => $this->getHistory() 
 			];
 		}
 		
@@ -493,8 +498,7 @@ class ReportController extends AbstractCrudController {
 			->get('translator')
 			->translate($this->successEditMessage));
 		
-		return $this->redirect()
-			->toRoute($this->getActionRoute('list'), [ ], true);
+		return $this->getHistoricalRedirect('list');
 	}
 
 	/**
@@ -520,7 +524,8 @@ class ReportController extends AbstractCrudController {
 			$entity = $objRepository->find($id);
 			
 			return [ 
-					'entity' => $entity 
+					'entity' => $entity,
+					'history' => $this->setHistory() 
 			];
 		}
 		
@@ -569,8 +574,7 @@ class ReportController extends AbstractCrudController {
 					->get('translator')
 					->translate($this->successDeleteMessage));
 				
-				return $this->redirect()
-					->toRoute($this->getActionRoute('list'), [ ], true);
+				return $this->getHistoricalRedirect('list');
 			}
 		}
 		
@@ -580,7 +584,8 @@ class ReportController extends AbstractCrudController {
 			->translate($this->errorDeleteMessage));
 		
 		return [ 
-				'entity' => $entity 
+				'entity' => $entity,
+				'history' => $this->setHistory() 
 		];
 	}
 

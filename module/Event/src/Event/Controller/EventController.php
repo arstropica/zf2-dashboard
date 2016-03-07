@@ -114,7 +114,8 @@ class EventController extends AbstractCrudController {
 				'query' => $this->params()
 					->fromQuery(),
 				'filters' => $filters,
-				'ui' => $ui 
+				'ui' => $ui,
+				'history' => $this->setHistory() 
 		];
 	}
 
@@ -160,7 +161,8 @@ class EventController extends AbstractCrudController {
 		
 		return [ 
 				'entity' => $entity,
-				'events' => $events 
+				'events' => $events,
+				'history' => $this->setHistory() 
 		];
 	}
 

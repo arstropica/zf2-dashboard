@@ -7,10 +7,12 @@ $title = 'View Report';
 $this->headTitle($title);
 ?>
 <h1>
-<?php echo $this->escapeHtml($title); ?>
+	<span class="title">
+		<?php echo $this->escapeHtml($title); ?>
+	</span>
 	<span class="pull-right"> <a class="btn btn-info"
 		style="margin-left: 15px;"
-		href="<?php echo $this->losUrl()->from('report', ['action'=>'list'], true);?>">Back</a>
+		href="<?php echo $this->history ? : $this->losUrl()->from('report', ['action'=>'list'], true);?>">Back</a>
 	</span> <span class="pull-right"> <a class="btn btn-danger"
 		style="margin-left: 15px;"
 		href="<?php echo $this->url('report/delete', array('action'=>'delete', 'id' => $entity->getId()));?>">Delete
@@ -19,17 +21,14 @@ $this->headTitle($title);
 		style="margin-left: 15px;"
 		href="<?php echo $this->url('report/edit', array('action'=>'edit', 'id' => $entity->getId()));?>">Edit
 			Report</a>
-	</span> <span class="pull-right"> <a class="btn btn-primary"
-		href="<?php echo $this->url('lead/submit', array('action'=>'submit', 'id' => $entity->getId()));?>">Submit
-			Lead</a>
-	</span>
+	</span> 
 </h1>
 <?php
 $agent = $entity->getAgent();
 $criteria = $agent ? $agent->getCriteria(false) : [ ];
 $account = $entity->getAccount();
 $events = $entity->getEvents();
-$results = $entity->getResults(false, 10);
+$results = $entity->getResults(false);
 ?>
 <div class="row content-row">
 	<div class="col-md-12">
@@ -67,6 +66,7 @@ $results = $entity->getResults(false, 10);
 			<div class="panel-body">
 				<table class="table table-hover table-condensed nomargin">
 					<tr>
+						<th>Attribute</th>
 						<th>Criterion</th>
 						<th>Condition</th>
 						<th>Weight</th>
@@ -82,6 +82,7 @@ $results = $entity->getResults(false, 10);
 							if ($value && $relationship) :
 								?>
 					<tr>
+						<td><?php echo $criterion->getAttribute()->getAttributeDesc(); ?></td>
 						<td><?php echo $value->__toString(); ?></td>
 						<td><?php echo $relationship->getDescription() . '(' . $relationship->getSymbol() . ')'; ?></td>
 						<td><?php echo $criterion->getWeight(); ?></td>
@@ -107,7 +108,7 @@ $results = $entity->getResults(false, 10);
 						<th>Account</th>
 					</tr>
 					<?php
-					
+					$i = 0;
 					/* @var $result \Report\Entity\Result */
 					foreach ( $results as $result ) :
 						if ($result) :
@@ -122,7 +123,14 @@ $results = $entity->getResults(false, 10);
 						<td><?php if ($_account) : ?><a
 							href="<?php echo $this->losUrl()->from('account/view', ['id' => $_account->getId(), 'action' => 'view']); ?>"><?php echo $_account->getName(); ?></a><?php else: ?>None<?php endif; ?></td>
 					</tr>
-					<?php endif; endif; endforeach; ?>
+					<?php 
+						$i ++;
+						if ($i >= 10) {
+							break;
+						}
+						endif; 
+					endif; 
+				endforeach; ?>
 				</table>
 			</div>
 			<?php if (count($results) > 10) : ?>

@@ -10,9 +10,11 @@ $this->headTitle($title);
 	</div>
 </div>
 <h1>
-<?php echo $this->escapeHtml($title); ?>
-<span class="pull-right"> <a
-		href="<?php echo $this->url('account/list', array('action' => 'list')); ?>"
+	<span class="title">
+		<?php echo $this->escapeHtml($title); ?>
+	</span>
+	<span class="pull-right"> <a
+		href="<?php echo $this->history ? : $this->url('account/list', array('action' => 'list')); ?>"
 		class="btn btn-info" title="Back">Back</a>
 	</span>
 </h1>
@@ -25,7 +27,7 @@ $this->headTitle($title);
 			<h2>You did not select anything!</h2>
 		<div>
 			<a
-				href="<?php echo $this->url('account/list', array('action' => 'list')); ?>"
+				href="<?php echo $this->history ? : $this->url('account/list', array('action' => 'list')); ?>"
 				class="btn btn-info" title="Back">Back</a>
 		</div>
 		<?php else : ?>

@@ -168,7 +168,8 @@ class ResultController extends AbstractCrudController {
 					'query' => $this->params()
 						->fromQuery(),
 					'form' => $form,
-					'ui' => $ui 
+					'ui' => $ui,
+					'history' => $this->setHistory() 
 			];
 		}
 		
@@ -283,12 +284,18 @@ class ResultController extends AbstractCrudController {
 		/* @var $report \Report\Entity\Report */
 		$report = $objRepository->find($id);
 		
-		$entity = $report->findResult($lead);
-		
-		return [ 
-				'entity' => $entity,
-				'report' => $report 
-		];
+		if ($report) {
+			$entity = $report->findResult($lead);
+			
+			return [ 
+					'entity' => $entity,
+					'report' => $report,
+					'history' => $this->setHistory() 
+			];
+		} else {
+			$this->setHistory();
+			return $this->getHistoricalRedirect('list');
+		}
 	}
 
 	public function exportAction()
@@ -322,7 +329,7 @@ class ResultController extends AbstractCrudController {
 		$em = $this->getEntityManager();
 		$attributeRepository = $em->getRepository("Lead\\Entity\\LeadAttribute");
 		
-		$attributes = $attributeRepository->getUniqueArray();
+		$attributes = $this->extractAttributes($results);
 		
 		$headings = [ 
 				'lead' => [ 

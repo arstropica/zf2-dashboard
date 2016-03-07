@@ -4,8 +4,10 @@ $title = 'Email Leads';
 $this->headTitle($title);
 ?>
 <h1>
-<?php echo $this->escapeHtml($title); ?>
-<span class="pull-right" style="margin-left: 15px;"> <a target="_blank"
+	<span class="title">
+		<?php echo $this->escapeHtml($title); ?>
+	</span>
+	<span class="pull-right" style="margin-left: 15px;"> <a target="_blank"
 		href="<?php echo $this->url('services/email/export', array('action' => 'export')); ?>"
 		class="btn btn-info" id="exportLeads" title="Export Leads">Export
 			Leads</a>

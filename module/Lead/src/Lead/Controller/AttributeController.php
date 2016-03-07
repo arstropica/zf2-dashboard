@@ -156,7 +156,8 @@ class AttributeController extends AbstractCrudController {
 					->fromQuery(),
 				'ui' => $ui,
 				'isAdmin' => $this->isAdmin(),
-				'sortable' => $sortable 
+				'sortable' => $sortable,
+				'history' => $this->setHistory() 
 		];
 	}
 
@@ -207,7 +208,8 @@ class AttributeController extends AbstractCrudController {
 			
 			return [ 
 					'entityForm' => $form,
-					'entity' => $entity 
+					'entity' => $entity,
+					'history' => $this->setHistory() 
 			];
 		}
 		
@@ -242,7 +244,8 @@ class AttributeController extends AbstractCrudController {
 		} else {
 			return [ 
 					'entityForm' => $form,
-					'entity' => $entity 
+					'entity' => $entity,
+					'history' => $this->getHistory() 
 			];
 		}
 		
@@ -257,11 +260,7 @@ class AttributeController extends AbstractCrudController {
 			$action = 'list';
 		}
 		
-		return $this->redirect()
-			->toRoute($this->getActionRoute('list'), [ ], [ 
-				'query' => $this->params()
-					->fromQuery() 
-		], true);
+		return $this->getHistoricalRedirect('list');
 	}
 
 	/**
@@ -334,7 +333,8 @@ class AttributeController extends AbstractCrudController {
 			
 			return [ 
 					'entityForm' => $form,
-					'entity' => $entity 
+					'entity' => $entity,
+					'history' => $this->setHistory() 
 			];
 		}
 		
@@ -363,7 +363,8 @@ class AttributeController extends AbstractCrudController {
 		} else {
 			return [ 
 					'entityForm' => $form,
-					'entity' => $entity 
+					'entity' => $entity,
+					'history' => $this->getHistory() 
 			];
 		}
 		
@@ -372,11 +373,7 @@ class AttributeController extends AbstractCrudController {
 			->get('translator')
 			->translate($this->successEditMessage));
 		
-		return $this->redirect()
-			->toRoute($this->getActionRoute('list'), [ ], [ 
-				'query' => $this->params()
-					->fromQuery() 
-		], true);
+		return $this->getHistoricalRedirect();
 	}
 
 	/**
@@ -405,7 +402,8 @@ class AttributeController extends AbstractCrudController {
 			$entity = $objRepository->find($id);
 			
 			return [ 
-					'entity' => $entity 
+					'entity' => $entity,
+					'history' => $this->setHistory() 
 			];
 		}
 		
@@ -423,11 +421,7 @@ class AttributeController extends AbstractCrudController {
 					->get('translator')
 					->translate($this->successDeleteMessage));
 				
-				return $this->redirect()
-					->toRoute($this->getActionRoute('list'), [ ], [ 
-						'query' => $this->params()
-							->fromQuery() 
-				], true);
+				return $this->getHistoricalRedirect('list');
 			}
 		}
 		
@@ -437,7 +431,8 @@ class AttributeController extends AbstractCrudController {
 			->translate($this->errorDeleteMessage));
 		
 		return [ 
-				'entity' => $entity 
+				'entity' => $entity,
+				'history' => $this->getHistory() 
 		];
 	}
 
@@ -488,7 +483,8 @@ class AttributeController extends AbstractCrudController {
 			
 			return [ 
 					'entityForm' => $form,
-					'entity' => $entity 
+					'entity' => $entity,
+					'history' => $this->setHistory() 
 			];
 		}
 		
@@ -579,15 +575,12 @@ class AttributeController extends AbstractCrudController {
 		if (!$merge_success || !$delete_success) {
 			return [ 
 					'entityForm' => $form,
-					'entity' => $entity 
+					'entity' => $entity,
+					'history' => $this->getHistory() 
 			];
 		}
 		
-		return $this->redirect()
-			->toRoute($this->getActionRoute('list'), [ ], [ 
-				'query' => $this->params()
-					->fromQuery() 
-		], true);
+		return $this->getHistoricalRedirect();
 	}
 
 	public function sortAction()

@@ -176,6 +176,8 @@ class ReportController extends AbstractCrudController {
 		
 		}
 		
+		$this->setHistory();
+		
 		// Set Session-Cached data
 		if ($prg) {
 			$_id = md5(serialize($prg));
@@ -217,7 +219,8 @@ class ReportController extends AbstractCrudController {
 				'query' => $this->params()
 					->fromQuery(),
 				'form' => $form,
-				'ui' => $ui 
+				'ui' => $ui,
+				'history' => $this->getHistory() 
 		];
 	
 	}
@@ -266,7 +269,8 @@ class ReportController extends AbstractCrudController {
 		
 		return [ 
 				'entity' => $entity,
-				'report' => $report 
+				'report' => $report,
+				'history' => $this->setHistory() 
 		];
 	
 	}
@@ -327,7 +331,7 @@ class ReportController extends AbstractCrudController {
 							$em = $this->getEntityManager();
 							$attributeRepository = $em->getRepository("Lead\\Entity\\LeadAttribute");
 							
-							$attributes = $attributeRepository->getUniqueArray();
+							$attributes = $this->extractAttributes($results);
 							
 							$headings = [ 
 									'lead' => [ 

@@ -14,10 +14,12 @@ $this->headTitle($title);
 	</div>
 </div>
 <h1>
-<?php echo $this->escapeHtml($title); ?>
-<span class="pull-right" style="margin-left: 15px;"> <a
+	<span class="title">
+		<?php echo $this->escapeHtml($title); ?>
+	</span>
+	<span class="pull-right" style="margin-left: 15px;"> <a
 		class="btn btn-info"
-		href="<?php echo $this->url('account', array('action'=>'list'));?>">Back</a>
+		href="<?php echo $this->history ? : $this->url('account', array('action'=>'list'));?>">Back</a>
 	</span> <span class="pull-right" style="margin-left: 15px;"> <a
 		href="<?php
 		

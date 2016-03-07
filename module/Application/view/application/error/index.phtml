@@ -6,7 +6,11 @@ $this->headTitle($title);
 <div class="row content">
 	<div class="col-md-12">
 		<section class="main">
-			<h1><?php echo $this->escapeHtml($title); ?></h1>
+			<h1>
+				<span class="title">
+					<?php echo $this->escapeHtml($title); ?>
+				</span>			
+			</h1>
 		</section>
 		<section class="desc">
 			<h4>

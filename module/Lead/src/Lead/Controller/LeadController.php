@@ -177,7 +177,8 @@ class LeadController extends AbstractCrudController {
 					'form' => $form,
 					'filters' => $filters,
 					'hiddenFilters' => $hiddenFilters,
-					'ui' => $ui 
+					'ui' => $ui,
+					'history' => $this->setHistory() 
 			];
 		}
 		
@@ -267,8 +268,7 @@ class LeadController extends AbstractCrudController {
 				->get('translator')
 				->translate($message));
 		}
-		return $this->redirect()
-			->toRoute($this->getActionRoute('list'), [ ], true);
+		return $this->getHistoricalRedirect('list', true);
 	}
 
 	public function viewAction()
@@ -282,7 +282,8 @@ class LeadController extends AbstractCrudController {
 		$entity = $objRepository->find($id);
 		
 		return [ 
-				'entity' => $entity 
+				'entity' => $entity,
+				'history' => $this->setHistory() 
 		];
 	}
 
@@ -328,7 +329,8 @@ class LeadController extends AbstractCrudController {
 			
 			return [ 
 					'entityForm' => $form,
-					'entity' => $entity 
+					'entity' => $entity,
+					'history' => $this->setHistory() 
 			];
 		}
 		
@@ -356,7 +358,8 @@ class LeadController extends AbstractCrudController {
 		} else {
 			return [ 
 					'entityForm' => $form,
-					'entity' => $entity 
+					'entity' => $entity,
+					'history' => $this->getHistory() 
 			];
 		}
 		
@@ -365,14 +368,7 @@ class LeadController extends AbstractCrudController {
 			->get('translator')
 			->translate($this->successAddMessage));
 		
-		if ($this->needAddOther($form)) {
-			$action = 'add';
-		} else {
-			$action = 'list';
-		}
-		
-		return $this->redirect()
-			->toRoute($this->getActionRoute($action), [ ], true);
+		return $this->getHistoricalRedirect('list');
 	}
 
 	/**
@@ -445,7 +441,8 @@ class LeadController extends AbstractCrudController {
 			
 			return [ 
 					'entityForm' => $form,
-					'entity' => $entity 
+					'entity' => $entity,
+					'history' => $this->setHistory() 
 			];
 		}
 		
@@ -486,7 +483,8 @@ class LeadController extends AbstractCrudController {
 		} else {
 			return [ 
 					'entityForm' => $form,
-					'entity' => $entity 
+					'entity' => $entity,
+					'history' => $this->getHistory() 
 			];
 		}
 		
@@ -495,8 +493,7 @@ class LeadController extends AbstractCrudController {
 			->get('translator')
 			->translate($this->successEditMessage));
 		
-		return $this->redirect()
-			->toRoute($this->getActionRoute('list'), [ ], true);
+		return $this->getHistoricalRedirect('list');
 	}
 
 	/**
@@ -522,7 +519,8 @@ class LeadController extends AbstractCrudController {
 			$entity = $objRepository->find($id);
 			
 			return [ 
-					'entity' => $entity 
+					'entity' => $entity,
+					'history' => $this->setHistory() 
 			];
 		}
 		
@@ -548,8 +546,7 @@ class LeadController extends AbstractCrudController {
 					->get('translator')
 					->translate($this->successDeleteMessage));
 				
-				return $this->redirect()
-					->toRoute($this->getActionRoute('list'), [ ], true);
+				return $this->getHistoricalRedirect('list');
 			}
 		}
 		
@@ -559,7 +556,8 @@ class LeadController extends AbstractCrudController {
 			->translate($this->errorDeleteMessage));
 		
 		return [ 
-				'entity' => $entity 
+				'entity' => $entity,
+				'history' => $this->getHistory() 
 		];
 	}
 
@@ -597,7 +595,7 @@ class LeadController extends AbstractCrudController {
 		$em = $this->getEntityManager();
 		$attributeRepository = $em->getRepository("Lead\\Entity\\LeadAttribute");
 		
-		$attributes = $attributeRepository->getUniqueArray();
+		$attributes = $this->extractAttributes($results);
 		
 		$headings = [ 
 				'lead' => [ 
@@ -650,7 +648,8 @@ class LeadController extends AbstractCrudController {
 			$entity = $objRepository->find($id);
 			
 			return [ 
-					'entity' => $entity 
+					'entity' => $entity,
+					'history' => $this->setHistory() 
 			];
 		}
 		
@@ -669,8 +668,7 @@ class LeadController extends AbstractCrudController {
 					->get('translator')
 					->translate($this->successSubmitMessage));
 				
-				return $this->redirect()
-					->toRoute($this->getActionRoute('list'), [ ], true);
+				return $this->getHistoricalRedirect('list');
 			}
 		}
 		
@@ -680,7 +678,8 @@ class LeadController extends AbstractCrudController {
 			->translate($this->errorSubmitMessage));
 		
 		return [ 
-				'entity' => $entity 
+				'entity' => $entity,
+				'history' => $this->getHistory() 
 		];
 	}
 
