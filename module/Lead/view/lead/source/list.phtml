@@ -1,0 +1,102 @@
+<?php
+use Application\Form\View\Helper\Form as FormHelper;
+$title = 'Manage Sources';
+$this->headTitle($title);
+?>
+<h1>
+	<span class="title">
+		<?php echo $this->escapeHtml($title); ?>
+	</span> <span class="pull-right" style="margin-left: 15px;"> <a
+		href="<?php echo $this->history ? : $this->url('lead', array('action' => 'list')); ?>"
+		class="btn btn-info" title="Display Leads">Back</a>
+	</span>
+</h1>
+<hr class="small">
+<br />
+<div class="row">
+	<div class="col-xs-12">
+		<div class="view-header row">
+			<div class="col-xs-12">
+				<div class="pager-header pull-left">
+					<?php echo $this->form($this->pager, FormHelper::LAYOUT_HORIZONTAL); ?>
+				</div>
+				<div class="total-item-count pull-right">
+					<?php echo $this->paginatorPosition($this->paginator); ?>
+				</div>
+			</div>
+		</div>
+		<div class="questionsgrid clearfix">
+			<hr class="small">
+			<table class="table table-hover table-striped" id="sourcestable">
+				<thead>
+					<tr>
+						<?php
+						foreach ( $this->ui ['table'] as $field => $ui ) :
+							$selected = $this->sort == $field;
+							$rorder = $this->order == 'asc' ? 'desc' : 'asc';
+							?>
+						<th class="col-xs-<?php echo $ui['col']; ?> <?php echo $field; ?>">
+						<?php if ($ui['sort']) : ?>
+						<a class="sort <?php if ($selected) : echo "selected"; endif; ?>"
+							title="Sort by <?php echo $ui['label']; ?>"
+							href="<?php echo $this->url('attribute', array('action' => 'list'), array('query' => array_merge($this->query, array('page' => $this->page, 'sort' => $field, 'order' => ($selected ? $rorder : $this->order)))), true); ?>">
+								<span>
+						<?php echo $ui['label']; ?> <span
+									class="glyphicon <?php echo $this->order; ?>"
+									aria-hidden="true"></span>
+							</span>
+						</a>
+						<?php else: echo $ui['label']; endif; ?>
+						</th>
+						<?php endforeach; ?>
+						<th class="action col-xs-2 text-right">Actions</th>
+					</tr>
+				</thead>
+				<tbody class="sortable">
+	    		<?php foreach ($this->paginator as $record): ?>
+	        		<tr class="sourceitem" id="<?php echo $record['source']; ?>">
+						<td
+							class="col-xs-<?php echo $this->ui['table']['source']['col']; ?> source">
+							<a title="Edit Source"
+							href="<?php echo $this->losUrl()->from('source/edit',[], ['query' => ['source' => $record['source']]], true)?>"><?php echo $record['source']; ?></a>
+						</td>
+						<td
+							class="col-xs-<?php echo $this->ui['table']['referrers']['col']; ?> referrers">
+							<ul class="inline">
+								<?php foreach ($record['referrers'] as $referrer) : ?>
+									<li><span><?php echo $referrer; ?></span></li>
+								<?php endforeach; ?>
+							</ul>
+						</td>
+						<td
+							class="col-xs-<?php echo $this->ui['table']['count']['col']; ?> count">
+							<a
+							href="<?php echo $this->losUrl()->from('lead/list',['action' => 'list'], ['query' => ['referrer' => $record['source']]], true)?>"><?php echo $record['count']; ?></a>
+						</td>
+						<td class="action col-xs-2 text-right">
+							<?php if ($this->isAdmin) : ?><a class="btn btn-xs btn-info"
+							href="<?php echo $this->losUrl()->from('source/merge',[], ['query' => ['source' => $record['source']]], true)?>"
+							title="Merge Source" class="btn btn-xs btn-info"><?php echo $this->losIcon('glyphicon-duplicate') ?></a><?php endif; ?>							
+							<a
+							href="<?php echo $this->losUrl()->from('source/edit',[], ['query' => ['source' => $record['source']]], true)?>"
+							title="Edit Source" class="btn btn-xs btn-success"><?php echo $this->losIcon('glyphicon-edit') ?></a>
+							<input type="hidden" class="identifier"
+							value="<?php echo $record['source'];?>" />
+						</td>
+					</tr>
+				<?php endforeach;?>
+				</tbody>
+			</table>
+			<input id="page" type="hidden" value="<?php echo $this->page; ?>" />
+			<input id="order" type="hidden" value="<?php echo $this->order; ?>" />
+			<input id="limit" type="hidden"
+				value="<?php echo $this->pager->get('limit')->getValue(); ?>" />
+			<hr>
+		</div>
+	</div>
+</div>
+<?php if ($this->paginator->count() > 1):?>
+<div class="row">
+	<div class="col-xs-12 text-center"><?php echo $this->losPaginationControl($this->paginator,'Sliding',null,['query'=>$this->query]); ?></div>
+</div>
+<?php endif?>

@@ -8,6 +8,7 @@ return array (
 						'Lead\Controller\Import' => 'Lead\Controller\ImportController',
 						'Lead\Controller\Services' => 'Lead\Controller\ServicesController',
 						'Lead\Controller\Attribute' => 'Lead\Controller\AttributeController',
+						'Lead\Controller\Source' => 'Lead\Controller\SourceController',
 						'Lead\Controller\Ajax' => 'Lead\Controller\AjaxController',
 						'Lead\Controller\Report' => 'Lead\Controller\ReportController' 
 				),
@@ -476,6 +477,49 @@ return array (
 																'controller' => 'Lead\Controller\Attribute',
 																'action' => 'sort',
 																'id' => 0 
+														) 
+												) 
+										) 
+								) 
+						),
+						'source' => array (
+								'type' => 'Literal',
+								'options' => array (
+										'route' => '/source',
+										'defaults' => array (
+												'controller' => 'Lead\Controller\Source',
+												'action' => 'list' 
+										) 
+								),
+								'may_terminate' => true,
+								'child_routes' => array (
+										'list' => array (
+												'type' => 'Literal',
+												'options' => array (
+														'route' => '/list',
+														'defaults' => array (
+																'controller' => 'Lead\Controller\Source',
+																'action' => 'list' 
+														) 
+												) 
+										),
+										'edit' => array (
+												'type' => 'Literal',
+												'options' => array (
+														'route' => '/edit',
+														'defaults' => array (
+																'controller' => 'Lead\Controller\Source',
+																'action' => 'edit' 
+														) 
+												) 
+										),
+										'merge' => array (
+												'type' => 'Literal',
+												'options' => array (
+														'route' => '/merge',
+														'defaults' => array (
+																'controller' => 'Lead\Controller\Source',
+																'action' => 'merge' 
 														) 
 												) 
 										) 

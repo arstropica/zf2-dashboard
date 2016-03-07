@@ -1,0 +1,29 @@
+<?php
+$title = 'Merge Source';
+$this->headTitle($title);
+?>
+<h1>
+	<span class="title">
+		<?php echo $this->escapeHtml($title); ?>
+	</span>
+	<span class="pull-right"> <a
+		href="<?php echo $this->history ? : $this->losUrl()->from('source', ['action'=>'list'], true);?>"
+		class="btn btn-success" title="Manage Sources">Back</a>
+	</span>
+</h1>
+<hr class="small">
+<br>
+<h3>Source: <?php echo $this->source; ?></h3>
+<hr class="small">
+<div class="row">
+	<div class="col-xs-12 col-sm-10 col-md-8">
+		<?php echo $this->losForm($this->entityForm, true, 4); ?>
+	</div>
+</div>
+<?php echo $this->losHeadLink()->setBasePath('/js')->appendChosen()?>
+<?php echo $this->losHeadScript()->setBasePath('/js')->appendChosen()?>
+<script type="text/javascript">
+	$('#merge').find('OPTION[value="<?php echo $this->source; ?>"]').remove();
+	$('#merge').prop('multiple', 'multiple').prop("selected", false).val([]);
+	<?= $this->losChosen('#merge',['disable_search_threshold'=>2, 'max_selected_options'=>1, 'placeholder_text_multiple' => 'Select Source', 'allow_single_deselect'=>true])?>
+</script>

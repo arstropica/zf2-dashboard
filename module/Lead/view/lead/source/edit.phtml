@@ -1,0 +1,18 @@
+<?php
+$title = 'Edit Source';
+$this->headTitle($title);
+?>
+<h1>
+	<span class="title">
+		<?php echo $this->escapeHtml($title); ?>
+	</span> <span class="pull-right"> <a
+		href="<?php echo $this->history ? : $this->losUrl()->from('source', ['action'=>'list'], false);?>"
+		class="btn btn-success" title="Manage Sources">Back</a>
+	</span>
+</h1>
+<hr class="small">
+<div class="row">
+	<div class="col-xs-12 col-sm-10 col-md-8 col-lg-6">
+		<?php echo $this->losForm($this->entityForm, true, 4); ?>
+	</div>
+</div>
