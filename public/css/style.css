@@ -795,6 +795,12 @@ a.underline {
 	float: left;
 }
 
+.panel .table.table-condensed tbody td p,
+.panel .table.table-condensed tbody td code {
+	word-break: break-all;
+	hyphens: auto;
+}
+
 .treataslabel {
 	resize: none !important;
 	outline: none !important;
@@ -1081,6 +1087,30 @@ form#pagerform label {
 .sortTable .sortable .sortable-order[contentEditable=true]:focus,
 .sortTable .sortable td:hover .sortable-order[contentEditable=true] {
 	border: 1px solid #5BC0DE;
+}
+
+.sourceitem .referrers {
+}
+
+.sourceitem .referrers .inline {
+	padding-left: 0;
+	list-style: none inside;
+	width: 100%;
+	display: table;
+	table-layout: fixed;
+}
+
+.sourceitem .referrers .inline li {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	word-break: break-all;
+	word-wrap: break-word;
+	display: block;
+}
+
+.sourceitem .referrers .inline li span {
+	min-width: 200px;
 }
 
 #questionstable:not(.sortTable) th:not([class*="col-"]),
