@@ -74,7 +74,8 @@ return array (
 		'controller_plugins' => array (
 				'factories' => array (
 						'getJsonErrorResponse' => 'Application\Controller\Plugin\Factory\JsonErrorResponseFactory',
-						'getErrorResponse' => 'Application\Controller\Plugin\Factory\ErrorResponseFactory' 
+						'getErrorResponse' => 'Application\Controller\Plugin\Factory\ErrorResponseFactory',
+						'SessionHistory' => 'Application\Controller\Plugin\Factory\SessionHistoryFactory' 
 				),
 				'invokables' => array () 
 		),
@@ -99,7 +100,8 @@ return array (
 						'Application\Options\ModuleOptions' => 'Application\Options\Factory\ModuleOptionsFactory',
 						'Application\Service\Lead' => 'Application\Service\Factory\LeadServiceFactory',
 						'Application\Service\Account' => 'Application\Service\Factory\AccountServiceFactory',
-						'Application\Service\Event' => 'Application\Service\Factory\EventServiceFactory' 
+						'Application\Service\Event' => 'Application\Service\Factory\EventServiceFactory',
+						'Application\Service\Factory\SessionHistoryServiceFactory' => 'Application\Service\Factory\SessionHistoryServiceFactory' 
 				) 
 		),
 		'translator' => array (
@@ -238,6 +240,11 @@ return array (
 										array (
 												'label' => 'Lead Attributes',
 												'route' => 'attribute',
+												'action' => 'list' 
+										),
+										array (
+												'label' => 'Manage Sources',
+												'route' => 'source',
 												'action' => 'list' 
 										),
 										array (
@@ -549,7 +556,28 @@ return array (
 																'action' => 'merge' 
 														) 
 												) 
-										) 
+										), 
+										array (
+												'label' => 'Sources',
+												'route' => 'source',
+												'pages' => array (
+														array (
+																'label' => 'Manage Sources',
+																'route' => 'source/list',
+																'action' => 'list' 
+														),
+														array (
+																'label' => 'Edit Source',
+																'route' => 'source/edit',
+																'action' => 'edit' 
+														),
+														array (
+																'label' => 'Merge Source',
+																'route' => 'source/merge',
+																'action' => 'merge' 
+														) 
+												) 
+										), 
 								) 
 						),
 						array (
