@@ -55,6 +55,10 @@ class LeadListener {
 		$ip = $lead->getIpaddress();
 		$ip_filtered = Helper::validate_ipv4($ip, false) ? $ip : $default_ip;
 		$lead->setIpv4address($ip_filtered);
+		
+		$referrer = $lead->getReferrer();
+		$referrer_filtered = $referrer ? Helper::add_protocol(strtolower($referrer)) : null;
+		$lead->setReferrer($referrer_filtered);
 	}
 }
 
