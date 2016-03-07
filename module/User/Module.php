@@ -37,6 +37,8 @@ class Module implements AutoloaderProviderInterface {
 		ZendViewHelperNavigation::setDefaultRole($role);
 		
 		$this->initSession($config ['User'] ['session']);
+		
+		$this->onLogOut($e);
 	}
 
 	public function getConfig()
@@ -161,5 +163,18 @@ class Module implements AutoloaderProviderInterface {
 		$sessionManager = new SessionManager($sessionConfig);
 		$sessionManager->start();
 		Container::setDefaultManager($sessionManager);
+	}
+
+	public function onLogOut(MvcEvent $e)
+	{
+		$sm = $e->getApplication()
+			->getServiceManager();
+		/* @var $service \Application\Service\SessionHistoryServce */
+		$service = $sm->get('Application\Service\Factory\SessionHistoryServiceFactory');
+		$adapter = $sm->get('ZfcUser\Authentication\Adapter\AdapterChain');
+		$adapter->getEventManager()
+			->attach('logout', function ($e) use($service) {
+			$service->resetHistory();
+		});
 	}
 }
