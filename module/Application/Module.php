@@ -251,7 +251,8 @@ class Module implements AutoloaderProviderInterface {
 							$serviceLocator = $sm->getServiceLocator();
 							$dataDump = new DataDump($serviceLocator, 'varDump');
 							return $dataDump;
-						} 
+						},
+						'SessionHistory' => 'Application\Controller\Plugin\Factory\SessionHistoryFactory' 
 				) 
 		);
 	}
