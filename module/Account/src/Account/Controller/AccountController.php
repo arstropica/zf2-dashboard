@@ -133,7 +133,8 @@ class AccountController extends AbstractCrudController {
 				'form' => $form,
 				'filters' => $filters,
 				'ui' => $ui,
-				'pager' => $pager 
+				'pager' => $pager,
+				'history' => $this->setHistory() 
 		];
 	}
 
@@ -148,7 +149,8 @@ class AccountController extends AbstractCrudController {
 		$entity = $objRepository->find($id);
 		
 		return [ 
-				'entity' => $entity 
+				'entity' => $entity,
+				'history' => $this->setHistory() 
 		];
 	}
 
@@ -199,7 +201,8 @@ class AccountController extends AbstractCrudController {
 			
 			return [ 
 					'entityForm' => $form,
-					'entity' => $entity 
+					'entity' => $entity,
+					'history' => $this->setHistory() 
 			];
 		}
 		
@@ -227,7 +230,8 @@ class AccountController extends AbstractCrudController {
 		} else {
 			return [ 
 					'entityForm' => $form,
-					'entity' => $entity 
+					'entity' => $entity,
+					'history' => $this->getHistory() 
 			];
 		}
 		
@@ -242,8 +246,7 @@ class AccountController extends AbstractCrudController {
 			$action = 'list';
 		}
 		
-		return $this->redirect()
-			->toRoute($this->getActionRoute($action), [ ], true);
+		return $this->getHistoricalRedirect('list');
 	}
 
 	public function editAction()
@@ -308,7 +311,8 @@ class AccountController extends AbstractCrudController {
 			
 			return [ 
 					'entityForm' => $form,
-					'entity' => $entity 
+					'entity' => $entity,
+					'history' => $this->setHistory() 
 			];
 		}
 		
@@ -337,7 +341,8 @@ class AccountController extends AbstractCrudController {
 		} else {
 			return [ 
 					'entityForm' => $form,
-					'entity' => $entity 
+					'entity' => $entity,
+					'history' => $this->getHistory() 
 			];
 		}
 		
@@ -346,8 +351,7 @@ class AccountController extends AbstractCrudController {
 			->get('translator')
 			->translate($this->successEditMessage));
 		
-		return $this->redirect()
-			->toRoute($this->getActionRoute('list'), [ ], true);
+		return $this->getHistoricalRedirect('list');
 	}
 
 	public function getForm($entityClass = null)

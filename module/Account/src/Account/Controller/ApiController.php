@@ -1,5 +1,7 @@
 <?php
+
 namespace Account\Controller;
+
 use Application\Controller\AbstractCrudController;
 use Zend\Paginator\Paginator;
 use Doctrine\ORM\QueryBuilder as Builder;
@@ -14,37 +16,40 @@ use Account\Entity\Account;
  * @author arstropica
  *        
  */
-class ApiController extends AbstractCrudController
-{
-
+class ApiController extends AbstractCrudController {
+	
 	protected $defaultSort = 'id';
-
+	
 	protected $defaultOrder = 'asc';
-
+	
 	protected $defaultPageSize = 10;
-
+	
 	protected $paginatorRange = 5;
-
+	
 	protected $uniqueField = null;
-
+	
 	protected $uniqueEntityMessage = null;
-
+	
 	protected $successAddMessage = 'The API was successfully added.';
-
+	
 	protected $successEditMessage = 'The API Setting was successfully edited.';
-
+	
 	protected $successDeleteMessage = 'The API Setting was successfully deleted.';
-
+	
 	protected $errorEditMessage = 'There was a problem editing your Api Setting(s).';
-
+	
 	protected $errorDeleteMessage = 'There was a problem deleting your Api Setting.';
 
-	public function listAction ()
+	public function listAction()
 	{
-		$page = $this->getRequest()->getQuery('page', 0);
-		$limit = $this->getRequest()->getQuery('limit', $this->defaultPageSize);
-		$sort = $this->getRequest()->getQuery('sort', $this->defaultSort);
-		$order = $this->getRequest()->getQuery('order', $this->defaultOrder);
+		$page = $this->getRequest()
+			->getQuery('page', 0);
+		$limit = $this->getRequest()
+			->getQuery('limit', $this->defaultPageSize);
+		$sort = $this->getRequest()
+			->getQuery('sort', $this->defaultSort);
+		$order = $this->getRequest()
+			->getQuery('order', $this->defaultOrder);
 		
 		$id = $this->getEvent()
 			->getRouteMatch()
@@ -60,7 +65,8 @@ class ApiController extends AbstractCrudController
 		}
 		
 		/* @var $qb \Doctrine\ORM\QueryBuilder */
-		$qb = $this->getEntityManager()->createQueryBuilder();
+		$qb = $this->getEntityManager()
+			->createQueryBuilder();
 		$qb->add('select', 'e')
 			->add('from', '\Api\Entity\ApiSetting e')
 			->innerJoin('e.account', 'a')
@@ -72,49 +78,50 @@ class ApiController extends AbstractCrudController
 		
 		$qb = $this->handleSearch($qb);
 		
-		$paginator = new Paginator(
-				new DoctrinePaginator(new LosPaginator($qb, false)));
+		$paginator = new Paginator(new DoctrinePaginator(new LosPaginator($qb, false)));
 		$paginator->setDefaultItemCountPerPage($limit);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setPageRange($this->paginatorRange);
 		
-		$ui = [
-				'table' => [
-						"api" => [
+		$ui = [ 
+				'table' => [ 
+						"api" => [ 
 								"col" => 2,
 								"label" => "API",
-								"sort" => true
+								"sort" => true 
 						],
-						"apiOption" => [
+						"apiOption" => [ 
 								"col" => 5,
 								"label" => "Setting",
-								"sort" => true
+								"sort" => true 
 						],
-						"apiValue" => [
+						"apiValue" => [ 
 								"col" => 3,
 								"label" => "Value",
-								"sort" => true
-						]
-				]
+								"sort" => true 
+						] 
+				] 
 		];
 		
 		$filters = $this->getFilterForm($this->params()
 			->fromQuery())
 			->remove('account');
 		
-		return [
+		return [ 
 				'id' => $id,
 				'paginator' => $paginator,
 				'sort' => $sort,
 				'order' => $order,
 				'page' => $page,
-				'query' => $this->params()->fromQuery(),
+				'query' => $this->params()
+					->fromQuery(),
 				'filters' => $filters,
-				'ui' => $ui
+				'ui' => $ui,
+				'history' => $this->setHistory() 
 		];
 	}
 
-	public function editAction ()
+	public function editAction()
 	{
 		if (method_exists($this, 'getEditForm')) {
 			$form = $this->getEditForm();
@@ -126,58 +133,58 @@ class ApiController extends AbstractCrudController
 			->getRouteMatch()
 			->getParam('id', 0);
 		
-		$form->add(
-				[
-						'type' => 'Zend\Form\Element\Hidden',
-						'name' => 'id',
-						'attributes' => [
-								'id' => 'id',
-								'value' => $id
-						],
-						'filters' => [
-								[
-										'name' => 'Int'
-								]
-						],
-						'validators' => [
-								[
-										'name' => 'Digits'
-								]
-						]
-				]);
+		$form->add([ 
+				'type' => 'Zend\Form\Element\Hidden',
+				'name' => 'id',
+				'attributes' => [ 
+						'id' => 'id',
+						'value' => $id 
+				],
+				'filters' => [ 
+						[ 
+								'name' => 'Int' 
+						] 
+				],
+				'validators' => [ 
+						[ 
+								'name' => 'Digits' 
+						] 
+				] 
+		]);
 		
 		$em = $this->getEntityManager();
 		$objRepository = $em->getRepository($this->getEntityClass());
 		$entity = $objRepository->find($id);
 		
-		$this->getEventManager()->trigger('getForm', $this, 
-				[
-						'form' => $form,
-						'entityClass' => $this->getEntityClass(),
-						'id' => $id,
-						'entity' => $entity
-				]);
+		$this->getEventManager()
+			->trigger('getForm', $this, [ 
+				'form' => $form,
+				'entityClass' => $this->getEntityClass(),
+				'id' => $id,
+				'entity' => $entity 
+		]);
 		
 		$form->bind($entity);
 		
-		$redirectUrl = $this->url()->fromRoute($this->getMatchedRoute(), [], 
-				true);
+		$redirectUrl = $this->url()
+			->fromRoute($this->getMatchedRoute(), [ ], true);
 		$prg = $this->fileprg($form, $redirectUrl, true);
 		
 		if ($prg instanceof Response) {
 			return $prg;
 		} elseif ($prg === false) {
-			$this->getEventManager()->trigger('getForm', $this, 
-					[
-							'form' => $form,
-							'entityClass' => $this->getEntityClass(),
-							'id' => $id,
-							'entity' => $entity
-					]);
+			$this->getEventManager()
+				->trigger('getForm', $this, [ 
+					'form' => $form,
+					'entityClass' => $this->getEntityClass(),
+					'id' => $id,
+					'entity' => $entity 
+			]);
 			
-			return [
+			return [ 
 					'entityForm' => $form,
-					'entity' => $entity
+					'entity' => $entity,
+					'history' => $this->setHistory() 
 			];
 		}
 		
@@ -186,56 +193,59 @@ class ApiController extends AbstractCrudController
 			->setEntityClass($this->getEntityClass())
 			->setDescription("API Settings Edited");
 		
-		$this->getEventManager()->trigger('edit', $this, 
-				[
-						'form' => $form,
-						'entityClass' => $this->getEntityClass(),
-						'id' => $id,
-						'entity' => $entity
-				]);
+		$this->getEventManager()
+			->trigger('edit', $this, [ 
+				'form' => $form,
+				'entityClass' => $this->getEntityClass(),
+				'id' => $id,
+				'entity' => $entity 
+		]);
 		
-		if (! $form->isValid()) {
-			return [
+		if (!$form->isValid()) {
+			return [ 
 					'entityForm' => $form,
-					'entity' => $entity
+					'entity' => $entity,
+					'history' => $this->getHistory() 
 			];
 		}
-		$savedEntity = $this->getEntityService()->save($form, $entity);
+		$savedEntity = $this->getEntityService()
+			->save($form, $entity);
 		
 		if ($savedEntity && $savedEntity instanceof Account) {
 			$name = $savedEntity->getName();
-			$this->getServiceEvent()->setMessage(
-					"API Settings were edited for {$name}.");
+			$this->getServiceEvent()
+				->setMessage("API Settings were edited for {$name}.");
 			$this->logEvent("EditAction.post");
 		} else {
-			return [
+			return [ 
 					'entityForm' => $form,
-					'entity' => $entity
+					'entity' => $entity, 
+					'history' => $this->setHistory()
 			];
 		}
 		
-		$this->flashMessenger()->addSuccessMessage(
-				$this->getServiceLocator()
-					->get('translator')
-					->translate($this->successEditMessage));
+		$this->flashMessenger()
+			->addSuccessMessage($this->getServiceLocator()
+			->get('translator')
+			->translate($this->successEditMessage));
 		
-		return $this->redirect()->toRoute($this->getMatchedRoute(), 
-				[
-						'id' => $id
-				], true);
+		return $this->redirect()
+			->toRoute($this->getMatchedRoute(), [ 
+				'id' => $id 
+		], true);
 	}
 
-	public function getForm ($entityClass = null)
+	public function getForm($entityClass = null)
 	{
 		$form = parent::getForm($entityClass);
 		
 		if ($form) {
 			$entityClass = $entityClass ?  : $this->getEntityClass();
-			$hydrator = new DoctrineHydrator($this->getEntityManager(), 
-					$entityClass);
+			$hydrator = new DoctrineHydrator($this->getEntityManager(), $entityClass);
 			$form->setHydrator($hydrator);
 			if ($form->has('submit')) {
-				$form->get('submit')->setLabel('Save');
+				$form->get('submit')
+					->setLabel('Save');
 			}
 			if ($form->has('cancelar')) {
 				$form->get('cancelar')
@@ -246,15 +256,16 @@ class ApiController extends AbstractCrudController
 		return $form;
 	}
 
-	protected function getFilterForm ($data = array())
+	protected function getFilterForm($data = array())
 	{
 		$sl = $this->getServiceLocator();
-		$form = $sl->get('FormElementManager')->get('Api\Form\FilterForm');
+		$form = $sl->get('FormElementManager')
+			->get('Api\Form\FilterForm');
 		$form->setInputFilter($form->getInputFilter());
 		if ($data) {
 			$form->setData($data);
-			if (! $form->isValid()) {
-				$form->setData(array());
+			if (!$form->isValid()) {
+				$form->setData(array ());
 			}
 		}
 		return $form;
@@ -266,50 +277,51 @@ class ApiController extends AbstractCrudController
 	 * @see \LosBase\Controller\ORM\AbstractCrudController::getEditForm()
 	 * @return \Account\Form\EditForm
 	 */
-	protected function getEditForm ($data = array())
+	protected function getEditForm($data = array())
 	{
 		$sl = $this->getServiceLocator();
 		$form = $sl->get('Account\Form\EditFormFactory');
-		$form->get('cancel')->setAttribute('onclick', 
-				'top.location=\'' . $this->url()
-					->fromRoute($this->getActionRoute('list')) . '\'');
+		$form->get('cancel')
+			->setAttribute('onclick', 'top.location=\'' . $this->url()
+			->fromRoute($this->getActionRoute('list')) . '\'');
 		$form->setInputFilter($form->getInputFilter());
 		if ($data) {
 			$form->setData($data);
-			if (! $form->isValid()) {
-				$form->setData(array());
+			if (!$form->isValid()) {
+				$form->setData(array ());
 			}
 		}
 		return $form;
 	}
 
-	public function handleSearch (Builder $qb)
+	public function handleSearch(Builder $qb)
 	{
-		$query = $this->getRequest()->getQuery();
-		$filters = [
+		$query = $this->getRequest()
+			->getQuery();
+		$filters = [ 
 				'api',
-				'apiOption'
+				'apiOption' 
 		];
 		if ($query) {
-			$where = [];
-			$params = [];
-			foreach ($filters as $condition) {
-				if (isset($query[$condition]) && "" !== $query[$condition]) {
+			$where = [ ];
+			$params = [ ];
+			foreach ( $filters as $condition ) {
+				if (isset($query [$condition]) && "" !== $query [$condition]) {
 					switch ($condition) {
-						case 'api':
-							$where['api'] = $query[$condition];
-							$qb->innerJoin('e.api', 'p')->andWhere(
-									"p.id = :api");
+						case 'api' :
+							$where ['api'] = $query [$condition];
+							$qb->innerJoin('e.api', 'p')
+								->andWhere("p.id = :api");
 							break;
-						case 'apiOption':
-							$where['apiOption'] = $query[$condition];
+						case 'apiOption' :
+							$where ['apiOption'] = $query [$condition];
 							$qb->andWhere("e.apiOption = :apiOption");
 							break;
 					}
 				}
 			}
 			if ($where) {
-				foreach ($where as $key => $value) {
+				foreach ( $where as $key => $value ) {
 					$qb->setParameter($key, $value);
 				}
 			}
@@ -317,19 +329,24 @@ class ApiController extends AbstractCrudController
 		return $qb;
 	}
 
-	protected function logEvent ($event)
+	protected function logEvent($event)
 	{
-		$this->getEventManager()->trigger($event, $this->getServiceEvent());
+		$this->getEventManager()
+			->trigger($event, $this->getServiceEvent());
 	}
 
-	protected function logError (\Exception $e, $result = [])
+	protected function logError(\Exception $e, $result = [])
 	{
-		$this->getServiceEvent()->setIsError(true);
-		$this->getServiceEvent()->setMessage($e->getMessage());
+		$this->getServiceEvent()
+			->setIsError(true);
+		$this->getServiceEvent()
+			->setMessage($e->getMessage());
 		if ($result) {
-			$this->getServiceEvent()->setResult(print_r($result, true));
+			$this->getServiceEvent()
+				->setResult(print_r($result, true));
 		} else {
-			$this->getServiceEvent()->setResult($e->getTraceAsString());
+			$this->getServiceEvent()
+				->setResult($e->getTraceAsString());
 		}
 		$this->logEvent('RuntimeError');
 	}
