@@ -320,6 +320,12 @@ BODY {
 	border-color: transparent transparent transparent #CCC;
 }
 /**** Display Elements ****/
+H1 .title {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: inline-block;
+}
 .user-logged-in .main > H1, .user-logged-in .jumbotron {
 	padding: 15px;
 	margin-left: 15px;
@@ -327,6 +333,16 @@ BODY {
 	-webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, .13);
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.13);
 	background-color: #F9F9F9;
+}
+.user-logged-in .main > H1 {
+	clear: both;
+}
+.user-logged-in .main > H1:after {
+	clear: both;
+	content: ' ';
+	width: 100%;
+	height: 0px;
+	display: block;
 }
 .user-logged-in H2.subtitle {
 	padding: 15px;
