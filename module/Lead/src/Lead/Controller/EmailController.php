@@ -355,13 +355,118 @@ class EmailController extends AbstractCrudController {
 		return $form;
 	}
 
+	protected function buildNameCriteria($name = null)
+	{
+		$result = [ ];
+		if ($name) {
+			$terms = array_filter(explode(" ", $name));
+			if ($terms) {
+				if (count($terms) > 1) {
+					$result ['attributeDesc'] ['First Name'] = $terms [0];
+					$result ['attributeDesc'] ['Last Name'] = $terms [1];
+				} else {
+					$result ['attributeDesc'] ['First Name'] = $terms;
+					$result ['attributeDesc'] ['Last Name'] = $terms;
+				}
+			}
+		}
+		return $result;
+	}
+
+	public function buildNameQuery(Builder $qb, $query = null)
+	{
+		if (!isset($query)) {
+			$query = $this->getRequest()
+				->getQuery('description');
+		}
+		
+		$filters = [ 
+				'attributeDesc' 
+		];
+		if ($query) {
+			$where = [ ];
+			$params = [ ];
+			$i = 0;
+			
+			foreach ( $filters as $condition ) {
+				if (isset($query [$condition])) {
+					if (is_array($query [$condition])) {
+						$uValues = [ ];
+						foreach ( $query [$condition] as $values ) {
+							if (is_array($values)) {
+								$uValues = array_merge($uValues, $values);
+							} else {
+								$uValues = array_merge($uValues, [ 
+										$values 
+								]);
+							}
+						}
+						$uValues = array_unique($uValues);
+						$boolX = (count($uValues) > 1) ? $qb->expr()
+							->andX() : $qb->expr()
+							->orX();
+						foreach ( $query [$condition] as $criteria => $values ) {
+							$qb->innerJoin('e.attributes', 'v' . $i);
+							$qb->innerJoin('v' . $i . '.attribute', 'a' . $i);
+							switch ($condition) {
+								case 'attributeDesc' :
+									$expr = $qb->expr();
+									$andX = $expr->andX();
+									$where ["desc_{$i}"] = "%{$criteria}%";
+									$andX->add($expr->like("a" . $i . ".attributeDesc", ":desc_{$i}"));
+									if ($values && is_array($values)) {
+										$j = 0;
+										$_orX = $qb->expr()
+											->orX();
+										foreach ( $values as $value ) {
+											$where ["value_{$j}"] = "%{$value}%";
+											$_orX->add($expr->like("v" . $i . ".value", ":value_{$j}"));
+											$j++;
+										}
+										$andX->add($_orX);
+									} else {
+										$where ["value_{$i}"] = "%{$values}%";
+										$andX->add($expr->like("v" . $i . ".value", ":value_{$i}"));
+									}
+									$boolX->add($andX);
+									$i++;
+									break;
+							}
+						}
+						if ($boolX->getParts()) {
+							$qb->andWhere($boolX);
+						}
+					}
+				} elseif ("" !== $query [$condition]) {
+					$qb->innerJoin('e.attributes', 'v');
+					$qb->innerJoin('v.attribute', 'a');
+					switch ($condition) {
+						case 'attributeDesc' :
+							$where ['attributeDesc'] = "%{$query[$condition]}%";
+							$qb->andWhere("a.attributeDesc LIKE :attributeDesc");
+							break;
+					}
+				}
+			}
+			if ($where) {
+				foreach ( $where as $key => $value ) {
+					$qb->setParameter($key, $value);
+				}
+			}
+		}
+		return $qb;
+	}
+
 	public function handleSearch(Builder $qb)
 	{
 		$query = $this->getRequest()
 			->getQuery();
 		$filters = [ 
-				'daterange',
-				'account' 
+				'lastsubmitted',
+				'timecreated',
+				'account',
+				'referrer',
+				'description' 
 		];
 		if ($query) {
 			$where = [ ];
@@ -369,14 +474,29 @@ class EmailController extends AbstractCrudController {
 			foreach ( $filters as $condition ) {
 				if (isset($query [$condition]) && "" !== $query [$condition]) {
 					switch ($condition) {
-						case 'daterange' :
-							list ( $from, $to ) = array_map(function ($d) {
-								return date('Y-m-d', strtotime($d));
-							}, explode("-", $query [$condition]));
-							$where ['from'] = $from . ' 00:00:00';
-							$where ['to'] = $to . ' 23:59:59';
-							$qb->andWhere($qb->expr()
-								->between("e.timecreated", ":from", ":to"));
+						case 'lastsubmitted' :
+							try {
+								list ( $from, $to ) = array_map(function ($d) {
+									return @date('Y-m-d', strtotime($d));
+								}, explode("-", $query [$condition]));
+								$where ['s_from'] = $from . ' 00:00:00';
+								$where ['s_to'] = $to . ' 23:59:59';
+								$qb->andWhere($qb->expr()
+									->between("e.lastsubmitted", ":s_from", ":s_to"));
+							} catch ( \Exception $e ) {
+							}
+							break;
+						case 'timecreated' :
+							try {
+								list ( $from, $to ) = array_map(function ($d) {
+									return @date('Y-m-d', strtotime($d));
+								}, explode("-", $query [$condition]));
+								$where ['t_from'] = $from . ' 00:00:00';
+								$where ['t_to'] = $to . ' 23:59:59';
+								$qb->andWhere($qb->expr()
+									->between("e.timecreated", ":t_from", ":t_to"));
+							} catch ( \Exception $e ) {
+							}
 							break;
 						case 'account' :
 							switch ($query [$condition]) {
@@ -389,6 +509,16 @@ class EmailController extends AbstractCrudController {
 									$qb->leftJoin('e.account', 'a');
 									$qb->andWhere("a.id = :id");
 									break;
+							}
+							break;
+						case 'referrer' :
+							$where ['referrer'] = "%{$query[$condition]}%";
+							$qb->andWhere("e.referrer LIKE :referrer");
+							break;
+						case 'description' :
+							$criteria = $this->buildNameCriteria($query [$condition]);
+							if ($criteria) {
+								$qb = $this->buildNameQuery($qb, $criteria);
 							}
 							break;
 					}
