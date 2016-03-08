@@ -599,7 +599,7 @@ class LeadController extends AbstractCrudController {
 		$em = $this->getEntityManager();
 		$attributeRepository = $em->getRepository("Lead\\Entity\\LeadAttribute");
 		
-		$attributes = $this->extractAttributes($results, !empty($query));
+		$attributes = $this->extractAttributes($results, !empty(array_filter($query)));
 		
 		$headings = [ 
 				'lead' => [ 
