@@ -33,6 +33,7 @@ CRUD operations and submit lead information to API/Email.
 * Services - Central API Operations Controller
 * Email - Email Leads Controller (List only) 
 * TenStreet - TenStreet Leads Controller (List/Submit)
+* Source - Leads Referrer Management Controller (Edit/Merge)
 * Report - Leads Advanced Search Controller (Search/Result/Export)
 
 ### Account - Account
