@@ -185,10 +185,11 @@ class AbstractCrudController extends BaseController {
 		return false;
 	}
 
-	protected function extractAttributes(Array $results)
+	protected function extractAttributes(Array $results, $filter = true)
 	{
 		$attributes = [ ];
-		if ($results) {
+		
+		if ($results && $filter) {
 			foreach ( $results as $entity ) {
 				$lead = false;
 				if ($entity instanceof Lead) {
@@ -210,6 +211,11 @@ class AbstractCrudController extends BaseController {
 					}
 				}
 			}
+		} else {
+			$em = $this->getEntityManager();
+			$attributeRepository = $em->getRepository("Lead\\Entity\\LeadAttribute");
+			
+			$attributes = $attributeRepository->getUniqueArray();
 		}
 		return $attributes;
 	}

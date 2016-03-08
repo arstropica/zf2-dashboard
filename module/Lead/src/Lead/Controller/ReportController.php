@@ -293,6 +293,9 @@ class ReportController extends AbstractCrudController {
 		$order = $this->getRequest()
 			->getQuery('order', $this->defaultOrder);
 		
+		$query = $this->params()
+			->fromQuery();
+		
 		if (empty($sort)) {
 			$sort = $this->defaultSort;
 		}
@@ -331,7 +334,7 @@ class ReportController extends AbstractCrudController {
 							$em = $this->getEntityManager();
 							$attributeRepository = $em->getRepository("Lead\\Entity\\LeadAttribute");
 							
-							$attributes = $this->extractAttributes($results);
+							$attributes = $this->extractAttributes($results, !empty($query));
 							
 							$headings = [ 
 									'lead' => [ 
