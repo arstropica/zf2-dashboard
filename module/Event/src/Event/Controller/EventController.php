@@ -168,6 +168,7 @@ class EventController extends AbstractCrudController {
 
 	public function exportAction()
 	{
+		set_time_limit(0);
 		$results = array ();
 		$labels = array ();
 		$headings = array ();
