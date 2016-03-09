@@ -421,7 +421,7 @@ class AttributeController extends AbstractCrudController {
 					->get('translator')
 					->translate($this->successDeleteMessage));
 				
-				return $this->getHistoricalRedirect('list');
+				return $this->getHistoricalRedirect('list', true);
 			}
 		}
 		
