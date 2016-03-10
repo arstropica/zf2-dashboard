@@ -91,7 +91,12 @@ class AddForm extends AbstractForm implements ObjectManagerAwareInterface, Servi
 						'target_class' => 'Account\Entity\Account',
 						'property' => 'name',
 						'find_method' => array (
-								'name' => 'findAll' 
+								'name' => 'findBy',
+								'params' => array (
+										'criteria' => array (
+												'active' => 1 
+										) 
+								) 
 						) 
 				),
 				'attributes' => array (

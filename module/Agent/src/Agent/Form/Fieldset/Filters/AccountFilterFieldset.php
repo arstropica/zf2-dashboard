@@ -78,12 +78,17 @@ class AccountFilterFieldset extends AbstractFieldset implements InputFilterProvi
 						'property' => 'name',
 						'is_method' => true,
 						'find_method' => array (
-								'name' => 'findAll' 
+								'name' => 'findBy',
+								'params' => array (
+										'criteria' => array (
+												'active' => 1 
+										) 
+								) 
 						) 
 				),
 				'attributes' => array (
 						'id' => 'accountFilter',
-						'class' => 'control filter'
+						'class' => 'control filter' 
 				) 
 		));
 	}

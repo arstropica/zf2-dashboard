@@ -20,6 +20,8 @@ class AccountRepository extends EntityRepository {
 			a 
 		FROM 
 			\Account\Entity\Account a
+		WHERE 
+			a.active = 1
 		ORDER BY a.description ASC
 DQL;
 		
@@ -52,6 +54,8 @@ DQL;
 			a 
 		FROM 
 			\Account\Entity\Account a
+		WHERE
+			a.active = 1
 		ORDER BY a.name ASC
 DQL;
 		
@@ -84,6 +88,8 @@ DQL;
 			a
 		FROM
 			\Account\Entity\Account a
+		WHERE
+			a.active = 1
 		ORDER BY a.name ASC
 DQL;
 		
