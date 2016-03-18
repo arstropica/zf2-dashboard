@@ -4,7 +4,6 @@ namespace Lead\Controller;
 
 use Lead\Entity\Lead;
 use Zend\View\Model\JsonModel;
-use Event\Entity\Event;
 use Api\Entity\Api;
 use Application\Provider\EntityManagerAwareTrait;
 use Application\Provider\ServiceEventTrait;

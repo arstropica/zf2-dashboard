@@ -4,7 +4,6 @@ namespace Agent\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Zend\Form\Annotation;
-use Elastica;
 use Application\Provider\EntityDataTrait;
 use Agent\Entity\Relationship\AbstractQuery;
 use Doctrine\Common\Collections\ArrayCollection;

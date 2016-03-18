@@ -5,7 +5,6 @@ namespace Report\Form;
 use Application\Form\AbstractForm;
 use DoctrineORMModule\Stdlib\Hydrator\DoctrineEntity as DoctrineHydrator;
 use Doctrine\ORM\EntityManager;
-use Lead\Entity\Lead;
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use Zend\InputFilter\InputFilter;
 use Application\Hydrator\Strategy\DateTimeStrategy;

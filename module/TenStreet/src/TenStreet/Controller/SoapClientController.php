@@ -12,8 +12,6 @@ use OAuth2\Server as OAuth2Server;
 use OAuth2\Request as OAuth2Request;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Application\Provider\EntityManagerAwareTrait;
-use Lead\Entity\Lead;
-use Event\Entity\Event;
 
 class SoapClientController extends AbstractActionController
 {

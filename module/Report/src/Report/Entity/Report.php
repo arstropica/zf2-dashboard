@@ -8,7 +8,6 @@ use Zend\Form\Annotation;
 use Doctrine\Common\Collections\ArrayCollection;
 use Agent\Entity\Agent;
 use Account\Entity\Account;
-use Lead\Entity\Lead;
 use Application\Provider\EntityDataTrait;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Application\Provider\ServiceLocatorAwareTrait;

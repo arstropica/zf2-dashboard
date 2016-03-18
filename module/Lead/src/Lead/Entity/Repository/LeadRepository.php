@@ -9,7 +9,6 @@ namespace Lead\Entity\Repository;
  */
 use Doctrine\ORM\EntityRepository;
 use Lead\Entity\Lead;
-use JMS\Serializer\Annotation as JMS;
 
 class LeadRepository extends EntityRepository {
 	
