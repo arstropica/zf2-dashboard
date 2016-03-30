@@ -131,6 +131,9 @@ $this->headTitle($title);
 							<a
 							href="<?php echo $this->losUrl()->from('report/edit',['id'=>$entity->getId()], true)?>"
 							title="Edit Report" class="btn btn-xs btn-warning"><?php echo $this->losIcon('glyphicon-edit') ?></a>
+							<a
+							href="<?php echo $this->losUrl()->from('report/delete',['id'=>$entity->getId()], true)?>"
+							title="Delete Report" class="btn btn-xs btn-danger"><?php echo $this->losIcon('glyphicon-remove') ?></a>
 						</td>
 					</tr>
 				<?php endforeach;?>
