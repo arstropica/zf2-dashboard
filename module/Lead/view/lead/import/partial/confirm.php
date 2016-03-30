@@ -1,3 +1,6 @@
+<?php 
+    use Application\Utility\Helper;
+?>
 <?php
 $form = $this->form;
 $confirm = $form->get('confirm');
@@ -61,7 +64,11 @@ $headings = $this->headings;
 			                              <?php foreach ($entry as $data_label => $data_value) : ?> 
 				                            <tr>
     											<td><?php echo $data_label; ?></td>
-    											<td><?php echo $data_value; ?></td>
+    											<?php if (is_array($data_value)) : ?>
+    												<td><?php echo Helper::recursive_implode($data_value, ", ", false, false); ?></td>
+    											<?php else : ?>
+    												<td><?php echo $data_value; ?></td>
+    											<?php endif; ?>
 										    </tr>
 			                             <?php endforeach; ?> 
 			                          <?php endforeach; ?> 
