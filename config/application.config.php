@@ -21,6 +21,7 @@ $modules = array (
 		'EasyXML',
 		'RdnCsv',
 		'LosUi',
+		'ZfSnapGeoip',
 		'Account',
 		'Api',
 		'Event',

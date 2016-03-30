@@ -4,7 +4,7 @@
   "version" : "2.2",
   "require" : {
     "php" : ">=5.5",
-    "zendframework/zendframework" : "~2.5",
+    "zendframework/zendframework" : "=2.5.2",
     "zf-commons/zfc-user-doctrine-orm" : "dev-master",
     "bjyoungblood/bjy-authorize" : "=1.4.0",
     "radnan/rdn-csv" : "=v1.1.0",
@@ -25,7 +25,8 @@
     "ruflin/elastica" : "dev-master",
     "igorw/event-source" : "1.0.*",
     "ghunti/highcharts-php" : "v3.0.2",
-    "wiredmedia/doctrine-extensions" : "v0.1"
+    "wiredmedia/doctrine-extensions" : "v0.1",
+    "snapshotpl/zf-snap-geoip" : "2.4.2"
   },
   "require-dev" : {
     "zendframework/zend-developer-tools" : "dev-master",
