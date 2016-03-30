@@ -142,13 +142,27 @@ return array (
 												),
 												'may_terminate' => true,
 												'child_routes' => array (
-														'tenstreet' => array (
+														'name' => array (
 																'type' => 'Literal',
 																'options' => array (
 																		'route' => '/name',
 																		'defaults' => array (
 																				'controller' => 'Lead\Controller\Ajax',
 																				'action' => 'name' 
+																		) 
+																) 
+														),
+														'geo' => array (
+																'type' => 'Segment',
+																'options' => array (
+																		'route' => '/geo[/:id]',
+																		'constraints' => array (
+																				'id' => '[0-9]+' 
+																		),
+																		'defaults' => array (
+																				'controller' => 'Lead\Controller\Ajax',
+																				'action' => 'geo',
+																				'id' => 0 
 																		) 
 																) 
 														) 
@@ -421,6 +435,16 @@ return array (
 														'defaults' => array (
 																'controller' => 'Lead\Controller\Attribute',
 																'action' => 'add' 
+														) 
+												) 
+										),
+										'geo' => array (
+												'type' => 'Literal',
+												'options' => array (
+														'route' => '/geo',
+														'defaults' => array (
+																'controller' => 'Lead\Controller\Attribute',
+																'action' => 'geo' 
 														) 
 												) 
 										),

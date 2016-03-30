@@ -1,0 +1,122 @@
+<?php
+$title = 'Lead Geo-Update Tool';
+$this->headTitle($title);
+$this->headScript()
+	->appendFile("http://code.jquery.com/ui/1.10.4/jquery-ui.js");
+
+$this->headlink()
+	->appendStylesheet("http://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css");
+?>
+<style>
+.ui-widget-header {
+	background: #cedc98;
+	border: 1px solid #DDDDDD;
+	color: #333333;
+	font-weight: bold;
+}
+
+.progress-label {
+	position: absolute;
+	left: 50%;
+	top: 7px;
+	font-weight: bold;
+	text-shadow: 1px 1px 0 #fff;
+}
+</style>
+
+<h1>
+	<span class="title">
+		<?php echo $this->escapeHtml($title); ?>
+	</span> <span class="pull-right"> <a class="btn btn-info"
+		href="<?php echo $this->history ? : $this->url('attribute/list', array('action'=>'list'));?>">Back</a>
+	</span>
+</h1>
+<hr class="small">
+
+<div class="row">
+	<div class="col-xs-12">
+		<div id="progressbar">
+			<div class="progress-label">Waiting...</div>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-xs-12">
+		<div class="form-group">
+			<label for="comment">Log:</label>
+			<textarea class="form-control" rows="15" id="log"></textarea>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-xs-12">
+		<div class="form-group">
+			<button class="btn btn-primary" id="start">Start</button>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+var ids = [];
+var total = 0;
+var i = 0;
+var updated = 0;
+$(function() {
+    var progressbar = $("#progressbar");
+    progressLabel = $(".progress-label");
+    
+    $("#progressbar").progressbar({
+        value: false,
+        change: function() {
+            progressLabel.text('Processed ' + getIndex() + ' / ' + total + ' Leads ...');
+        },
+        complete: function() {
+            progressLabel.text("Operation Complete. " + updated + " / " + total + " updated.");
+        }
+    });
+
+    function getIndex() {
+        return i;
+    }
+
+    $('#start').click(function() {
+        $.getJSON('/lead/ajax/geo', function(data) {
+            if (data && data.outcome == 1) {
+                ids = data.data.ids;
+                total = ids.length;
+                
+                function onProgress() {
+                    var val = parseInt((i / total) * 100);
+                    progressbar.progressbar("value", val);
+                    if (i < total) {
+                        progress(ids[i]);
+                    }
+                }
+
+                function progress(idx) {
+                    $.getJSON('/lead/ajax/geo/' + idx + '?operation=update', function(data) {
+                        var log;
+                        if (data && typeof data.outcome != 'undefined') {
+                            if (data.outcome == 1) {
+                            	log = $('#log').val() + 'Lead #' + idx + ': successfully updated.' + "\n";
+		                        updated++;
+	                        } else if (data.outcome == 2) {
+	                            log = $('#log').val() + 'Lead #' + idx + ': skipped.' + "\n";
+		                        updated++;
+	                        } else {
+	                            log = $('#log').val() + 'Lead #' + idx + ': not updated.' + "\n";
+	                        }
+	                        $('#log').val(log);
+	                        $('#log').scrollTop($('#log')[0].scrollHeight);
+                        }
+                        
+                        i++;
+                        onProgress();
+                    });
+                }
+                onProgress();
+            }
+        });
+    });
+});
+</script>

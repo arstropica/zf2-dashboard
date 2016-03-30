@@ -264,6 +264,16 @@ return array (
 								),
 								
 								array (
+										'controller' => 'ZfSnapGeoip\Controller\Console',
+										'roles' => array (
+												'guest',
+												'user',
+												'moderator',
+												'administrator' 
+										) 
+								),
+								
+								array (
 										'controller' => 'Lead\Controller\Ajax',
 										'roles' => array (
 												'user',

@@ -554,6 +554,11 @@ return array (
 																'label' => 'Merge Attribute',
 																'route' => 'attribute/merge',
 																'action' => 'merge' 
+														), 
+														array (
+																'label' => 'Lead Geo-Update Tool',
+																'route' => 'attribute/geo',
+																'action' => 'geo' 
 														) 
 												) 
 										), 
