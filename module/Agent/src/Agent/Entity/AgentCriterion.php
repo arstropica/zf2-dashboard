@@ -31,9 +31,9 @@ class AgentCriterion implements ServiceLocatorAwareInterface {
 	/**
 	 *
 	 * @var \Lead\Entity\LeadAttribute @ORM\ManyToOne(targetEntity="Lead\Entity\LeadAttribute",
-	 *      inversedBy="values", cascade={"persist", "remove"})
+	 *      inversedBy="values", cascade={"persist"})
 	 *      @ORM\JoinColumns({
-	 *      @ORM\JoinColumn(name="attribute_id", referencedColumnName="id", onDelete="CASCADE")
+	 *      @ORM\JoinColumn(name="attribute_id", referencedColumnName="id")
 	 *      })
 	 */
 	private $attribute;
