@@ -30,7 +30,7 @@ use Agent;
  */
 class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	use EntityDataTrait, SearchManagerAwareTrait, ServiceLocatorAwareTrait;
-	
+
 	/**
 	 *
 	 * @var integer @ORM\Column(name="id", type="integer", nullable=false)
@@ -42,7 +42,7 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	 *      @JMS\Expose @JMS\Groups({"list", "details"})
 	 */
 	private $id;
-	
+
 	/**
 	 *
 	 * @var integer @ORM\Column(name="active", type="integer", nullable=false)
@@ -56,7 +56,7 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	 *      )
 	 */
 	private $active;
-	
+
 	/**
 	 *
 	 * @var \DateTime @ORM\Column(name="timecreated", type="datetime",
@@ -70,7 +70,7 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	 *      )
 	 */
 	private $timecreated;
-	
+
 	/**
 	 *
 	 * @var string @ORM\Column(name="referrer", type="string", length=255,
@@ -84,7 +84,7 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	 *      )
 	 */
 	private $referrer;
-	
+
 	/**
 	 *
 	 * @var string @ORM\Column(name="ipaddress", type="string", length=15,
@@ -92,7 +92,7 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	 *      @Annotation\Exclude()
 	 */
 	private $ipaddress;
-	
+
 	/**
 	 *
 	 * @var string @JMS\Type("string")
@@ -102,7 +102,7 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	 *     
 	 */
 	private $ipv4address;
-	
+
 	/**
 	 *
 	 * @var string @Annotation\Exclude()
@@ -116,7 +116,7 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	 *      })
 	 */
 	private $description;
-	
+
 	/**
 	 *
 	 * @var \Account\Entity\Account @ORM\ManyToOne(
@@ -154,7 +154,7 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	 *      })
 	 */
 	private $account;
-	
+
 	/**
 	 *
 	 * @var \DateTime @ORM\Column(name="lastsubmitted", type="datetime",
@@ -169,7 +169,7 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	 *      )
 	 */
 	protected $lastsubmitted;
-	
+
 	/**
 	 *
 	 * @var string @ORM\Column(name="locality", type="string", length=255,
@@ -182,7 +182,7 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	 *      )
 	 */
 	protected $locality;
-	
+
 	/**
 	 *
 	 * @var \Doctrine\Common\Collections\Collection @ORM\OneToMany(
@@ -195,7 +195,7 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	 *      @Annotation\Exclude()
 	 */
 	protected $attributes;
-	
+
 	/**
 	 *
 	 * @var \Doctrine\Common\Collections\Collection @ORM\OneToMany(
@@ -209,13 +209,13 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	 *      @Annotation\Exclude()
 	 */
 	protected $events;
-	
+
 	/**
 	 *
 	 * @var Collection
 	 */
 	protected $reports;
-	
+
 	/**
 	 *
 	 * @var boolean
@@ -421,13 +421,13 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 		foreach ( $keys as $key ) {
 			$leadAttribute = $this->findAttribute("FirstName");
 			if ($leadAttribute)
-				$description [$key] = $leadAttribute->getValue();
+				$description[$key] = $leadAttribute->getValue();
 		}
-		$description ['domain'] = parse_url($this->getReferrer(), PHP_URL_HOST);
-		$description ['ipaddress'] = $this->getIpaddress();
-		$description ['date'] = date_format($this->getTimecreated(), 'm.d.Y');
+		$description['domain'] = parse_url($this->getReferrer(), PHP_URL_HOST);
+		$description['ipaddress'] = $this->getIpaddress();
+		$description['date'] = date_format($this->getTimecreated(), 'm.d.Y');
 		foreach ( $fields as $field ) {
-			if (isset($description [$field])) {
+			if (isset($description[$field])) {
 				switch ($field) {
 					case 'LastName' :
 						$result .= " {$description[$field]}";
@@ -442,7 +442,7 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 						$result .= " on {$description[$field]}";
 						break;
 					default :
-						$result .= $description [$field];
+						$result .= $description[$field];
 						break;
 				}
 			}
@@ -470,11 +470,11 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 		foreach ( $keys as $key ) {
 			$leadAttribute = $this->findAttribute($key);
 			if ($leadAttribute)
-				$description [$key] = $leadAttribute->getValue();
+				$description[$key] = $leadAttribute->getValue();
 		}
-		$description ['ipaddress'] = $this->getIpaddress();
+		$description['ipaddress'] = $this->getIpaddress();
 		foreach ( $fields as $field ) {
-			if (isset($description [$field])) {
+			if (isset($description[$field])) {
 				switch ($field) {
 					case 'LastName' :
 						$result .= " {$description[$field]}";
@@ -483,7 +483,7 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 						$result .= "@{$description[$field]}";
 						break;
 					default :
-						$result .= $description [$field];
+						$result .= $description[$field];
 						break;
 				}
 			}
@@ -507,16 +507,16 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 		foreach ( $keys as $key ) {
 			$leadAttribute = $this->findAttribute($key);
 			if ($leadAttribute)
-				$description [$key] = $leadAttribute->getValue();
+				$description[$key] = $leadAttribute->getValue();
 		}
 		foreach ( $fields as $field ) {
-			if (isset($description [$field])) {
+			if (isset($description[$field])) {
 				switch ($field) {
 					case 'LastName' :
 						$result .= " {$description[$field]}";
 						break;
 					default :
-						$result .= $description [$field];
+						$result .= $description[$field];
 						break;
 				}
 			}
@@ -763,8 +763,14 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	 */
 	public function getReports($ac = false)
 	{
-		$reports = $this->reports;
-		return $ac ? $reports : ($reports ? $reports->getValues() : [ ]);
+		$reports = $this->reports ? $this->reports->filter(function ($report) {
+			try {
+				return $report ? $report->getActive() : false;
+			} catch ( \Exception $e ) {
+				return false;
+			}
+		}) : new ArrayCollection();
+		return $ac ? $reports : $reports->getValues();
 	}
 
 	/**
@@ -838,7 +844,7 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	 */
 	public function getLocality()
 	{
-		if (!isset($this->locality)) {
+		if (!isset($this->locality) || empty($this->locality)) {
 			$result = null;
 			$fields = [ 
 					'city',
@@ -853,19 +859,19 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 				] as $name ) {
 					$attribute = $this->findAttribute($name);
 					if ($attribute) {
-						$location [$field] = $attribute->getValue();
+						$location[$field] = $attribute->getValue();
 						break 1;
 					}
 				}
 			}
 			
 			$location = array_filter($location);
-			if (count($location) > 1 || isset($location ['zip'])) {
+			if (count($location) > 1 || isset($location['zip'])) {
 				try {
 					$localityQuery = new Agent\Elastica\Query\LocalityQuery($this->getServiceLocator());
 					$locality = $localityQuery->request($location);
 					if ($locality) {
-						$result = $this->locality = implode(",", $locality ['_source'] ['latlon']);
+						$result = $this->locality = implode(",", $locality['_source']['latlon']);
 					}
 				} catch ( \Exception $e ) {
 					return $result;

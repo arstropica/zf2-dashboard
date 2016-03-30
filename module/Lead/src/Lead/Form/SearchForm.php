@@ -61,6 +61,12 @@ class SearchForm extends AbstractForm implements ObjectManagerAwareInterface, Se
 		));
 		
 		$this->add(array (
+				'required' => false,
+				'type' => 'Zend\Form\Element\Hidden',
+				'name' => 'active' 
+		));
+		
+		$this->add(array (
 				'required' => true,
 				'type' => 'Zend\Form\Element\Hidden',
 				'name' => 'updated',

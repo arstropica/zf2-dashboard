@@ -39,7 +39,14 @@ class Report implements ServiceLocatorAwareInterface, ObjectManagerAwareInterfac
 	
 	/**
 	 *
-	 * @var string @ORM\Column(name="scope", type="string", length=255,
+	 * @var integer @ORM\Column(name="active", type="integer", nullable=false)
+	 *      @Annotation\Exclude()
+	 */
+	private $active;
+	
+	/**
+	 *
+	 * @var string @ORM\Column(name="name", type="string", length=255,
 	 *      nullable=true)
 	 */
 	private $name;
@@ -128,6 +135,7 @@ class Report implements ServiceLocatorAwareInterface, ObjectManagerAwareInterfac
 	function __construct()
 	{
 		$dateTime = date('Y-m-d H:i:s');
+		$this->active = 1;
 		$this->agent = new Agent();
 		$this->results = new ArrayCollection();
 		$this->events = new ArrayCollection();
@@ -156,6 +164,29 @@ class Report implements ServiceLocatorAwareInterface, ObjectManagerAwareInterfac
 		return $this;
 	}
 
+	/**
+	 * Get active
+	 *
+	 * @return integer $active
+	 */
+	public function getActive()
+	{
+		return $this->active;
+	}
+
+	/**
+	 * Set active
+	 *
+	 * @param integer $active        	
+	 *
+	 * @return Report
+	 */
+	public function setActive($active)
+	{
+		$this->active = $active;
+		return $this;
+	}
+	
 	/**
 	 *
 	 * @return string $name

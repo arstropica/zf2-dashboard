@@ -66,6 +66,12 @@ class AddForm extends AbstractForm implements ObjectManagerAwareInterface, Servi
 		));
 		
 		$this->add(array (
+				'required' => true,
+				'type' => 'Zend\Form\Element\Hidden',
+				'name' => 'active' 
+		));
+		
+		$this->add(array (
 				'options' => array (
 						'label' => 'Name' 
 				),

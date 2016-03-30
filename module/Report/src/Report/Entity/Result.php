@@ -19,19 +19,19 @@ use Zend\ServiceManager\ServiceLocatorInterface;
 class Result implements ServiceLocatorAwareInterface, ObjectManagerAwareInterface {
 	
 	use ServiceLocatorAwareTrait, ObjectManagerAwareTrait;
-	
+
 	/**
 	 *
 	 * @var Lead
 	 */
 	private $lead;
-	
+
 	/**
 	 *
 	 * @var float
 	 */
 	private $_score;
-	
+
 	/**
 	 *
 	 * @var Collection
@@ -99,7 +99,14 @@ class Result implements ServiceLocatorAwareInterface, ObjectManagerAwareInterfac
 	 */
 	public function getReports($ac = false)
 	{
-		return $ac ? $this->reports : $this->reports->getValues();
+		$reports = $this->reports ? $this->reports->filter(function ($report) {
+			try {
+				return $report ? $report->getActive() : false;
+			} catch ( \Exception $e ) {
+				return false;
+			}
+		}) : new ArrayCollection();
+		return $ac ? $reports : $reports->getValues();
 	}
 
 	/**

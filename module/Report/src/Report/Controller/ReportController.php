@@ -17,7 +17,6 @@ use Application\ORM\Tools\Pagination\Doctrine\Paginator as FastPaginator;
 use DoctrineORMModule\Stdlib\Hydrator\DoctrineEntity as DoctrineHydrator;
 use Application\Hydrator\Strategy\DateTimeStrategy;
 use Zend\Stdlib\ResponseInterface as Response;
-use Lead\Entity\Lead;
 use Account\Entity\Account;
 use Report\Entity\Report;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -216,7 +215,7 @@ class ReportController extends AbstractCrudController {
 					->translate($message));
 			} else {
 				$message = $this->errorSubmitMessage;
-				$message_part = " " . ($total - $count) . " of {$total} Lead(s) were not successfully ";
+				$message_part = " " . ($total - $count) . " of {$total} Report(s) were not successfully ";
 				
 				switch ($action) {
 					case 'delete' :
@@ -537,28 +536,6 @@ class ReportController extends AbstractCrudController {
 		$name = $entity->getName();
 		
 		if ($this->validateDelete($post)) {
-			if (null !== $entity->getAccount()) {
-				$entity->setAccount(null);
-				$this->createServiceEvent()
-					->setEntityId($id)
-					->setEntityClass($this->getEntityClass())
-					->setDescription("Report Edited")
-					->setMessage("Report: \"{$name}\" was unassigned.");
-				try {
-					$em->persist($entity);
-					$em->flush();
-					$this->getServiceEvent()
-						->setMessage("Report: \"{$name}\" was unassigned");
-					$this->logEvent("EditAction.post");
-				} catch ( \Exception $e ) {
-					$this->logError($e);
-					$this->flashMessenger()
-						->addErrorMessage($this->getServiceLocator()
-						->get('translator')
-						->translate($this->errorDeleteMessage));
-					return false;
-				}
-			}
 			if ($this->getEntityService()
 				->archive($entity)) {
 				$this->createServiceEvent()
@@ -760,6 +737,7 @@ class ReportController extends AbstractCrudController {
 				}
 			}
 		}
+		$qb->andWhere('e.active = 1');
 		return $qb;
 	}
 
@@ -787,7 +765,6 @@ class ReportController extends AbstractCrudController {
 				$actions [] = 'unassign';
 				break;
 			case 'delete' :
-				$actions [] = 'unassign';
 				$actions [] = 'delete';
 				break;
 			case 'submit' :

@@ -11,6 +11,7 @@ use Application\Form\Element\Collection;
 			echo $this->form(null, \Application\Form\View\Helper\Form::LAYOUT_HORIZONTAL)->openTag($this->form);
 			echo $this->formHidden($form->get('id'));
 			echo $this->formHidden($form->get('name'));
+			echo $this->formHidden($form->get('active'));
 			echo $this->formHidden($form->get('updated'));
 			$agent = $this->form->get('agent'); 
 		?>

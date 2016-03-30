@@ -35,6 +35,11 @@ class AddFormInputFilter extends InputFilter implements ServiceLocatorAwareInter
 		)));
 		
 		$this->add($factory->createInput(array (
+				'name' => 'active',
+				'required' => true 
+		)));
+		
+		$this->add($factory->createInput(array (
 				'name' => 'updated',
 				'required' => true,
 				'filters' => array (

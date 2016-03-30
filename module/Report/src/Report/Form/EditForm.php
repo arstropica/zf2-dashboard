@@ -62,6 +62,12 @@ class EditForm extends AbstractForm implements ObjectManagerAwareInterface, Serv
 		$this->add(array (
 				'required' => true,
 				'type' => 'Zend\Form\Element\Hidden',
+				'name' => 'active' 
+		));
+		
+		$this->add(array (
+				'required' => true,
+				'type' => 'Zend\Form\Element\Hidden',
 				'name' => 'updated' 
 		));
 		
