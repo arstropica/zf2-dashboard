@@ -27,7 +27,7 @@ use Doctrine\Common\Collections\Criteria;
  */
 class Account implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	use EntityDataTrait, SearchManagerAwareTrait, ServiceLocatorAwareTrait;
-	
+
 	/**
 	 *
 	 * @var integer @ORM\Column(name="id", type="integer", nullable=false)
@@ -39,7 +39,7 @@ class Account implements SearchableEntityInterface, ServiceLocatorAwareInterface
 	 *      @JMS\Expose @JMS\Groups({"list", "details"})
 	 */
 	private $id;
-	
+
 	/**
 	 *
 	 * @var string @ORM\Column(name="guid", type="string", length=255,
@@ -47,7 +47,7 @@ class Account implements SearchableEntityInterface, ServiceLocatorAwareInterface
 	 *      @Annotation\Type("Zend\Form\Element\Hidden")
 	 */
 	private $guid;
-	
+
 	/**
 	 *
 	 * @var string @ORM\Column(name="name", type="string", length=255,
@@ -66,7 +66,7 @@ class Account implements SearchableEntityInterface, ServiceLocatorAwareInterface
 	 *      })
 	 */
 	private $name;
-	
+
 	/**
 	 *
 	 * @var string @ORM\Column(name="description", type="text", length=65535,
@@ -77,7 +77,7 @@ class Account implements SearchableEntityInterface, ServiceLocatorAwareInterface
 	 *      @Annotation\Options({"label":"Description"})
 	 */
 	private $description;
-	
+
 	/**
 	 *
 	 * @var boolean @ORM\Column(name="active", type="boolean", nullable=false)
@@ -88,7 +88,7 @@ class Account implements SearchableEntityInterface, ServiceLocatorAwareInterface
 	 *      })
 	 */
 	private $active = '1';
-	
+
 	/**
 	 *
 	 * @var \Doctrine\Common\Collections\Collection @ORM\ManyToMany(
@@ -116,7 +116,7 @@ class Account implements SearchableEntityInterface, ServiceLocatorAwareInterface
 	 *      @Annotation\Exclude()
 	 */
 	private $apis;
-	
+
 	/**
 	 *
 	 * @var \Doctrine\Common\Collections\Collection @ORM\OneToMany(
@@ -151,7 +151,7 @@ class Account implements SearchableEntityInterface, ServiceLocatorAwareInterface
 	 *      @Annotation\Exclude()
 	 */
 	private $leads;
-	
+
 	/**
 	 *
 	 * @var Collection @ORM\OneToMany(
@@ -182,7 +182,7 @@ class Account implements SearchableEntityInterface, ServiceLocatorAwareInterface
 	 *      @Annotation\Exclude()
 	 */
 	private $reports;
-	
+
 	/**
 	 *
 	 * @var \Doctrine\Common\Collections\Collection @ORM\OneToMany(
@@ -197,7 +197,7 @@ class Account implements SearchableEntityInterface, ServiceLocatorAwareInterface
 	 *     
 	 */
 	private $events;
-	
+
 	/**
 	 *
 	 * @var \Doctrine\Common\Collections\Collection @ORM\OneToMany(
@@ -422,7 +422,7 @@ class Account implements SearchableEntityInterface, ServiceLocatorAwareInterface
 
 	/**
 	 * Get leads.
-	 * 
+	 *
 	 * @param boolean $ac        	
 	 * @param boolean $activeOnly        	
 	 *
@@ -430,7 +430,7 @@ class Account implements SearchableEntityInterface, ServiceLocatorAwareInterface
 	 */
 	public function getLeads($ac = false, $activeOnly = true)
 	{
-		$leads = $this->leads;
+		$leads = $this->leads ?: new ArrayCollection();
 		$criteria = Criteria::create();
 		if ($activeOnly) {
 			$criteria->where(Criteria::expr()->eq('active', 1));
@@ -591,7 +591,14 @@ class Account implements SearchableEntityInterface, ServiceLocatorAwareInterface
 	 */
 	public function getReports($ac = false)
 	{
-		return $ac ? $this->reports : $this->reports->getValues();
+		$reports = $this->reports ? $this->reports->filter(function ($report) {
+			try {
+				return $report ? $report->getActive() : false;
+			} catch ( \Exception $e ) {
+				return false;
+			}
+		}) : new ArrayCollection();
+		return $ac ? $reports : $reports->getValues();
 	}
 
 	/**
