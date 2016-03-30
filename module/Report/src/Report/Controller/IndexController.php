@@ -91,7 +91,8 @@ class IndexController extends AbstractCrudController implements CacheAwareInterf
 			$qb = $this->getEntityManager()
 				->createQueryBuilder();
 			$qb->add('select', 'e')
-				->add('from', $entityClass . ' e');
+				->add('from', $entityClass . ' e')
+			    ->where('e.active = 1');
 			
 			$results ['doctrine'] ['attributes'] ['entities'] = $qb->getQuery()
 				->getResult();
