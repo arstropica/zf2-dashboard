@@ -34,6 +34,14 @@ class LeadListener {
 		// Get the values for the ArrayCollection and sort it using the function
 		$attributes = $lead->getAttributes();
 		
+		// Filter by active LeadAttribute
+		if ($attributes) {
+		    $attributes = array_filter($attributes, function($leadAttributeValue){
+		        $attribute = $leadAttributeValue->getAttribute();
+		        return $attribute ? $attribute->getActive() : false;
+		    });
+		}
+		
 		// sort as you like
 		usort($attributes, function ($a, $b) {
 			$aOrder = $bOrder = 0;

@@ -412,6 +412,7 @@ class EmailController extends AbstractCrudController {
 						foreach ( $query [$condition] as $criteria => $values ) {
 							$qb->innerJoin('e.attributes', 'v' . $i);
 							$qb->innerJoin('v' . $i . '.attribute', 'a' . $i);
+							$qb->andWhere('a' . $i . '.active = 1');
 							switch ($condition) {
 								case 'attributeDesc' :
 									$expr = $qb->expr();

@@ -100,7 +100,7 @@ $this->headTitle($title);
 					</tr>
 				</thead>
 				<tbody class="sortable">
-	    		<?php foreach ($this->paginator as $entity): $numleads = $entity->getCount(); ?>
+	    		<?php foreach ($this->paginator as $entity): $numleads = $entity->getCount(); $question = $entity->getAttributeName() == 'Question'; ?>
 	        		<tr class="attributeitem"
 						id="<?php echo $entity->getId(); ?>">
 						<?php if ($this->sortable): ?><td class="handle"></td><?php endif; ?>
@@ -110,7 +110,7 @@ $this->headTitle($title);
 							class="col-xs-<?php echo $this->ui['table']['attributeDesc']['col']; ?> attributeDesc"><?php echo $entity->getAttributeDesc(); ?></td>
 						<td class="col-xs-1 count"><?php echo $numleads; ?></td>
 						<td class="action col-xs-2 text-right">
-							<?php if ($this->isAdmin) : ?><a <?php if (! $numleads) : ?>
+							<?php if ($this->isAdmin) : ?><a <?php if (! $numleads || ! $question) : ?>
 							class="disabled btn btn-xs btn-info" onclick="return false;"
 							<?php else: ?> class="btn btn-xs btn-info" <?php endif; ?>
 							href="<?php echo $this->losUrl()->from('attribute/merge',['id'=>$entity->getId()], true)?>"
@@ -121,7 +121,9 @@ $this->headTitle($title);
 							title="Edit Attribute" class="btn btn-xs btn-success"><?php echo $this->losIcon('glyphicon-edit') ?></a>
 							
 							<?php if ($this->isAdmin) : ?>
-								<a <?php if ($numleads) : ?> class="btn btn-xs btn-danger"
+								<a <?php if (! $question) : ?>
+							class="disabled btn btn-xs btn-danger" onclick="return false;"
+							<?php elseif ($numleads) : ?> class="btn btn-xs btn-danger"
 							onclick="warn_before_delete(this); return false;" <?php else: ?>
 							class="btn btn-xs btn-warning" <?php endif; ?>
 							href="<?php echo $this->losUrl()->from('attribute/delete',['id'=>$entity->getId()], true)?>"

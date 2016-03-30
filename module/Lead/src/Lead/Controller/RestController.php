@@ -266,12 +266,14 @@ class RestController extends AbstractRestfulController {
 						{
 							foreach ( $values as $attributeName => $attributeValue ) {
 								$leadAttribute = $leadAttributeRepository->findOneBy([ 
-										'attributeName' => $attributeName 
+										'attributeName' => $attributeName,
+									    'active' => 1 
 								]);
 								if (!$leadAttribute) {
 									$leadAttribute = $leadAttributeRepository->findOneBy([ 
 											'attributeDesc' => $attributeName,
-											'attributeName' => 'Question' 
+											'attributeName' => 'Question',
+									        'active' => 1
 									]);
 								}
 								if (!$leadAttribute) {

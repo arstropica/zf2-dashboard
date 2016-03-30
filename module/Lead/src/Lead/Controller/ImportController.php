@@ -740,10 +740,13 @@ JTPL;
 			->add('from', '\Lead\Entity\LeadAttribute a')
 			->groupBy('a.attributeDesc')
 			->orderBy('a.attributeOrder');
+		$qb->andWhere("a.active = 1");
+		$orX = $qb->expr()->orX();
 		foreach ( $fields as $key => $value ) {
-			$qb->orWhere("a.attributeDesc = :{$key}");
+		    $orX->add($qb->expr()->eq("a.attributeDesc", ":{$key}"));
 			$qb->setParameter($key, $value);
 		}
+		$qb->andWhere($orX);
 		$results = $qb->getQuery()
 			->getResult();
 		$headings = [ ];
@@ -999,7 +1002,8 @@ JTPL;
 						'Zip Code',
 						'Phone',
 						'Email' 
-				) 
+				),
+		        'active' => 1
 		));
 		
 		// Get Key Attribute IDs
@@ -1179,7 +1183,8 @@ JTPL;
 				$csvValue = current($csvRowItem);
 				if (is_numeric($attributeId)) {
 					$leadAttribute = $leadAttributeRepository->findOneBy([ 
-							'id' => $attributeId 
+							'id' => $attributeId,
+					        'active' => 1
 					]);
 					if ($leadAttribute) {
 						$leadAttributeValue = new LeadAttributeValue();
@@ -1195,7 +1200,8 @@ JTPL;
 							$csvValue = current($arrayValue);
 							
 							$leadAttribute = $leadAttributeRepository->findOneBy([ 
-									'attributeDesc' => $csvHeading 
+									'attributeDesc' => $csvHeading,
+							        'active' => 1
 							]);
 							if (!$leadAttribute) {
 								$leadAttribute = new LeadAttribute();
@@ -1211,7 +1217,8 @@ JTPL;
 					} else {
 						
 						$leadAttribute = $leadAttributeRepository->findOneBy([ 
-								'attributeDesc' => $csvHeading 
+								'attributeDesc' => $csvHeading,
+						        'active' => 1
 						]);
 						if (!$leadAttribute) {
 							$leadAttribute = new LeadAttribute();

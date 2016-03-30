@@ -133,6 +133,20 @@ class LeadAttribute implements SearchableEntityInterface, ServiceLocatorAwareInt
 	
 	/**
 	 *
+	 * @var integer @ORM\Column(name="active", type="integer", nullable=false)
+	 *      @Annotation\Exclude()
+	 *      @JMS\Type("integer")
+	 *      @JMS\Expose @JMS\Groups({"list", "attributes"})
+	 *      @MAP\ElasticField(
+	 *      type="integer",
+	 *      nullValue="1",
+	 *      includeInAll=true
+	 *      )
+	 */
+	private $active;
+	
+	/**
+	 *
 	 * @var \Doctrine\Common\Collections\Collection @ORM\OneToMany(targetEntity="Lead\Entity\LeadAttributeValue",
 	 *      mappedBy="attribute", cascade={"persist", "remove"},
 	 *      fetch="EXTRA_LAZY")
@@ -152,6 +166,7 @@ class LeadAttribute implements SearchableEntityInterface, ServiceLocatorAwareInt
 	public function __construct()
 	{
 		$this->values = new ArrayCollection();
+		$this->active = 1;
 	}
 
 	/**
@@ -273,7 +288,15 @@ class LeadAttribute implements SearchableEntityInterface, ServiceLocatorAwareInt
 	 */
 	public function getValues($ac = false)
 	{
-		return $ac ? $this->values : $this->values->getValues();
+		$values = $this->values->filter(function($value) {
+		    try {
+		      $lead = $value ? $value->getLead() : false;
+		      return $lead ? $lead->getActive() : false;
+		    } catch (\Exception $e) {
+		        return false;
+		    }
+		});
+		return $ac ? $values : $values->getValues();
 	}
 
 	/**
@@ -337,6 +360,29 @@ class LeadAttribute implements SearchableEntityInterface, ServiceLocatorAwareInt
 		return $this;
 	}
 
+	/**
+	 * Get active
+	 *
+	 * @return integer $active
+	 */
+	public function getActive()
+	{
+		return $this->active;
+	}
+
+	/**
+	 * Set active
+	 *
+	 * @param integer $active        	
+	 *
+	 * @return LeadAttribute
+	 */
+	public function setActive($active)
+	{
+	    $this->active = $active;
+	    return $this;
+	}
+	
 	/**
 	 * Get values count
 	 *

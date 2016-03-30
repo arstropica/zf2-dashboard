@@ -11,12 +11,14 @@ use Doctrine\ORM\EntityRepository;
 use Lead\Entity\LeadAttribute;
 
 class LeadAttributeRepository extends EntityRepository {
-	
+
 	CONST CACHE_PREFIX = 'leadattribute-';
 
 	public function findUnique($reindex = false, $criteria = false)
 	{
-		$where = [ ];
+		$where = [ 
+				"a.active = 1" 
+		];
 		$params = [ ];
 		if ($criteria) {
 			foreach ( $criteria as $field => $criterion ) {
@@ -142,6 +144,8 @@ class LeadAttributeRepository extends EntityRepository {
 			COUNT(a.id)
 		FROM
 			\Lead\Entity\LeadAttribute a
+        WHERE
+            a.active = 1
 DQL;
 		
 		$query = $this->getEntityManager()
@@ -149,7 +153,7 @@ DQL;
 		return $query->getSingleScalarResult();
 	}
 
-	public function getIDFromDesc($desc)
+	public function getIDFromDesc($desc, $wildcard = false)
 	{
 		$id = false;
 		$qb = $this->getEntityManager()
@@ -157,8 +161,14 @@ DQL;
 		$qb->add('select', 'a')
 			->add('from', '\Lead\Entity\LeadAttribute a')
 			->setMaxResults(1)
-			->andWhere('a.attributeDesc = :desc')
-			->setParameter('desc', $desc);
+			->andWhere('a.active = 1');
+		if ($wildcard) {
+			$qb->andWhere('a.attributeDesc LIKE :desc')
+				->setParameter('desc', "%{$desc}%");
+		} else {
+			$qb->andWhere('a.attributeDesc = :desc')
+				->setParameter('desc', $desc);
+		}
 		
 		$dql = $qb->getDQL();
 		$query = $qb->getQuery();

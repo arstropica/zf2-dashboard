@@ -11,7 +11,7 @@ use Doctrine\ORM\EntityManager;
  */
 trait EntitySortableAwareTrait {
 
-	function fetchByOrder($sort, $order = 'asc', $reindex = true, $fixed_id = null)
+	function fetchByOrder($sort, $order = 'asc', $reindex = true, $fixed_id = null, $criteria = [])
 	{
 		/* @var $qb \Doctrine\ORM\QueryBuilder */
 		$qb = $this->getEntityManager()
@@ -20,6 +20,15 @@ trait EntitySortableAwareTrait {
 			->add('from', $this->getEntityClass() . ' e')
 			->addSelect('-e.' . $sort . ' AS HIDDEN sort')
 			->orderBy('sort', $this->_reverse($order));
+		if ($criteria) {
+		    if (is_array($criteria)) {
+		        foreach ($criteria as $criterion) {
+		            $qb->andWhere($criterion);
+		        }
+		    } else {
+		      $qb->where($criteria);
+		    }
+		}
 		$query = $qb->getQuery();
 		$results = $query->getArrayResult();
 		

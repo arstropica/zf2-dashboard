@@ -25,39 +25,39 @@ use Doctrine\Common\Collections\ArrayCollection;
 class AttributeController extends AbstractCrudController {
 	
 	use IdentityAwareTrait;
-	
+
 	protected $defaultSort = 'attributeOrder';
-	
+
 	protected $defaultOrder = 'asc';
-	
+
 	protected $defaultPageSize = 10;
-	
+
 	protected $paginatorRange = 5;
-	
+
 	protected $uniqueField = null;
-	
+
 	protected $uniqueEntityMessage = null;
-	
+
 	protected $successAddMessage = 'The Lead Attribute(s) were successfully added.';
-	
+
 	protected $successEditMessage = 'The Lead Attribute(s) were successfully edited.';
-	
+
 	protected $successAssignMessage = 'The Lead Attribute(s) were successfully assigned.';
-	
+
 	protected $successSubmitMessage = 'The Lead Attribute(s) were successfully submitted.';
-	
+
 	protected $successDeleteMessage = 'The Lead Attribute(s) were successfully deleted.';
-	
+
 	protected $successMergeMessage = 'The Lead Attribute(s) were successfully merged.';
-	
+
 	protected $errorEditMessage = 'There was a problem assigning your Lead Attribute(s).';
-	
+
 	protected $errorAssignMessage = 'There was a problem assigning your Lead Attribute(s).';
-	
+
 	protected $errorSubmitMessage = 'There was a problem submitting your Lead Attribute(s).';
-	
+
 	protected $errorDeleteMessage = 'There was a problem deleting your Lead Attribute(s).';
-	
+
 	protected $errorMergeMessage = 'There was a problem merging your Lead Attribute(s).';
 
 	public function listAction()
@@ -313,6 +313,11 @@ class AttributeController extends AbstractCrudController {
 		
 		$form->bind($entity);
 		
+		if ($entity && $entity->getAttributeName() != 'Question') {
+			$form->get('attributeDesc')
+				->setAttribute('readonly', 'readonly');
+		}
+		
 		$redirectUrl = $this->url()
 			->fromRoute($this->getActionRoute(), [ ], [ 
 				'query' => $this->params()
@@ -415,7 +420,7 @@ class AttributeController extends AbstractCrudController {
 		
 		if ($this->validateDelete($post)) {
 			if ($this->getEntityService()
-				->delete($entity)) {
+				->archive($entity)) {
 				$this->flashMessenger()
 					->addSuccessMessage($this->getServiceLocator()
 					->get('translator')
@@ -514,7 +519,7 @@ class AttributeController extends AbstractCrudController {
 					}
 					
 					if ($this->getEntityService()
-						->delete($entity)) {
+						->archive($entity)) {
 						$em->flush();
 						$delete_success = true;
 					}
@@ -611,7 +616,7 @@ class AttributeController extends AbstractCrudController {
 				if ($update) {
 					$result = 1;
 					if ($global) {
-						$sorted = $model->fetchByOrder($key, $order, true, $id);
+						$sorted = $model->fetchByOrder($key, $order, true, $id, 'e.active = 1');
 						$updated = $model->bulkUpdate($sorted);
 						if (!$updated) {
 							$result = false;
@@ -623,9 +628,13 @@ class AttributeController extends AbstractCrudController {
 		
 		return new JsonModel([ 
 				'result' => $result,
-				'collection' => $model->fetchByOrder($key, $order, false),
+				'collection' => $model->fetchByOrder($key, $order, false, null, 'e.active = 1'),
 				'updated' => $updated 
 		]);
+	}
+	
+	public function geoAction(){
+		return array();
 	}
 
 	/**
@@ -644,7 +653,7 @@ class AttributeController extends AbstractCrudController {
 		$form = parent::getForm($entityClass);
 		
 		if ($form) {
-			$entityClass = $entityClass ?  : $this->getEntityClass();
+			$entityClass = $entityClass ?: $this->getEntityClass();
 			$hydrator = new DoctrineHydrator($this->getEntityManager(), $entityClass);
 			$form->setHydrator($hydrator);
 			if ($form->has('submit')) {
@@ -756,6 +765,7 @@ class AttributeController extends AbstractCrudController {
 				}
 			}
 		}
+		$qb->andWhere('e.active = 1');
 		return $qb;
 	}
 

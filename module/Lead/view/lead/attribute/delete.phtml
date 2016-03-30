@@ -3,13 +3,19 @@
 
 <div class="row">
     <div class="col-xs-12">
-        <p class="alert alert-danger">Please, confirm the deletion of "<strong><?php echo $this->escapeHtml($this->entity->getAttributeDesc()) ?></strong>"?</p>
+    	<?php if ($this->entity->getAttributeName() == 'Question') : ?>
+        	<p class="alert alert-danger">Please, confirm the deletion of "<strong><?php echo $this->escapeHtml($this->entity->getAttributeDesc()) ?></strong>"?</p>
+        <?php else : ?>
+        	<p class="alert alert-warning">You cannot delete "<strong><?php echo $this->escapeHtml($this->entity->getAttributeDesc()) ?></strong>". It is a required field.</p>
+        <?php endif; ?>
     </div>
 </div>
 
 <div class="row">
     <div class="col-xs-12">
-        <button type="submit" class="btn btn-danger">Confirm</button>
+    	<?php if ($this->entity->getAttributeName() == 'Question') : ?>
+        	<button type="submit" class="btn btn-danger">Confirm</button>
+        <?php endif; ?>
         <a href="<?php echo $this->losurl()->from('attribute/list',[],true) ?>" class="btn btn-default">Cancel</a>
     </div>
 </div>
