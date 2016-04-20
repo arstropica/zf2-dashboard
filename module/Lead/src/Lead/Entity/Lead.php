@@ -556,7 +556,7 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 		if (!$attributes instanceof Collection) {
 			$attributes = new ArrayCollection($attributes);
 		}
-		return $attributes->filter(function ($leadAttribute) use($attributeName, $desc) {
+		return $attributes->filter(function ($leadAttribute) use($attributeName, $desc, $exact) {
 			$attribute = $leadAttribute->getAttribute();
 			if ($attribute) {
 				$name = $desc ? $attribute->getAttributeDesc() : $attribute->getAttributeName();
