@@ -24,11 +24,11 @@ use TenStreet\Entity\ApplicationData\Licenses\License;
 class TenStreetDataMapper implements ServiceLocatorAwareInterface {
 	
 	use EntityManagerAwareTrait;
-	
+
 	protected $dbAdapter;
-	
+
 	protected $sm;
-	
+
 	protected $objectRepository;
 
 	public function __construct(ServiceManager $sm, Adapter $dbAdapter)
@@ -98,7 +98,7 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface {
 					'Password',
 					'Service' 
 			] as $key ) {
-				$option = $api->findOption($key) ?  : false;
+				$option = $api->findOption($key) ?: false;
 				${$key} = $option ? $option->getValue() : "";
 				$authEntity->{'set' . $key}(${$key});
 			}
@@ -124,7 +124,7 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface {
 				'Password',
 				'Service' 
 		] as $key ) {
-			${$key} = isset($options [$key]) ? $options [$key] : "";
+			${$key} = isset($options[$key]) ? $options[$key] : "";
 			$authEntity->{'set' . $key}(${$key});
 		}
 		
@@ -143,13 +143,13 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface {
 		
 		$tenStreetEntity = new TenStreetData();
 		
-		$Mode = $options ['Mode'];
+		$Mode = $options['Mode'];
 		
-		$Source = $options ['Source'];
+		$Source = $options['Source'];
 		
-		$CompanyId = $options ['CompanyId'];
+		$CompanyId = $options['CompanyId'];
 		
-		$Company = isset($options ['Company']) ? $options ['Company'] : $lead->getAccount()
+		$Company = isset($options['Company']) ? $options['Company'] : $lead->getAccount()
 			->getName();
 		
 		// $DriverId = $lead->getLead()->getDriverid();
@@ -183,7 +183,7 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface {
 			} else {
 				$License->setCommercialDriversLicense('n');
 			}
-			$licenses [] = $License;
+			$licenses[] = $License;
 		}
 		
 		return $licenses;
@@ -203,7 +203,7 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface {
 				$DisplayValue = $attribute->getValue();
 				$displayField->setDisplayPrompt($DisplayPrompt);
 				$displayField->setDisplayValue($DisplayValue);
-				$displayFields [] = $displayField;
+				$displayFields[] = $displayField;
 			}
 		}
 		return $displayFields;
@@ -213,13 +213,15 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface {
 	{
 		$applicationData = new ApplicationData();
 		
-		$AppReferrer = isset($options ['AppReferrer']) ? $options ['AppReferrer'] : $lead->getReferrer();
+		$AppReferrer = isset($options['AppReferrer']) ? $options['AppReferrer'] : false;
 		
 		$Licenses = $this->getLicenses($lead);
 		
 		$DisplayFields = $this->getDisplayFields($lead);
 		
-		$applicationData->setAppReferrer($AppReferrer);
+		if (!empty($AppReferrer)) {
+			$applicationData->setAppReferrer($AppReferrer);
+		}
 		
 		$applicationData->setLicenses($Licenses);
 		
@@ -376,10 +378,12 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface {
 				foreach ( $option as $key => $value ) {
 					switch ($key) {
 						case 'AppReferrer' :
-							$options [$key] = preg_replace('/\{lead\}/i', "Lead #" . $lead->getId(), $value);
+							if (!preg_match('/none/i', trim($value))) {
+								$options[$key] = preg_replace('/\{lead\}/i', "Lead #" . $lead->getId(), $value);
+							}
 							break;
 						default :
-							$options [$key] = $value;
+							$options[$key] = $value;
 							break;
 					}
 				}
@@ -389,13 +393,17 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface {
 				$option = $apiSetting->getApiOption();
 				switch ($option->getOption()) {
 					case 'CompanyId' :
-						$options ['CompanyId'] = $apiSetting->getApiValue();
+						$options['CompanyId'] = $apiSetting->getApiValue();
 						break;
 					case 'Company' :
-						$options ['Company'] = $apiSetting->getApiValue();
+						$options['Company'] = $apiSetting->getApiValue();
 						break;
 					case 'AppReferrer' :
-						$options ['AppReferrer'] = $apiSetting->getApiValue();
+						if (!preg_match('/none/i', trim($apiSetting->getApiValue()))) {
+							$options['AppReferrer'] = $apiSetting->getApiValue();
+						} else {
+							unset($options['AppReferrer']);
+						}
 						break;
 				}
 			}
@@ -405,8 +413,7 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface {
 					'Password',
 					'Mode',
 					'Service',
-					'CompanyId',
-					'AppReferrer' 
+					'CompanyId' 
 			] as $option ) {
 				if (!in_array($option, array_keys($options))) {
 					$valid = false;

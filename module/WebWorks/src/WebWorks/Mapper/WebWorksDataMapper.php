@@ -152,13 +152,15 @@ class WebWorksDataMapper implements ServiceLocatorAwareInterface {
 	{
 		$applicationData = new ApplicationData();
 		
-		$AppReferrer = isset($options ['AppReferrer']) ? $options ['AppReferrer'] : $lead->getReferrer();
+		$AppReferrer = isset($options['AppReferrer']) ? $options['AppReferrer'] : false;
 		
 		$Licenses = $this->getLicenses($lead);
 		
 		$DisplayFields = $this->getDisplayFields($lead);
 		
-		$applicationData->setAppReferrer($AppReferrer);
+		if (!empty($AppReferrer)) {
+			$applicationData->setAppReferrer($AppReferrer);
+		}
 		
 		$applicationData->setLicenses($Licenses);
 		
@@ -315,7 +317,9 @@ class WebWorksDataMapper implements ServiceLocatorAwareInterface {
 				foreach ( $option as $key => $value ) {
 					switch ($key) {
 						case 'AppReferrer' :
-							$options [$key] = preg_replace('/\{lead\}/i', "Lead #" . $lead->getId(), $value);
+							if (!preg_match('/none/i', trim($value))) {
+								$options[$key] = preg_replace('/\{lead\}/i', "Lead #" . $lead->getId(), $value);
+							}
 							break;
 						default :
 							$options [$key] = $value;
@@ -334,14 +338,17 @@ class WebWorksDataMapper implements ServiceLocatorAwareInterface {
 						$options ['CompanyName'] = $apiSetting->getApiValue();
 						break;
 					case 'AppReferrer' :
-						$options ['AppReferrer'] = $apiSetting->getApiValue();
+						if (!preg_match('/none/i', trim($apiSetting->getApiValue()))) {
+							$options['AppReferrer'] = $apiSetting->getApiValue();
+						} else {
+							unset($options['AppReferrer']);
+						}
 						break;
 				}
 			}
 			foreach ( [ 
 					'Source',
 					'CompanyId',
-					'AppReferrer' 
 			] as $option ) {
 				if (!in_array($option, array_keys($options))) {
 					$valid = false;

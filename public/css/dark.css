@@ -40,6 +40,9 @@ BODY {
 		-o-transition-delay: 500ms;
 		transition-delay: 500ms;
 	}
+	.user-logged-in .navbar.fixed {
+		position: fixed;
+	}
 	.user-logged-in > .navbar > .container-fluid {
 		padding-left: 0;
 		padding-right: 0;
