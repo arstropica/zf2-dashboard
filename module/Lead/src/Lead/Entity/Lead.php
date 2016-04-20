@@ -528,13 +528,14 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	 *
 	 * @param string $attributeName        	
 	 * @param bool $desc        	
+	 * @param bool $exact
 	 *
 	 * @return \Lead\Entity\LeadAttributeValue|boolean
 	 */
-	public function findAttribute($attributeName, $desc = false)
+	public function findAttribute($attributeName, $desc = false, $exact = false)
 	{
 		$attribute = false;
-		$attributes = $this->findAttributes($attributeName, $desc);
+		$attributes = $this->findAttributes($attributeName, $desc, $exact);
 		if ($attributes->count() > 0) {
 			$attribute = $attributes->first();
 		}
@@ -545,10 +546,11 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 	 *
 	 * @param string $attributeName        	
 	 * @param bool $desc        	
+	 * @param bool $exact
 	 *
 	 * @return ArrayCollection
 	 */
-	public function findAttributes($attributeName, $desc = false)
+	public function findAttributes($attributeName, $desc = false, $exact = false)
 	{
 		$attributes = $this->getAttributes(true);
 		if (!$attributes instanceof Collection) {
@@ -558,7 +560,11 @@ class Lead implements SearchableEntityInterface, ServiceLocatorAwareInterface {
 			$attribute = $leadAttribute->getAttribute();
 			if ($attribute) {
 				$name = $desc ? $attribute->getAttributeDesc() : $attribute->getAttributeName();
-				return preg_match('/' . preg_quote($attributeName, '/') . '/i', $name);
+				if ($exact) {
+					return preg_match('/^' . preg_quote($attributeName, '$/') . '/i', $name);
+				} else {
+					return preg_match('/' . preg_quote($attributeName, '/') . '/i', $name);
+				}
 			}
 			return false;
 		});

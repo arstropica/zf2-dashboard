@@ -211,6 +211,9 @@ class WebWorksDataMapper implements ServiceLocatorAwareInterface {
 				case 'City' :
 					${$key} = $this->getLeadAttributeValue($lead, $key);
 					break;
+				case 'Address' :
+					${$key} = $this->getLeadAttributeValue($lead, $key, "", true, false);
+					break;
 				default :
 					${$key} = $this->getLeadAttributeValue($lead, $key, "", true);
 					break;
@@ -361,9 +364,9 @@ class WebWorksDataMapper implements ServiceLocatorAwareInterface {
 		return $valid ? $options : false;
 	}
 
-	protected function getLeadAttributeValue(Lead $lead, $key, $default = "", $desc = false)
+	protected function getLeadAttributeValue(Lead $lead, $key, $default = "", $desc = false, $exact = false)
 	{
-		$attribute = $lead->findAttribute($key, $desc);
+		$attribute = $lead->findAttribute($key, $desc, $exact);
 		return ($attribute) ? $attribute->getValue() : $default;
 	}
 
