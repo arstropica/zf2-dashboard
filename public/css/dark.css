@@ -42,6 +42,7 @@ BODY {
 	}
 	.user-logged-in .navbar.fixed {
 		position: fixed;
+		z-index: 99;
 	}
 	.user-logged-in > .navbar > .container-fluid {
 		padding-left: 0;
