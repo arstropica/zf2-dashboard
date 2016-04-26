@@ -273,7 +273,7 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface {
 					${$key} = $this->getLeadAttributeValue($lead, $key);
 					break;
 				case 'Address' :
-					${$key} = $this->getLeadAttributeValue($lead, $key, "", true, false);
+					${$key} = $this->getLeadAttributeValue($lead, $key, "", true, true);
 					break;
 				default :
 					${$key} = $this->getLeadAttributeValue($lead, $key, "", true);
