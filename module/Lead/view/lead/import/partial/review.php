@@ -1,4 +1,6 @@
 <?php
+use Application\Utility\Helper;
+
 $form = $this->form;
 $review = $form->get('review');
 $duplicates = ($form->has('duplicate')) ? $form->get('duplicate') : false;
@@ -61,7 +63,8 @@ $invalid = array_filter($this->valid);
 									</thead>
 									<tbody>
 			                          <?php foreach ($data as $attribute_id => $entry) : ?> 
-			                              <?php foreach ($entry as $data_label => $data_value) : ?> 
+			                              <?php foreach ($entry as $data_label => $data_value) : ?>
+			                              <?php if (is_array($data_value)) $data_value = Helper::recursive_implode($data_value); ?> 
 				                            <tr
 											class="<?php if (isset($fields[$attribute_id])) echo "duplicate"; ?>">
 											<td><?php echo $data_label; ?></td>
