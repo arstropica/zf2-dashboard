@@ -3,11 +3,18 @@ Lead KPI Dashboard Application
 
 Introduction
 ------------
-This is a ORM driven CRUD application for storing, viewing, relaying and submitting commerical driver applications to different 3rd Party Web Services and/or email depending on client account.
+This application presents an (S)CRUD administrative interface for storing, viewing, relaying and submitting commerical driver applications to different 3rd Party Web Services and/or email depending on client account.
 
 Installation
 ------------
-Import the SQL file in the /data directory to create the Database Schema. Copy/rename the .dist files in the config/autoload directory and enter database configuration parameters.
+a. Generate the schema
+
+    ./vendor/bin/doctrine-module orm:schema-tool:create
+
+b. Validate the schema against the generate database structure
+
+    ./vendor/bin/doctrine-module orm:validate-schema
+
 
 Details
 ------------
