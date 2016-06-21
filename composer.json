@@ -25,8 +25,8 @@
     "ruflin/elastica" : "dev-master",
     "igorw/event-source" : "1.0.*",
     "ghunti/highcharts-php" : "v3.0.2",
-    "wiredmedia/doctrine-extensions" : "v0.1",
-    "snapshotpl/zf-snap-geoip" : "2.4.2"
+    "snapshotpl/zf-snap-geoip" : "2.4.2",
+    "beberlei/DoctrineExtensions" : "v1.0.9"
   },
   "require-dev" : {
     "zendframework/zend-developer-tools" : "dev-master",
