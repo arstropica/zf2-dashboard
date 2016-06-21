@@ -52,6 +52,9 @@ BODY {
 		padding-left: 15px;
 		padding-right: 15px;
 	}
+	.user-logged-in.env-development .navbar .navbar-header {
+		border-top: 1px solid #FF0;
+	}
 	.user-logged-in #collapse-menu {
 		font-size: 13px;
 		line-height: 34px;

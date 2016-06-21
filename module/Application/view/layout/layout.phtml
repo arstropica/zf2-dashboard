@@ -1,6 +1,7 @@
 <?php
 // Body Classes
 $classes = "";
+$env = getenv('APPLICATION_ENV') ?  : 'production';
 try {
 	$sm = $this->getHelperPluginManager()
 		->getServiceLocator();
@@ -29,6 +30,7 @@ try {
 		@list ( $routeArray ['module'], , $routeArray ['controller'] ) = explode("\\", $routeParams ['controller']);
 	}
 	$routeArray ['user-logged'] = ($logged_in ? 'in' : 'out');
+	$routeArray ['env'] = $env;
 	foreach ( $routeArray as $key => $value )
 		$routeArray [$key] = $key . "-" . strtolower($value);
 	
