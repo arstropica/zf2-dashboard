@@ -153,12 +153,14 @@ class SendMailService extends AbstractEmailService implements EventManagerAwareI
 						try {
 							$transport->send($message);
 						} catch ( \Exception $e ) {
-							$transport = new Mail\Transport\Sendmail();
-							$transport->send($message);
+							return $this->respondError(new \Exception($e->getMessage(), $e->getCode()));
+							// $transport = new Mail\Transport\Sendmail();
+							// $transport->send($message);
 						}
 					} else {
-						$transport = new Mail\Transport\Sendmail();
-						$transport->send($message);
+						return $this->respondError(new \Exception('SMTP Credentials could not be found.', 400));
+						// $transport = new Mail\Transport\Sendmail();
+						// $transport->send($message);
 					}
 				} else {
 					return $this->respondError(new \Exception('No Lead Data could be found.', 404));
