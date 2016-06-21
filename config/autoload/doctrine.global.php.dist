@@ -17,6 +17,10 @@ return array(
                 'query_cache'       => 'redis',
                 'result_cache'      => 'redis',
 				'hydration_cache' => 'redis',
+				'string_functions' => array (
+						'FIELD' => 'DoctrineExtensions\Query\Mysql\Field',
+						'REGEXP' => 'DoctrineExtensions\Query\Mysql\Regexp' 
+				), 
             )
         ),
         'cache' => array(

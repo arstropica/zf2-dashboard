@@ -21,13 +21,6 @@ return array (
 										'Report\Entity' => 'Report_driver' 
 								) 
 						) 
-				),
-				'configuration' => array (
-						'orm_default' => array (
-								'string_functions' => array (
-										'FIELD' => 'DoctrineExtensions\Query\Mysql\Field' 
-								) 
-						) 
 				) 
 		),
 		'router' => array (
