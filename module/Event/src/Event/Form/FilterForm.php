@@ -9,25 +9,25 @@ use Zend\InputFilter\InputFilter;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
 class FilterForm extends Form implements InputFilterAwareInterface {
-	
+
 	/**
 	 *
 	 * @var EntityManager
 	 */
 	protected $entityManager;
-	
+
 	/**
 	 *
 	 * @var InputFilter
 	 */
 	protected $inputFilter;
-	
+
 	/**
 	 *
 	 * @var ServiceLocatorInterface
 	 */
 	protected $serviceLocator;
-	
+
 	protected $url;
 
 	public function __construct(EntityManager $entityManager)
@@ -60,6 +60,30 @@ class FilterForm extends Form implements InputFilterAwareInterface {
 								'TenStreetApiEvent' => 'TenStreet',
 								'ApiEvent' => 'Options',
 								'ErrorEvent' => 'Errors' 
+						) 
+				),
+				'attributes' => array (
+						'style' => 'margin: 0 5px' 
+				) 
+		));
+		
+		$this->add(array (
+				'type' => 'Zend\Form\Element\Select',
+				'name' => 'action',
+				'required' => false,
+				'allow_empty' => true,
+				'continue_if_empty' => true,
+				'options' => array (
+						'label' => 'Filter by Action',
+						'label_attributes' => array (
+								'class' => 'sr-only' 
+						),
+						'empty_option' => 'Filter by Action',
+						'value_options' => array (
+								'SubmitAction' 	=> 'Submissions',
+								'CreateAction' 	=> 'Additions',
+								'EditAction' 	=> 'Updates',
+								'DeleteAction' 	=> 'Deletions' 
 						) 
 				),
 				'attributes' => array (

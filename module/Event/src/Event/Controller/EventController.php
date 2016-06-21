@@ -18,17 +18,18 @@ use Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator;
 use Lead\Entity\Lead;
 use Account\Entity\Account;
 use Event\Entity\Event;
+use Event\Entity\LeadEvent;
 
 class EventController extends AbstractCrudController {
-	
+
 	protected $defaultSort = 'id';
-	
+
 	protected $defaultOrder = 'desc';
-	
+
 	protected $defaultPageSize = 10;
-	
+
 	protected $paginatorRange = 5;
-	
+
 	protected $uniqueField = null;
 
 	public function listAction()
@@ -155,7 +156,7 @@ class EventController extends AbstractCrudController {
 		reset($baseClasses);
 		array_shift($results);
 		foreach ( $results as $result ) {
-			$events [key($baseClasses)] = $result;
+			$events[key($baseClasses)] = $result;
 			next($baseClasses);
 		}
 		
@@ -199,8 +200,23 @@ class EventController extends AbstractCrudController {
 		$hydrator = new DoctrineHydrator($entityManager);
 		$eventPrototype = new Event();
 		$eventArray = $hydrator->extract($eventPrototype);
-		
-		$this->exportHeadings = array_map('ucwords', array_keys($eventArray));
+		$eventArray = array_map('ucwords', array_keys($eventArray));
+		$leadArray = [ 
+				'id',
+				'Full Name',
+				'Account' 
+		];
+		$leadArray = array_map('ucwords', $leadArray);
+		$headings = [ 
+				'event' => $eventArray,
+				'lead' => $leadArray 
+		];
+		foreach ( $headings as $entity => $array ) {
+			foreach ( $array as $heading ) {
+				$mergedArray[] = ucwords($entity . ' ' . $heading);
+			}
+		}
+		$this->exportHeadings = $mergedArray;
 		
 		$results = $qb->getQuery()
 			->getResult();
@@ -233,27 +249,28 @@ class EventController extends AbstractCrudController {
 		$filters = [ 
 				'daterange',
 				'account',
-				'event' 
+				'event',
+				'action' 
 		];
 		if ($query) {
 			$where = [ ];
 			$params = [ ];
 			foreach ( $filters as $condition ) {
-				if (isset($query [$condition]) && "" !== $query [$condition]) {
+				if (isset($query[$condition]) && "" !== $query[$condition]) {
 					switch ($condition) {
 						case 'daterange' :
 							list ( $from, $to ) = array_map(function ($d) {
 								return date('Y-m-d', strtotime($d));
-							}, explode("-", $query [$condition]));
-							$where ['from'] = $from . ' 00:00:00';
-							$where ['to'] = $to . ' 23:59:59';
+							}, explode("-", $query[$condition]));
+							$where['from'] = $from . ' 00:00:00';
+							$where['to'] = $to . ' 23:59:59';
 							$qb->andWhere($qb->expr()
 								->between("e.occurred", ":from", ":to"));
 							break;
 						case 'account' :
-							switch ($query [$condition]) {
+							switch ($query[$condition]) {
 								default :
-									$where ['id'] = $query [$condition];
+									$where['id'] = $query[$condition];
 									$qb->innerJoin('Event\Entity\AccountEvent', 'ae', 'WITH', 'e = ae.event')
 										->innerJoin('ae.account', 'account');
 									
@@ -263,6 +280,29 @@ class EventController extends AbstractCrudController {
 							break;
 						case 'event' :
 							$qb->innerJoin("Event\\Entity\\{$query[$condition]}", 'v', 'WITH', 'e = v.event');
+							break;
+						case 'action' :
+							$regexp = [ ];
+							$regexp['SubmitAction'] = [ 
+									'sent',
+									'submission' 
+							];
+							$regexp['CreateAction'] = [ 
+									'created',
+									'import' 
+							];
+							$regexp['EditAction'] = [ 
+									'edited',
+									'merged' 
+							];
+							$regexp['DeleteAction'] = [ 
+									'deleted',
+									'archived' 
+							];
+							if (isset($regexp[$query[$condition]])) {
+								$where['action'] = implode('|', $regexp[$query[$condition]]);
+								$qb->andWhere('REGEXP(e.event, :action) = true');
+							}
 							break;
 					}
 				}
@@ -281,26 +321,59 @@ class EventController extends AbstractCrudController {
 	{
 		$headings = $this->exportHeadings;
 		
-		$output = array_combine($headings, array_pad([ ], count($headings), ""));
+		$output = [ ];
+		
+		$lead = false;
+		$id = $event->getId();
+		
+		$em = $this->getEntityManager();
+		$objRepository = $em->getRepository("Event\\Entity\\LeadEvent");
+		$leadEvent = $objRepository->findOneBy([ 
+				'event' => $id 
+		]);
+		if ($leadEvent && $leadEvent instanceof LeadEvent) {
+			$lead = $leadEvent->getLead();
+		}
 		
 		foreach ( $headings as $heading ) {
-			$method_name = 'get' . ucfirst(preg_replace('/^[^\w]/i', '', $heading));
-			$method = method_exists($event, $method_name) ? $method_name : false;
-			if ($method) {
-				switch ($heading) {
-					case "Occurred" :
-						$time = $event->getOccurred();
-						if ($time instanceof \DateTime) {
-							$time = date_format($time, 'Y-m-d H:i:s');
+			$words = explode(' ', $heading);
+			$entity = strtolower(array_shift($words));
+			$field = implode('', $words);
+			switch ($entity) {
+				case 'event' :
+					$output[$heading] = "";
+					$method_name = 'get' . ucfirst(preg_replace('/^[^\w]/i', '', $field));
+					$method = method_exists($event, $method_name) ? $method_name : false;
+					if ($method) {
+						switch ($field) {
+							case "Occurred" :
+								$time = $event->getOccurred();
+								if ($time instanceof \DateTime) {
+									$time = date_format($time, 'Y-m-d H:i:s');
+								}
+								$output[$heading] = $time;
+								break;
+							default :
+								$output[$heading] = $event->{$method}();
+								break;
 						}
-						$output [$heading] = $time;
-						break;
-					default :
-						$output [$heading] = $event->{$method}();
-						break;
-				}
+					}
+					break;
+				case 'lead' :
+					$output[$heading] = "";
+					if ($lead instanceof Lead) {
+						$method_name = 'get' . ucfirst(preg_replace('/^[^\w]/i', '', $field));
+						$method = method_exists($lead, $method_name) ? $method_name : false;
+						if ($method) {
+							$output[$heading] = $lead->{$method}();
+						} else {
+							$output[$heading] = 'N/A';
+						}
+					}
+					break;
 			}
 		}
+		
 		return $output;
 	}
 
