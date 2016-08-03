@@ -24,13 +24,13 @@ use Application\Provider\ServiceEventTrait;
 abstract class AbstractEmailService implements ServiceLocatorAwareInterface, ApiServiceInterface, EventManagerAwareInterface {
 	
 	use EventManagerAwareTrait, ServiceLocatorAwareTrait, AuthorizationAwareTrait, EntityManagerAwareTrait, ServiceEventTrait;
-	
+
 	/**
 	 *
 	 * @var JSONErrorResponse
 	 */
 	protected $errorResponse;
-	
+
 	/**
 	 *
 	 * @var Lead
@@ -54,7 +54,8 @@ abstract class AbstractEmailService implements ServiceLocatorAwareInterface, Api
 	 *
 	 */
 	public function respondError(\Exception $e)
-	{}
+	{
+	}
 
 	/**
 	 * (non-PHPdoc)
@@ -63,7 +64,8 @@ abstract class AbstractEmailService implements ServiceLocatorAwareInterface, Api
 	 *
 	 */
 	public function getOptions($id, $service = 'Email')
-	{}
+	{
+	}
 
 	/**
 	 * (non-PHPdoc)
@@ -72,7 +74,8 @@ abstract class AbstractEmailService implements ServiceLocatorAwareInterface, Api
 	 *
 	 */
 	public function respond($data = null)
-	{}
+	{
+	}
 
 	/**
 	 * (non-PHPdoc)
@@ -81,7 +84,8 @@ abstract class AbstractEmailService implements ServiceLocatorAwareInterface, Api
 	 *
 	 */
 	public function send($id, $service = 'Email')
-	{}
+	{
+	}
 
 	/**
 	 * (non-PHPdoc)
@@ -90,7 +94,8 @@ abstract class AbstractEmailService implements ServiceLocatorAwareInterface, Api
 	 *
 	 */
 	public function respondSuccess($result)
-	{}
+	{
+	}
 
 	/**
 	 * (non-PHPdoc)
@@ -99,7 +104,8 @@ abstract class AbstractEmailService implements ServiceLocatorAwareInterface, Api
 	 *
 	 */
 	public function getData($id)
-	{}
+	{
+	}
 
 	/**
 	 * (non-PHPdoc)
@@ -108,7 +114,8 @@ abstract class AbstractEmailService implements ServiceLocatorAwareInterface, Api
 	 *
 	 */
 	public function logEvent($event)
-	{}
+	{
+	}
 
 	/**
 	 *
@@ -182,21 +189,28 @@ abstract class AbstractEmailService implements ServiceLocatorAwareInterface, Api
 				switch ($property) {
 					case 'id' :
 						// case 'referrer' :
-						$data ['summary'] [$property] = $asset;
+						$data['summary'][$property] = $asset;
 						break;
 					case 'ipaddress' :
-						$data ['summary'] ["IP Address"] = $asset;
+						$data['summary']["IP Address"] = $asset;
 						break;
 					case 'timecreated' :
-						$data ['summary'] ["Time Created"] = date_format($asset, 'Y-m-d H:i:s');
+						$data['summary']["Time Created"] = date_format($asset, 'Y-m-d H:i:s');
 						break;
 					case 'account' :
-						$data ['summary'] [$property] = $asset->getName();
+						$data['summary'][$property] = $asset->getName();
 						break;
 					case 'attributes' :
 						foreach ( $asset as $attributeValue ) {
-							$data ['details'] [$attributeValue->getAttribute()
-								->getAttributeDesc()] = $attributeValue->getValue();
+							$attributeDesc = $attributeValue->getAttribute()
+								->getAttributeDesc();
+							switch (strtolower($attributeDesc)) {
+								case 'notes' :
+									break;
+								default :
+									$data['details'][$attributeDesc] = $attributeValue->getValue();
+									break;
+							}
 						}
 						break;
 				}

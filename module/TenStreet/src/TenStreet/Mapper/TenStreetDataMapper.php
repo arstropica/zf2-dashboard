@@ -197,13 +197,19 @@ class TenStreetDataMapper implements ServiceLocatorAwareInterface {
 		
 		if ($leadAttributeValues->count() > 0) {
 			foreach ( $leadAttributeValues as $attribute ) {
-				$displayField = new DisplayField();
 				$DisplayPrompt = $attribute->getAttribute()
 					->getAttributeDesc();
-				$DisplayValue = $attribute->getValue();
-				$displayField->setDisplayPrompt($DisplayPrompt);
-				$displayField->setDisplayValue($DisplayValue);
-				$displayFields[] = $displayField;
+				switch (strtolower($DisplayPrompt)) {
+					case 'notes' :
+						break;
+					default :
+						$displayField = new DisplayField();
+						$DisplayValue = $attribute->getValue();
+						$displayField->setDisplayPrompt($DisplayPrompt);
+						$displayField->setDisplayValue($DisplayValue);
+						$displayFields[] = $displayField;
+						break;
+				}
 			}
 		}
 		return $displayFields;

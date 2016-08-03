@@ -23,11 +23,11 @@ use WebWorks\Entity\ApplicationData\Licenses\License;
 class WebWorksDataMapper implements ServiceLocatorAwareInterface {
 	
 	use EntityManagerAwareTrait;
-	
+
 	protected $dbAdapter;
-	
+
 	protected $sm;
-	
+
 	protected $objectRepository;
 
 	public function __construct(ServiceManager $sm, Adapter $dbAdapter)
@@ -86,11 +86,11 @@ class WebWorksDataMapper implements ServiceLocatorAwareInterface {
 		
 		$webWorksEntity = new WebWorksData();
 		
-		$Source = $options ['Source'];
+		$Source = $options['Source'];
 		
-		$CompanyId = $options ['CompanyId'];
+		$CompanyId = $options['CompanyId'];
 		
-		$CompanyName = isset($options ['CompanyName']) ? $options ['CompanyName'] : $lead->getAccount()
+		$CompanyName = isset($options['CompanyName']) ? $options['CompanyName'] : $lead->getAccount()
 			->getName();
 		
 		// $DriverId = $lead->getLead()->getDriverid();
@@ -122,7 +122,7 @@ class WebWorksDataMapper implements ServiceLocatorAwareInterface {
 			} else {
 				$License->setCommercialDriversLicense('n');
 			}
-			$licenses [] = $License;
+			$licenses[] = $License;
 		}
 		
 		return $licenses;
@@ -136,13 +136,19 @@ class WebWorksDataMapper implements ServiceLocatorAwareInterface {
 		
 		if ($leadAttributeValues->count() > 0) {
 			foreach ( $leadAttributeValues as $attribute ) {
-				$displayField = new DisplayField();
 				$DisplayPrompt = $attribute->getAttribute()
 					->getAttributeDesc();
-				$DisplayValue = $attribute->getValue();
-				$displayField->setDisplayPrompt($DisplayPrompt);
-				$displayField->setDisplayValue($DisplayValue);
-				$displayFields [] = $displayField;
+				switch (strtolower($DisplayPrompt)) {
+					case 'notes' :
+						break;
+					default :
+						$displayField = new DisplayField();
+						$DisplayValue = $attribute->getValue();
+						$displayField->setDisplayPrompt($DisplayPrompt);
+						$displayField->setDisplayValue($DisplayValue);
+						$displayFields[] = $displayField;
+						break;
+				}
 			}
 		}
 		return $displayFields;
@@ -325,7 +331,7 @@ class WebWorksDataMapper implements ServiceLocatorAwareInterface {
 							}
 							break;
 						default :
-							$options [$key] = $value;
+							$options[$key] = $value;
 							break;
 					}
 				}
@@ -335,10 +341,10 @@ class WebWorksDataMapper implements ServiceLocatorAwareInterface {
 				$option = $apiSetting->getApiOption();
 				switch ($option->getOption()) {
 					case 'CompanyId' :
-						$options ['CompanyId'] = $apiSetting->getApiValue();
+						$options['CompanyId'] = $apiSetting->getApiValue();
 						break;
 					case 'CompanyName' :
-						$options ['CompanyName'] = $apiSetting->getApiValue();
+						$options['CompanyName'] = $apiSetting->getApiValue();
 						break;
 					case 'AppReferrer' :
 						if (!preg_match('/none/i', trim($apiSetting->getApiValue()))) {
@@ -351,7 +357,7 @@ class WebWorksDataMapper implements ServiceLocatorAwareInterface {
 			}
 			foreach ( [ 
 					'Source',
-					'CompanyId',
+					'CompanyId' 
 			] as $option ) {
 				if (!in_array($option, array_keys($options))) {
 					$valid = false;
