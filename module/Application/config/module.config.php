@@ -359,45 +359,45 @@ return array (
 								'privilege' => 'display',
 								'icon' => 'glyphicon glyphicon-search',
 								'pages' => array (
-										array (
-												'label' => 'Display Reports',
-												'route' => 'report',
-												'action' => 'list' 
-										),
+// 										array (
+// 												'label' => 'Display Reports',
+// 												'route' => 'report',
+// 												'action' => 'list' 
+// 										),
 										array (
 												'label' => 'Index Manager',
 												'route' => 'report/index',
 												'action' => 'list' 
 										),
-										array (
-												'label' => 'Display Reports',
-												'route' => 'report/list',
-												'action' => 'list',
-												'visible' => false 
-										),
-										array (
-												'label' => 'Create Report',
-												'route' => 'report/add',
-												'action' => 'add' 
-										),
-										array (
-												'label' => 'View Report',
-												'route' => 'report/view',
-												'action' => 'view',
-												'visible' => false 
-										),
-										array (
-												'label' => 'Edit Report',
-												'route' => 'report/edit',
-												'action' => 'edit',
-												'visible' => false 
-										),
-										array (
-												'label' => 'Archive Report',
-												'route' => 'report/delete',
-												'action' => 'delete',
-												'visible' => false 
-										) 
+// 										array (
+// 												'label' => 'Display Reports',
+// 												'route' => 'report/list',
+// 												'action' => 'list',
+// 												'visible' => false 
+// 										),
+// 										array (
+// 												'label' => 'Create Report',
+// 												'route' => 'report/add',
+// 												'action' => 'add' 
+// 										),
+// 										array (
+// 												'label' => 'View Report',
+// 												'route' => 'report/view',
+// 												'action' => 'view',
+// 												'visible' => false 
+// 										),
+// 										array (
+// 												'label' => 'Edit Report',
+// 												'route' => 'report/edit',
+// 												'action' => 'edit',
+// 												'visible' => false 
+// 										),
+// 										array (
+// 												'label' => 'Archive Report',
+// 												'route' => 'report/delete',
+// 												'action' => 'delete',
+// 												'visible' => false 
+// 										) 
 								) 
 						),
 						array (

@@ -15,10 +15,10 @@ $report = $this->entity;
 	<span class="pull-right" style="margin-left: 15px;"> <a
 		href="<?php echo $this->history ? :$this->url('lead/list', array('action' => 'list')); ?>"
 		class="btn btn-info" title="Back">Back</a>
-	</span> <span class="pull-right" style="margin-left: 15px;"> <a
+	</span> <!-- <span class="pull-right" style="margin-left: 15px;"> <a
 		href="<?php echo $this->url('report/add', array('action' => 'add')); ?>"
 		class="btn btn-success" title="Create Report">Create Report</a>
-	</span>
+	</span>-->
 	<?php if ($report instanceof Report && $report->getId()) : ?> 
 		<span class="pull-right"> <a target="_blank"
 		href="<?php echo $this->url('lead/search/export', array('action' => 'export', 'id' => $report->getId())); ?>"
