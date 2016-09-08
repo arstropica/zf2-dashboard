@@ -195,10 +195,10 @@ abstract class AbstractEmailService implements ServiceLocatorAwareInterface, Api
 						$data['summary']["IP Address"] = $asset;
 						break;
 					case 'timecreated' :
-						// $data['summary']["Time Created"] = date_format($asset, 'Y-m-d H:i:s');
+						$data['summary']["Time Created"] = date_format($asset, 'Y-m-d H:i:s');
 						break;
 					case 'account' :
-						// $data['summary'][$property] = $asset->getName();
+						$data['summary'][$property] = $asset->getName();
 						break;
 					case 'attributes' :
 						foreach ( $asset as $attributeValue ) {
@@ -246,6 +246,8 @@ TEXT;
 TEXT;
 				$TR = "%1\$s : %2\$s\r\n";
 			}
+			// Remove Lead Summary
+			unset($data['summary']);
 			$outline = "";
 			foreach ( $data as $section => $values ) {
 				$inline = "";
