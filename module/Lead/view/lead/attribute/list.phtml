@@ -9,6 +9,10 @@ $this->headLink()
 
 $title = 'Display Attributes';
 $this->headTitle($title);
+$sl = $this->getHelperPluginManager()
+->getServiceLocator();
+$em = $sl->get('doctrine.entitymanager.orm_default');
+$r = $em->getRepository("Lead\\Entity\\LeadAttribute");
 ?>
 <h1>
 	<span class="title">
@@ -100,7 +104,10 @@ $this->headTitle($title);
 					</tr>
 				</thead>
 				<tbody class="sortable">
-	    		<?php foreach ($this->paginator as $entity): $numleads = $entity->getCount(); $question = $entity->getAttributeName() == 'Question'; ?>
+	    		<?php foreach ($this->paginator as $entity): 
+	    			$numleads = $r->getLeadCount($entity->getId()); 
+	    			$question = $entity->getAttributeName() == 'Question'; 
+	    		?>
 	        		<tr class="attributeitem"
 						id="<?php echo $entity->getId(); ?>">
 						<?php if ($this->sortable): ?><td class="handle"></td><?php endif; ?>

@@ -152,6 +152,26 @@ DQL;
 			->createQuery($dql);
 		return $query->getSingleScalarResult();
 	}
+	
+	public function getLeadCount($id)
+	{
+		$dql = <<<DQL
+		SELECT
+			COUNT(v.id)
+		FROM
+			\Lead\Entity\LeadAttribute a
+		JOIN 
+			a.values v
+        WHERE
+			a.id = $id
+		AND
+            a.active = 1
+DQL;
+		
+		$query = $this->getEntityManager()
+		->createQuery($dql);
+		return $query->getSingleScalarResult();
+	}
 
 	public function getIDFromDesc($desc, $wildcard = false)
 	{
