@@ -154,7 +154,7 @@ try {
             <?php echo $this->content; ?>
             <hr>
 		<footer>
-			<p>&copy; <?php echo date('Y') ?> by Target Media Partners <?php echo $this->translate('All rights reserved.') ?></p>
+			<p>&copy; <?php echo date('Y') ?> by Target Media Partners <?php echo $this->translate('All rights reserved.') ?> <span class="pull-right"><?php echo round(memory_get_usage() / 1024000, 2); ?> mb</span></p>
 		</footer>
 	</div>
 	<!-- /container -->
