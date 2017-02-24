@@ -853,28 +853,28 @@ $(function() {
 	});
 
 	// LEADS NAME FILTER
-	if (typeof $.fn.typeahead == 'function') {
-		$('.description.typeahead').typeahead({
-			hint : true,
-			highlight : true,
-			minLength : 2,
-			limit : Infinity
-		}, {
-			source : function(query, sync, process) {
-				return $.getJSON('/lead/ajax/name', {
-					query : query
-				}, function(data) {
-					return process(data);
-				});
-			}
-		}).on('typeahead:change', function(e) {
-			$(this).trigger('change');
-		}).on('typeahead:asyncrequest', function(e) {
-			$(this).addClass('loading');
-		}).on('typeahead:asyncreceive typeahead:asynccancel', function(e) {
-			$(this).removeClass('loading');
-		});
-	}
+//	if (typeof $.fn.typeahead == 'function') {
+//		$('.description.typeahead').typeahead({
+//			hint : true,
+//			highlight : true,
+//			minLength : 2,
+//			limit : Infinity
+//		}, {
+//			source : function(query, sync, process) {
+//				return $.getJSON('/lead/ajax/name', {
+//					query : query
+//				}, function(data) {
+//					return process(data);
+//				});
+//			}
+//		}).on('typeahead:change', function(e) {
+//			$(this).trigger('change');
+//		}).on('typeahead:asyncrequest', function(e) {
+//			$(this).addClass('loading');
+//		}).on('typeahead:asyncreceive typeahead:asynccancel', function(e) {
+//			$(this).removeClass('loading');
+//		});
+//	}
 
 	// IMPORT LEADS HINTER
 	$('#leadimport .import-fields SELECT').on(
