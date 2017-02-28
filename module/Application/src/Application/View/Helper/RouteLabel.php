@@ -47,7 +47,7 @@ class RouteLabel extends AbstractHelper implements ServiceLocatorAwareInterface 
 						$page->params = [ 
 								'id' => $id 
 						];
-						if ($entity) {
+						if ($entity && method_exists($entity, 'getName')) {
 							$page->setLabel($entity->getName());
 						}
 						break;
