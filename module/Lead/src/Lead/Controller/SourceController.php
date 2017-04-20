@@ -44,7 +44,7 @@ class SourceController extends AbstractCrudController {
 	{
 		$pagerAction = $this->handlePager();
 		$limit = $this->getLimit($this->defaultPageSize);
-		$limit = 100;
+		// $limit = 100;
 		
 		$page = $this->getRequest()
 			->getQuery('page', 0);
