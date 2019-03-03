@@ -62,6 +62,7 @@ class AttributeController extends AbstractCrudController {
 
 	public function listAction()
 	{
+	
 		$pagerAction = $this->handlePager();
 		$limit = $this->getLimit($this->defaultPageSize);
 		
@@ -107,10 +108,11 @@ class AttributeController extends AbstractCrudController {
 		
 		$pager = $this->getPagerForm($limit);
 		
+		
+		
 		$q = $qb->getQuery();
 		
-		$q->setMaxResults($limit);
-		$q->setFirstResult($offset);
+		
 		
 		$paginator = new Paginator(new DoctrinePaginatorAdapter(new DoctrinePaginator($q, $fetchJoin = true)));
 		$paginator->setDefaultItemCountPerPage($limit);
