@@ -9,3 +9,5 @@ local.php
 /user.development.php
 /user.global.php
 /bjyprofiler.development.php
+/zenddevelopertools.local.config.php
+/redis.global.php
